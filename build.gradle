@@ -1,6 +1,10 @@
 apply plugin: 'java'
+apply plugin: 'antlr'
+apply plugin:'application'
 
 version = '0.1'
+
+mainClassName = 'Test'
 
 task wrapper(type: Wrapper) {
   gradleVersion = '2.3'
@@ -11,5 +15,18 @@ repositories {
 }
 
 dependencies {
+    antlr 'org.antlr:antlr4:4.5'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+generateGrammarSource {
+    outputDirectory = file("src/main/generated")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/generated'
+        }
+    }
 }

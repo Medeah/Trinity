@@ -1,5 +1,8 @@
 # Created by https://www.gitignore.io
 
+### Antlr ###
+src/main/generated
+
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 
@@ -128,4 +131,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-

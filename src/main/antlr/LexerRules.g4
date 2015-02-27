@@ -1,6 +1,17 @@
 lexer grammar LexerRules; // note "lexer grammar"
 
-ID  :   [a-zA-Z]+ ;
+BLOCKSTART: 'do' ;
+BLOCKEND: 'end' ;
+
 INT :   [0-9]+ ;
-NEWLINE:'\r'? '\n' ;
-WS  :   [ \t]+ -> skip ;
+BOOL:   'true'
+   |    'false' ;
+
+TYPE:   'Boolean'
+    |   'Scalar'
+    |   'Vector'
+    |   'Matrix' ;
+ID  :   [a-zA-Z][a-zA-Z0-9]* ;
+
+COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;
+WS : [ \t\n\r]+ -> channel(HIDDEN) ;

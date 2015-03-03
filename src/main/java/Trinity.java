@@ -15,9 +15,9 @@ public class Trinity {
         InputStream is = System.in;
         if (inputFile != null) is = new FileInputStream(inputFile);
         ANTLRInputStream input = new ANTLRInputStream(is);
-        LibExprLexer lexer = new LibExprLexer(input);
+        TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LibExprParser parser = new LibExprParser(tokens);
+        TrinityParser parser = new TrinityParser(tokens);
         ParseTree tree = parser.prog();
         System.out.println(tree.toStringTree(parser));
     }

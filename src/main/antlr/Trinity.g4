@@ -13,9 +13,8 @@ decl:   constDecl ';'
     |   funcDecl
     ;
 
-//TODO: implement more operators like exponential, transpose...
-//expr '^'<assoc=right> expr
-expr:   expr ('*'|'/') expr
+expr:   expr '^'<assoc=right> expr  // exponent
+    |   expr ('*'|'/') expr
     |   expr ('+'|'-') expr
     |   expr ('=='|'!=') expr
     |   expr ('and'|'or') expr
@@ -25,14 +24,19 @@ expr:   expr ('*'|'/') expr
     |   ID
     |   funcCall
     |   matrix
+    |   matrixAccess
+    |   matrixTranspose
     ;
 
 exprList: expr (',' expr)* ;
 typedIDList: TYPE ID (',' TYPE ID)* ;
 
-//TODO: vector is not used indepenently (maybe remove rule)
+// TODO: vector is not used indepenently (maybe remove rule)
 vector: '[' (exprList | RANGE) ']' ;
 matrix: vector+ ;
+// TODO: Subscript and transpose might need refactor
+matrixAccess: ID matrix ;
+matrixTranspose: ID '\'' ;
 
 funcCall: ID '(' exprList ')' ;
 

@@ -17,9 +17,9 @@ public class TrinityTest {
     public void testParser() throws Exception  {
         InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
         ANTLRInputStream input = new ANTLRInputStream(is);
-        LibExprLexer lexer = new LibExprLexer(input);
+        TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LibExprParser parser = new LibExprParser(tokens);
+        TrinityParser parser = new TrinityParser(tokens);
         //parser.removeErrorListeners();
         ParseTree tree = parser.prog();
         assertEquals(0, parser.getNumberOfSyntaxErrors());

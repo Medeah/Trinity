@@ -1,0 +1,54 @@
+# Parser tests
+
+# Types and declarations (and comments)
+Boolean t = true;
+Scalar s = 1;
+Vector v = [1,5,6];
+Matrix m = [1,2][4,5];
+
+# Expressions
+Scalar s = 1 + 2 * (3 + 4) / 1.5 - s;
+Scalar t = v[2];
+Scalar u = m[2,3];
+if lort do
+m^2;
+m';
+end
+
+# Loops and enumeration
+for Scalar s in [1..9] by 2 do
+    print(s);
+end
+
+for Scalar s in v do
+    print(s);
+end
+
+for Vector v in [1,2,3] do print(0); end
+
+# Conditionals
+if m == v * v do
+    Matrix x = [1][0];
+elseif 1 + 2 != 4 or 5 == 2 + 2 do
+    print(m);
+elseif true and false do
+    print(m);
+else do
+    Scalar leet = 1337;
+end
+
+if !something do
+
+else do
+
+end
+
+# Function declaration
+Matrix f(Scalar s1, Scalar s2) do
+    Matrix m = [s1][s2];
+    return m;
+end
+
+# Functions calls
+Matrix n = f(5,20 +3);
+fire(param, param, gideon, 2+2, xz/lol-(os),arnejohn);

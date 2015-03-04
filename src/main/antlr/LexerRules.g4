@@ -23,6 +23,7 @@ ID  :   [a-zA-Z][a-zA-Z0-9]* ;
 
 RANGE:   INT '..' INT ;
 
+// TODO: fix last-line comments.
 COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;
 

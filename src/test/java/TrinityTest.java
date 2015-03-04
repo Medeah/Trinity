@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Test;
 
@@ -9,20 +10,79 @@ import static org.junit.Assert.*;
 public class TrinityTest {
 
     @Test
-    public void testAdd() throws Exception {
-        assertEquals(5, Trinity.add(2,3));
+    public void correctSyntax_parseFile() throws Exception  {
+        InputStream is = this.getClass().getResourceAsStream("parsing-tests-new.tri");
+        TrinityParser parser = createParser(is);
+        ParseTree tree = parser.prog();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 
     @Test
-    public void testParser() throws Exception  {
-        InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
-        ANTLRInputStream input = new ANTLRInputStream(is);
+    public void correctSyntax_lastLineComment() throws Exception  {
+        assertTrue(canParse("#comment"));
+    }
+
+    @Test
+    public void badSyntax_noSemiColon() throws Exception  {
+        assertFalse(canParse("Scalar a = 1"));
+        assertFalse(canParse("func()"));
+        assertFalse(canParse("3 + 3"));
+    }
+
+    @Test
+    public void badSyntax_wrongType() throws Exception  {
+        assertFalse(canParse("Matrixx m = [1][1];"));
+        assertFalse(canParse("m = 1;"));
+        assertFalse(canParse("Scalar Scalar s = 1;"));
+        assertFalse(canParse("Bool m() do end"));
+        assertFalse(canParse("Boolean m(Scala r) do end"));
+    }
+
+    @Test
+    public void badSyntax_wrongVectorMatrix() throws Exception  {
+        assertFalse(canParse("[1,2,3;"));
+        assertFalse(canParse("1,3];"));
+        assertFalse(canParse("[1,2,];"));
+        assertFalse(canParse("[1]4];"));
+        assertFalse(canParse("[[1][4];"));
+    }
+
+    @Test
+    public void badSyntax_wrongFunctionCall() throws Exception  {
+        assertFalse(canParse("f(1,);"));
+        assertFalse(canParse("f(,2,3);"));
+    }
+
+    @Test
+    public void badSyntax_missingParamType() throws Exception  {
+        assertFalse(canParse("Matrix m(var) do end"));
+    }
+
+
+    // Utility functions
+    public Boolean canParse(String syntax) throws IOException {
+        TrinityParser parser = createParser(syntax);
+        parser.prog();
+        return 0 == parser.getNumberOfSyntaxErrors();
+    }
+
+    public TrinityParser createParser(ANTLRInputStream input) throws IOException {
         TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
-        //parser.removeErrorListeners();
-        ParseTree tree = parser.prog();
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        // do not output (most) errors
+        parser.removeErrorListeners();
+        return parser;
+    }
+
+    public TrinityParser createParser(String string) throws IOException {
+        ANTLRInputStream input = new ANTLRInputStream(string);
+        return createParser(input);
+    }
+
+    public TrinityParser createParser(InputStream is) throws IOException {
+        ANTLRInputStream input = new ANTLRInputStream(is);
+        return createParser(input);
     }
 
 }

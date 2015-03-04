@@ -1,62 +1,59 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog:   stmt+ ;
+prog: (functionDecl | constDecl | stmt)+ ;
 
-stmt:   decl
-    |   forStmt
-    |   ifStmt
-    |   expr ';'
+// Declarations
+
+constDecl: TYPE ID '=' expr ';';
+
+functionDecl: TYPE ID '(' formalParameters? ')' block; // "void f(int x) {...}" ;
+formalParameters: formalParameter (',' formalParameter)* ;
+formalParameter: TYPE ID;
+
+// Statements
+
+block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
+
+stmt: block             // mega nice block scope
+    | constDecl
+    | 'for' TYPE ID 'in' expr ('by' NUMBER)? block
+    //| 'if' expr block ('else' block)?
+    | 'if' expr ifblock
+    | 'return' expr? ';'
+    |  expr ';' // including function call
     ;
 
-decl:   constDecl ';'
-    |   funcDecl
-    ;
+// TODO: inconsistent grammar design
+ifblock: ifblockStart ('elseif' expr ifblockStart)* ('else' ifblockStart)? BLOCKEND;
+ifblockStart: 'do' stmt*;
 
-expr:   expr '^'<assoc=right> expr  // exponent
-    |   expr ('*'|'/') expr
-    |   expr ('+'|'-') expr
-    |   expr ('=='|'!=') expr
-    |   expr ('and'|'or') expr
-    |   '(' expr ')'
-    |   NUMBER
-    |   BOOL
-    |   ID
-    |   funcCall
-    |   matrix
-    |   matrixAccess
-    |   matrixTranspose
+// Expressions
+
+// TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
+expr: ID '(' exprList? ')'          # FunctionCall
+    | expr '[' expr ']'             # VectorIndexing
+    | expr '[' expr ',' expr ']'    # MatrixIndexing
+    | '-' expr                      # Negate
+    | '!' expr                      # Not
+    | expr '\''                     # Transpose
+    | <assoc=right> expr '^' expr   # Exponent
+    | expr ('*'|'/'|'%') expr       # MultDivMod
+    | expr ('+'|'-') expr           # AddSub
+    | expr ('<'|'>'|'<='|'>=')      # Relation
+    | expr ('=='|'!=') expr         # Equality
+    | expr 'and' expr               # And
+    | expr 'or' expr                # Or
+    | ID                            # Const
+    | NUMBER                        # Number
+    | BOOL                          # Boolean
+    | vector                        # VectorLit // TODO: naming
+    | matrix                        # MatrixLit
+    | '(' expr ')'                  # Parens
     ;
 
 exprList: expr (',' expr)* ;
-typedIDList: TYPE ID (',' TYPE ID)* ;
 
-// TODO: vector is not used indepenently (maybe remove rule)
 vector: '[' (exprList | RANGE) ']' ;
-matrix: vector+ ;
-// TODO: Subscript and transpose might need refactor
-matrixAccess: ID matrix ;
-matrixTranspose: ID '\'' ;
+matrix: vector vector+ ; // [][]...[]
 
-funcCall: ID '(' exprList ')' ;
-
-// Declarations
-constDecl: TYPE ID '=' expr ;
-
-// TODO: TYPE ID might need to be special for functions? (also in funcCall)
-funcDecl: TYPE ID '(' typedIDList? ')' funcDeclBlock ;
-
-// Statements
-// NOTE: remember the 'by' option should probably only work for integers
-forStmt: FOR TYPE ID 'in' expr ('by' NUMBER)? block ;
-
-ifStmt: IF expr ifBlock ;
-
-// Blocks
-// NOTE: only used by forStmt (forBlock?)
-block:   BLOCKSTART stmt+ BLOCKEND ;
-
-funcDeclBlock: BLOCKSTART (RETURN? stmt)+ BLOCKEND ;
-
-// TODO: 'then' is BLOCKSTART for if blocks?
-ifBlock: 'then' stmt+ (ELSEIF expr 'then' stmt+)* (ELSE stmt+)? BLOCKEND ;

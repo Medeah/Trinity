@@ -18,15 +18,17 @@ block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
 stmt: block             // mega nice block scope
     | constDecl
     | 'for' TYPE ID 'in' expr ('by' NUMBER)? block
-    //| 'if' expr block ('else' block)?
-    | 'if' expr ifblock
+    | ifSection
     | 'return' expr? ';'
     |  expr ';' // including function call
     ;
 
 // TODO: inconsistent grammar design
-ifblock: ifblockStart ('elseif' expr ifblockStart)* ('else' ifblockStart)? BLOCKEND;
-ifblockStart: 'do' stmt*;
+ifSection: ifStmt elseIfStmt* elseStmt? 'end' ;
+ifStmt: 'if' expr 'do' stmt* ;
+elseIfStmt: 'elseif' expr 'do' stmt* ;
+elseStmt: 'else' 'do' stmt*;
+
 
 // Expressions
 

@@ -1,7 +1,7 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog: (functionDecl | constDecl | stmt)+ ;
+prog: (functionDecl | constDecl | stmt)* ;
 
 // Declarations
 
@@ -18,13 +18,13 @@ block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
 stmt: block             // mega nice block scope
     | constDecl
     | 'for' TYPE ID 'in' expr ('by' NUMBER)? block
-    | ifSection
+    | ifBlock
     | 'return' expr? ';'
     |  expr ';' // including function call
     ;
 
 // TODO: inconsistent grammar design
-ifSection: ifStmt elseIfStmt* elseStmt? 'end' ;
+ifBlock: ifStmt elseIfStmt* elseStmt? 'end' ;
 ifStmt: 'if' expr 'do' stmt* ;
 elseIfStmt: 'elseif' expr 'do' stmt* ;
 elseStmt: 'else' 'do' stmt*;

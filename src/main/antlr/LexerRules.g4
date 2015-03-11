@@ -26,11 +26,7 @@ RANGE:   INT '..' INT ;
 COMMENT : '#' ~'\n'* -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;
 
-fragment FLOAT
-    :   '-'? INT '.' INT EXP?   // 1.35, 1.35E-9, 0.3, -4.5
-    |   '-'? INT EXP            // 1e10 -3e4
-    |   '-'? INT                // -3, 45
-    ;
 
+fragment FLOAT:  '-'? INT ('.' [0-9]+)? EXP? ; // 3, 1.35, 1.3e9, 1E10
 fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
 fragment EXP :   [Ee] [+\-]? INT ;

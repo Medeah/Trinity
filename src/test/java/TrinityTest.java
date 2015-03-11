@@ -18,6 +18,26 @@ public class TrinityTest {
     }
 
     @Test
+    public void correctSyntax_numbers() throws Exception  {
+        assertTrue(canParse("0;"));
+        assertTrue(canParse("1;"));
+        assertTrue(canParse("-12;"));
+        assertTrue(canParse("1.23;"));
+        assertTrue(canParse("1.002;"));
+        assertTrue(canParse("2.43E-9;"));
+        assertTrue(canParse("1.13e3;"));
+        assertTrue(canParse("-1e9;"));
+    }
+
+
+    @Test
+    public void wrongSyntax_numbers() throws Exception  {
+        assertFalse(canParse("00;"));
+        assertFalse(canParse("01;"));
+        assertFalse(canParse("01.2;"));
+    }
+
+    @Test
     public void correctSyntax_lastLineComment() throws Exception  {
         assertTrue(canParse("#comment"));
     }

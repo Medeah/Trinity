@@ -5,9 +5,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Trinity {
-    public static int add(int a, int b) {
-        return a + b;
-    }
 
     public static void main(String[] args) throws Exception {
         String inputFile = null;
@@ -21,4 +18,5 @@ public class Trinity {
         ParseTree tree = parser.prog();
         System.out.println(tree.toStringTree(parser));
     }
+
 }

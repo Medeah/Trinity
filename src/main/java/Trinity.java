@@ -16,7 +16,7 @@ public class Trinity {
 
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-            String is =  new String(encoded, Charset.defaultCharset());
+            String is = new String(encoded, Charset.defaultCharset());
             String out = compile(is);
             System.out.println(out);
         } catch (NoSuchFileException test) {

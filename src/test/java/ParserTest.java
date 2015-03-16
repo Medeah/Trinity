@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TrinityTest {
+public class ParserTest {
 
     @Test
     public void correctSyntax_parseFile() throws Exception  {

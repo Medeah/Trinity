@@ -1,7 +1,7 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog: (functionDecl | constDecl | stmt)* ;
+prog: (functionDecl /*| constDecl*/ | stmt)* ;
 
 // Declarations
 
@@ -49,8 +49,8 @@ expr: ID '(' exprList? ')'          # FunctionCall
     | ID                            # Const
     | NUMBER                        # Number
     | BOOL                          # Boolean
-    | vector                        # VectorLit // TODO: naming
     | matrix                        # MatrixLit
+    | vector                        # VectorLit // TODO: naming
     | '(' expr ')'                  # Parens
     ;
 

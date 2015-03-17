@@ -17,7 +17,7 @@ public class Type {
         this.type = type;
     }
 
-    public enum TrinityType {Boolean, Scalar, Vector, Matrix}
+    public enum TrinityType {BOOLEAN, SCALAR, VECTOR, MATRIX}
 
     private TrinityType type;
 }

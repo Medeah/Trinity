@@ -89,7 +89,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitMatrixLit(TrinityParser.MatrixLitContext ctx) {
-        return new Type(Type.TrinityType.Matrix);
+        return new Type(Type.TrinityType.MATRIX);
     }
 
     @Override
@@ -99,12 +99,12 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
-        return new Type(Type.TrinityType.Vector);
+        return new Type(Type.TrinityType.VECTOR);
     }
 
     @Override
     public Type visitNumber(TrinityParser.NumberContext ctx) {
-        return new Type(Type.TrinityType.Scalar);
+        return new Type(Type.TrinityType.SCALAR);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitBoolean(TrinityParser.BooleanContext ctx) {
-        return new Type(Type.TrinityType.Boolean);
+        return new Type(Type.TrinityType.BOOLEAN);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
-        return new Type(Type.TrinityType.Matrix);
+        return new Type(Type.TrinityType.MATRIX);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
-        return new Type(Type.TrinityType.Vector);
+        return new Type(Type.TrinityType.VECTOR);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVector(TrinityParser.VectorContext ctx) {
-        return new Type(Type.TrinityType.Vector);
+        return new Type(Type.TrinityType.VECTOR);
     }
 
     @Override
@@ -206,13 +206,13 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     public Type visitTerminal(TerminalNode node) {
         // Check and return type of node
         if (node.getSymbol().getText().contentEquals("Boolean"))
-            return new Type(Type.TrinityType.Boolean);
+            return new Type(Type.TrinityType.BOOLEAN);
         else if (node.getSymbol().getText().contentEquals("Scalar"))
-            return new Type(Type.TrinityType.Scalar);
+            return new Type(Type.TrinityType.SCALAR);
         else if (node.getSymbol().getText().contentEquals("Vector"))
-            return new Type(Type.TrinityType.Vector);
+            return new Type(Type.TrinityType.VECTOR);
         else if (node.getSymbol().getText().contentEquals("Matrix"))
-            return new Type(Type.TrinityType.Matrix);
+            return new Type(Type.TrinityType.MATRIX);
         else
             return new Type();
     }

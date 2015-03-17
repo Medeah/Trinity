@@ -30,13 +30,13 @@ public class TypeVisitorTest {
     public void testConstDecl() throws Exception {
         // Check if the given ConstDecl have same types on LHS and RHS...
         parseTree = createParseTree("Boolean b = true;");
-        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.Boolean);
+        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.BOOLEAN);
         parseTree = createParseTree("Scalar s = 1;");
-        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.Scalar);
+        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.SCALAR);
         parseTree = createParseTree("Vector v = [1,2];");
-        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.Vector);
+        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.VECTOR);
         parseTree = createParseTree("Matrix m = [1,2][3,4];");
-        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.Matrix);
+        assertEquals(parseTree.getChild(0).getChild(0).accept(typeVisitor).getType(), Type.TrinityType.MATRIX);
 
         // Check if the given ConstDecl have same types on LHS and RHS...
         parseTree = createParseTree("Boolean b = 1;");

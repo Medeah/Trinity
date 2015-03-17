@@ -32,9 +32,9 @@ public class TypeVisitor implements TrinityVisitor<Type> {
         if (LHS.getType() == RHS.getType())
             return LHS;
         else
-            errorReporter.reportError("Idiot! You made a type error!");
+            errorReporter.reportError("Type error!");
 
-        return new Type();
+        return null;
     }
 
     @Override

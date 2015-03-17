@@ -1,6 +1,6 @@
 public interface GenericErrorReporter {
 
-    public int getErrors();
+    public int getErrorAmount();
 
     public void reportError(String message);
 }

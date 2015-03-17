@@ -1,5 +1,5 @@
 public class ErrorReporter implements GenericErrorReporter {
-    private int errors = 0;
+    private int errorAmount = 0;
     private boolean failOnError;
 
     public ErrorReporter(boolean fail) {
@@ -11,14 +11,14 @@ public class ErrorReporter implements GenericErrorReporter {
     }
 
     @Override
-    public int getErrors() {
-        return errors;
+    public int getErrorAmount() {
+        return errorAmount;
     }
 
     @Override
     public void reportError(String message) {
         System.out.println("ERROR: " + message);
-        errors++;
+        errorAmount++;
         if (failOnError) {
             System.exit(1);
         }

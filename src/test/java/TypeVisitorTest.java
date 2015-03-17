@@ -156,7 +156,7 @@ public class TypeVisitorTest {
     @Test
     public void testComplexConstDecl() throws Exception {
         // Check if the given ConstDecl have same types on LHS and RHS...
-        tree = createParseTree("Boolean b = 2 <= 3 and (4 == 4) or 3 != 2;");
+        tree = createParseTree("Boolean b = [5,4][1,5] <= [3,7][8,8] and ([4] == [7]) or 3 != 2;");
         assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.BOOLEAN);
 
         // Check if the given ConstDecl have same types on LHS and RHS...
@@ -170,6 +170,19 @@ public class TypeVisitorTest {
         // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Matrix m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);");
         assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.MATRIX);
+    }
+
+    @Test
+    public void testWeirdConstDecl() throws Exception {
+        // Check if the correct ErrorReport is thrown...
+        tree = createParseTree("Boolean b = 4 <= (8 and 4) == 7 or 3 != 2;");
+        tree.getChild(0).getChild(0).accept(vis);
+        System.out.println(er.getError(er.getErrorAmount() - 1));
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.BOOLEAN
+                        + " but got "
+                        + Type.TrinityType.SCALAR));
     }
 
 }

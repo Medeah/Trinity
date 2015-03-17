@@ -243,6 +243,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitEquality(TrinityParser.EqualityContext ctx) {
+        System.out.println(ctx.expr().get(0).getText());
 
         // Type found in LHS expr
         Type LHS = new Type(ctx.expr().get(0).accept(this).getType());

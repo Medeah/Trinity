@@ -19,8 +19,8 @@ public class Trinity {
             String is = new String(encoded, Charset.defaultCharset());
             String out = compile(is);
             System.out.println(out);
-        } catch (NoSuchFileException test) {
-            System.out.println("file not found: " + test.getMessage());
+        } catch (NoSuchFileException ex) {
+            System.out.println("File not found: " + ex.getMessage());
             showUsage();
         }
     }

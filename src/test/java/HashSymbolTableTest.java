@@ -80,5 +80,6 @@ public class HashSymbolTableTest {
         tab.closeScope();
         tab.openScope();
         assertFalse(tab.declaredLocally("x"));
+        assertFalse(tab.declaredLocally("z"));
     }
 }

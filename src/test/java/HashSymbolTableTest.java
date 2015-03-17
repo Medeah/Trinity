@@ -14,8 +14,8 @@ public class HashSymbolTableTest {
     @Before
     public void initialize() {
         tab = new HashSymbolTable();
-        scalar = new Type("Scalar");
-        vector = new Type("Vector");
+        scalar = new Type(Type.TrinityType.Scalar);
+        vector = new Type(Type.TrinityType.Vector);
     }
 
     @Test

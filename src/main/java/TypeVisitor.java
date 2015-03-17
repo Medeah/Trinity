@@ -3,189 +3,189 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class TypeVisitor implements TrinityVisitor<String> {
+public class TypeVisitor implements TrinityVisitor<Type> {
     @Override
-    public String visitProg(TrinityParser.ProgContext ctx) {
+    public Type visitProg(TrinityParser.ProgContext ctx) {
         return null;
     }
 
     @Override
-    public String visitConstDecl(TrinityParser.ConstDeclContext ctx) {
+    public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         return null;
     }
 
     @Override
-    public String visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
+    public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
         return null;
     }
 
     @Override
-    public String visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
+    public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
         return null;
     }
 
     @Override
-    public String visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
+    public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         return null;
     }
 
     @Override
-    public String visitBlock(TrinityParser.BlockContext ctx) {
+    public Type visitBlock(TrinityParser.BlockContext ctx) {
         return null;
     }
 
     @Override
-    public String visitStmt(TrinityParser.StmtContext ctx) {
+    public Type visitStmt(TrinityParser.StmtContext ctx) {
         return null;
     }
 
     @Override
-    public String visitIfBlock(TrinityParser.IfBlockContext ctx) {
+    public Type visitIfBlock(TrinityParser.IfBlockContext ctx) {
         return null;
     }
 
     @Override
-    public String visitIfStmt(TrinityParser.IfStmtContext ctx) {
+    public Type visitIfStmt(TrinityParser.IfStmtContext ctx) {
         return null;
     }
 
     @Override
-    public String visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
+    public Type visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
         return null;
     }
 
     @Override
-    public String visitElseStmt(TrinityParser.ElseStmtContext ctx) {
+    public Type visitElseStmt(TrinityParser.ElseStmtContext ctx) {
         return null;
     }
 
     @Override
-    public String visitRelation(TrinityParser.RelationContext ctx) {
+    public Type visitRelation(TrinityParser.RelationContext ctx) {
         return null;
     }
 
     @Override
-    public String visitMatrixLit(TrinityParser.MatrixLitContext ctx) {
+    public Type visitMatrixLit(TrinityParser.MatrixLitContext ctx) {
         return null;
     }
 
     @Override
-    public String visitParens(TrinityParser.ParensContext ctx) {
+    public Type visitParens(TrinityParser.ParensContext ctx) {
         return null;
     }
 
     @Override
-    public String visitVectorLit(TrinityParser.VectorLitContext ctx) {
+    public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
         return null;
     }
 
     @Override
-    public String visitNumber(TrinityParser.NumberContext ctx) {
+    public Type visitNumber(TrinityParser.NumberContext ctx) {
         return null;
     }
 
     @Override
-    public String visitTranspose(TrinityParser.TransposeContext ctx) {
+    public Type visitTranspose(TrinityParser.TransposeContext ctx) {
         return null;
     }
 
     @Override
-    public String visitAddSub(TrinityParser.AddSubContext ctx) {
+    public Type visitAddSub(TrinityParser.AddSubContext ctx) {
         return null;
     }
 
     @Override
-    public String visitBoolean(TrinityParser.BooleanContext ctx) {
+    public Type visitBoolean(TrinityParser.BooleanContext ctx) {
         return null;
     }
 
     @Override
-    public String visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
+    public Type visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
         return null;
     }
 
     @Override
-    public String visitNot(TrinityParser.NotContext ctx) {
+    public Type visitNot(TrinityParser.NotContext ctx) {
         return null;
     }
 
     @Override
-    public String visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
+    public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
         return null;
     }
 
     @Override
-    public String visitExponent(TrinityParser.ExponentContext ctx) {
+    public Type visitExponent(TrinityParser.ExponentContext ctx) {
         return null;
     }
 
     @Override
-    public String visitOr(TrinityParser.OrContext ctx) {
+    public Type visitOr(TrinityParser.OrContext ctx) {
         return null;
     }
 
     @Override
-    public String visitMultDivMod(TrinityParser.MultDivModContext ctx) {
+    public Type visitMultDivMod(TrinityParser.MultDivModContext ctx) {
         return null;
     }
 
     @Override
-    public String visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
+    public Type visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
         return null;
     }
 
     @Override
-    public String visitConst(TrinityParser.ConstContext ctx) {
+    public Type visitConst(TrinityParser.ConstContext ctx) {
         return null;
     }
 
     @Override
-    public String visitNegate(TrinityParser.NegateContext ctx) {
+    public Type visitNegate(TrinityParser.NegateContext ctx) {
         return null;
     }
 
     @Override
-    public String visitAnd(TrinityParser.AndContext ctx) {
+    public Type visitAnd(TrinityParser.AndContext ctx) {
         return null;
     }
 
     @Override
-    public String visitEquality(TrinityParser.EqualityContext ctx) {
+    public Type visitEquality(TrinityParser.EqualityContext ctx) {
         return null;
     }
 
     @Override
-    public String visitExprList(TrinityParser.ExprListContext ctx) {
+    public Type visitExprList(TrinityParser.ExprListContext ctx) {
         return null;
     }
 
     @Override
-    public String visitVector(TrinityParser.VectorContext ctx) {
+    public Type visitVector(TrinityParser.VectorContext ctx) {
         return null;
     }
 
     @Override
-    public String visitMatrix(TrinityParser.MatrixContext ctx) {
+    public Type visitMatrix(TrinityParser.MatrixContext ctx) {
         return null;
     }
 
     @Override
-    public String visit(ParseTree tree) {
+    public Type visit(ParseTree tree) {
         return null;
     }
 
     @Override
-    public String visitChildren(RuleNode node) {
+    public Type visitChildren(RuleNode node) {
         return null;
     }
 
     @Override
-    public String visitTerminal(TerminalNode node) {
+    public Type visitTerminal(TerminalNode node) {
         return null;
     }
 
     @Override
-    public String visitErrorNode(ErrorNode node) {
+    public Type visitErrorNode(ErrorNode node) {
         return null;
     }
 }

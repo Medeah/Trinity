@@ -52,6 +52,7 @@ public class ParserTest {
     @Test
     public void badSyntax_wrongType() throws Exception  {
         assertFalse(canParse("Matrixx m = [1][1];"));
+        assertFalse(canParse("YOLOSWAG m = [1][1];"));
         assertFalse(canParse("m = 1;"));
         assertFalse(canParse("Scalar Scalar s = 1;"));
         assertFalse(canParse("Bool m() do end"));

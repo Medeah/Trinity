@@ -10,12 +10,16 @@ public class HashSymbolTableTest {
     SymbolTable tab;
     Type scalar;
     Type vector;
+    Type matrix;
+    Type bool;
 
     @Before
     public void initialize() {
         tab = new HashSymbolTable();
-        scalar = new Type(Type.TrinityType.Scalar);
-        vector = new Type(Type.TrinityType.Vector);
+        scalar = new Type(Type.TrinityType.SCALAR);
+        vector = new Type(Type.TrinityType.VECTOR);
+        matrix = new Type(Type.TrinityType.MATRIX);
+        bool = new Type(Type.TrinityType.BOOLEAN);
     }
 
     @Test

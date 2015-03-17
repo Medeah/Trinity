@@ -32,7 +32,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
         if (LHS.getType() == RHS.getType())
             return LHS;
         else
-            errorReporter.reportError("Type error!");
+            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
 
         return null;
     }

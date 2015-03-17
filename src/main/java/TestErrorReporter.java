@@ -1,12 +1,11 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class TestErrorReporter implements GenericErrorReporter {
-    private int errors;
+    private int errorAmount;
     private ArrayList<String> errorList;
 
     public TestErrorReporter() {
-        errors = 0;
+        errorAmount = 0;
         errorList = new ArrayList<>();
     }
 
@@ -16,13 +15,21 @@ public class TestErrorReporter implements GenericErrorReporter {
 
     @Override
     public int getErrorAmount() {
-        return errors;
+        return errorAmount;
+    }
+
+    private void errorHandling(String message) {
+        errorList.add(message);
+        errorAmount++;
     }
 
     @Override
     public void reportError(String message) {
+        errorHandling("ERROR: " + message);
+    }
 
-        errorList.add(message);
-        errors++;
+    @Override
+    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType) {
+        errorHandling("TYPE ERROR: " + "Expected type " + expectedType + " but got " + receivedType);
     }
 }

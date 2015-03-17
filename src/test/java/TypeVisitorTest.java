@@ -42,26 +42,114 @@ public class TypeVisitorTest {
     }
 
     @Test
-    public void testSimpleConstDeclErrorReporting() throws Exception {
+    public void testSimpleBooleanConstDeclErrorReporting() throws Exception {
         // Check if the correct ErrorReport is thrown...
-        tree = createParseTree("Boolean b = 1;");                               // Create invalid ConstDecl
-        tree.getChild(0).getChild(0).accept(vis);                               // Type-check ConstDecl
-        assertTrue(er.getError(er.getErrorAmount() - 1).equals("Type error!"));   // Expected error report
+        tree = createParseTree("Boolean b = 1;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.BOOLEAN
+                        + " but got "
+                        + Type.TrinityType.SCALAR));
 
-        tree = createParseTree("Scalar s = false;");                            // Create invalid ConstDecl
-        tree.getChild(0).getChild(0).accept(vis);                               // Type-check ConstDecl
-        assertTrue(er.getError(er.getErrorAmount() - 1).equals("Type error!"));   // Expected error report
+        tree = createParseTree("Boolean b = [1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.BOOLEAN
+                        + " but got "
+                        + Type.TrinityType.VECTOR));
 
-        tree = createParseTree("Vector v = [1][2];");                           // Create invalid ConstDecl
-        tree.getChild(0).getChild(0).accept(vis);                               // Type-check ConstDecl
-        assertTrue(er.getError(er.getErrorAmount() - 1).equals("Type error!"));   // Expected error report
-
-        tree = createParseTree("Matrix v = 1;");                                // Create invalid ConstDecl
-        tree.getChild(0).getChild(0).accept(vis);                               // Type-check ConstDecl
-        assertTrue(er.getError(er.getErrorAmount() - 1).equals("Type error!"));   // Expected error report
-
-        // There should be 4 reported errors...
-        assertTrue(er.getErrorAmount() == 4);
+        tree = createParseTree("Boolean b = [1][1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.BOOLEAN
+                        + " but got "
+                        + Type.TrinityType.MATRIX));
     }
 
+    @Test
+    public void testSimpleScalarConstDeclErrorReporting() throws Exception {
+        // Check if the correct ErrorReport is thrown...
+        tree = createParseTree("Scalar s = false;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.SCALAR
+                        + " but got "
+                        + Type.TrinityType.BOOLEAN));
+
+        tree = createParseTree("Scalar s = [1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.SCALAR
+                        + " but got "
+                        + Type.TrinityType.VECTOR));
+
+        tree = createParseTree("Scalar s = [1][1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.SCALAR
+                        + " but got "
+                        + Type.TrinityType.MATRIX));
+    }
+
+    @Test
+    public void testSimpleVectorConstDeclErrorReporting() throws Exception {
+        // Check if the correct ErrorReport is thrown...
+        tree = createParseTree("Vector v = false;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.VECTOR
+                        + " but got "
+                        + Type.TrinityType.BOOLEAN));
+
+        tree = createParseTree("Vector v = 1;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.VECTOR
+                        + " but got "
+                        + Type.TrinityType.SCALAR));
+
+        tree = createParseTree("Vector v = [1][1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.VECTOR
+                        + " but got "
+                        + Type.TrinityType.MATRIX));
+    }
+
+    @Test
+    public void testSimpleMatrixConstDeclErrorReporting() throws Exception {
+        // Check if the correct ErrorReport is thrown...
+        tree = createParseTree("Matrix m = false;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.MATRIX
+                        + " but got "
+                        + Type.TrinityType.BOOLEAN));
+
+        tree = createParseTree("Matrix m = 1;");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.MATRIX
+                        + " but got "
+                        + Type.TrinityType.SCALAR));
+
+        tree = createParseTree("Matrix m = [1];");
+        tree.getChild(0).getChild(0).accept(vis);
+        assertTrue(er.getError(er.getErrorAmount() - 1)
+                .equals("TYPE ERROR: Expected type "
+                        + Type.TrinityType.MATRIX
+                        + " but got "
+                        + Type.TrinityType.VECTOR));
+    }
 }

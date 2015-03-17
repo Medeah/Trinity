@@ -10,17 +10,27 @@ public class ErrorReporter implements GenericErrorReporter {
         failOnError = true;
     }
 
+
     @Override
     public int getErrorAmount() {
         return errorAmount;
     }
 
-    @Override
-    public void reportError(String message) {
-        System.out.println("ERROR: " + message);
+    private void errorHandling(String message) {
+        System.out.println(message);
         errorAmount++;
         if (failOnError) {
             System.exit(1);
         }
+    }
+
+    @Override
+    public void reportError(String message) {
+        errorHandling("ERROR: " + message);
+    }
+
+    @Override
+    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType) {
+        errorHandling("TYPE ERROR: " + "Expected type " + expectedType + " but got " + receivedType);
     }
 }

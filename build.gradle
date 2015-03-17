@@ -21,6 +21,7 @@ dependencies {
 
 generateGrammarSource {
     outputDirectory = file("src/main/generated")
+    arguments = ["-visitor"]
 }
 
 sourceSets {

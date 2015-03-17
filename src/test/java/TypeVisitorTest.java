@@ -156,6 +156,10 @@ public class TypeVisitorTest {
     @Test
     public void testComplexConstDecl() throws Exception {
         // Check if the given ConstDecl have same types on LHS and RHS...
+        tree = createParseTree("Boolean b = 2 <= 3 and (4 == 4) or 3 != 2;");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.BOOLEAN);
+
+        // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Scalar s = 1 + 2 * (5 + 2) / 4;");
         assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.SCALAR);
 

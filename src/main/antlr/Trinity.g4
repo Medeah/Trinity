@@ -42,7 +42,7 @@ expr: ID '(' exprList? ')'          # FunctionCall
     | <assoc=right> expr '^' expr   # Exponent
     | expr ('*'|'/'|'%') expr       # MultDivMod
     | expr ('+'|'-') expr           # AddSub
-    | expr ('<'|'>'|'<='|'>=')      # Relation
+    | expr ('<'|'>'|'<='|'>=') expr # Relation
     | expr ('=='|'!=') expr         # Equality
     | expr 'and' expr               # And
     | expr 'or' expr                # Or

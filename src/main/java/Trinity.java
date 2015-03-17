@@ -20,7 +20,7 @@ public class Trinity {
             String out = compile(is);
             System.out.println(out);
         } catch (NoSuchFileException ex) {
-            System.out.println("File not found: " + ex.getMessage());
+            System.out.println("File Not Found: " + ex.getMessage());
             showUsage();
         }
     }

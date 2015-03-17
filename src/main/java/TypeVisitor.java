@@ -4,6 +4,16 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class TypeVisitor implements TrinityVisitor<Type> {
+    TypeVisitor(GenericErrorReporter genericErrorReporter) {
+        errorReporter = genericErrorReporter;
+    }
+
+    TypeVisitor() {
+        errorReporter = new ErrorReporter(true);
+    }
+
+    private GenericErrorReporter errorReporter;
+
     @Override
     public Type visitProg(TrinityParser.ProgContext ctx) {
         return null;
@@ -11,7 +21,20 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
-        return null;
+
+        // Declared (expected) type:
+        Type LHS = new Type(ctx.getChild(0).accept(this).getType());
+
+        // Type found in expr (RHS of declaration)
+        Type RHS = new Type(ctx.expr().accept(this).getType());
+
+        // Check if the two achieved types matches each other and react accordingly:
+        if (LHS.getType() == RHS.getType())
+            return LHS;
+        else
+            errorReporter.reportError("Idiot! You made a type error!");
+
+        return new Type();
     }
 
     @Override
@@ -66,7 +89,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitMatrixLit(TrinityParser.MatrixLitContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Matrix);
     }
 
     @Override
@@ -76,12 +99,12 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Vector);
     }
 
     @Override
     public Type visitNumber(TrinityParser.NumberContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Scalar);
     }
 
     @Override
@@ -96,7 +119,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitBoolean(TrinityParser.BooleanContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Boolean);
     }
 
     @Override
@@ -111,7 +134,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Matrix);
     }
 
     @Override
@@ -131,7 +154,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Vector);
     }
 
     @Override
@@ -161,7 +184,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitVector(TrinityParser.VectorContext ctx) {
-        return null;
+        return new Type(Type.TrinityType.Vector);
     }
 
     @Override
@@ -181,7 +204,17 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitTerminal(TerminalNode node) {
-        return null;
+        // Check and return type of node
+        if (node.getSymbol().getText().contentEquals("Boolean"))
+            return new Type(Type.TrinityType.Boolean);
+        else if (node.getSymbol().getText().contentEquals("Scalar"))
+            return new Type(Type.TrinityType.Scalar);
+        else if (node.getSymbol().getText().contentEquals("Vector"))
+            return new Type(Type.TrinityType.Vector);
+        else if (node.getSymbol().getText().contentEquals("Matrix"))
+            return new Type(Type.TrinityType.Matrix);
+        else
+            return new Type();
     }
 
     @Override

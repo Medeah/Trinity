@@ -6,7 +6,7 @@ public class Type {
     }
 
     public Type() {
-        setType(TrinityType.Null);
+        setType(null);
     }
 
     public TrinityType getType() {
@@ -17,9 +17,7 @@ public class Type {
         this.type = type;
     }
 
-    public enum TrinityType {Null, Boolean, Scalar, Vector, Matrix}
-
-    ;
+    public enum TrinityType {Boolean, Scalar, Vector, Matrix}
 
     private TrinityType type;
 }

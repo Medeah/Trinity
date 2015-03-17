@@ -1,4 +1,4 @@
-public class ErrorReporter {
+public class ErrorReporter implements GenericErrorReporter {
     private int errors = 0;
     private boolean failOnError;
 
@@ -6,10 +6,16 @@ public class ErrorReporter {
         failOnError = fail;
     }
 
+    public ErrorReporter() {
+        failOnError = true;
+    }
+
+    @Override
     public int getErrors() {
         return errors;
     }
 
+    @Override
     public void reportError(String message) {
         System.out.println("ERROR: " + message);
         errors++;

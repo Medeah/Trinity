@@ -152,4 +152,20 @@ public class TypeVisitorTest {
                         + " but got "
                         + Type.TrinityType.VECTOR));
     }
+
+    @Test
+    public void testComplexConstDecl() throws Exception {
+        // Check if the given ConstDecl have same types on LHS and RHS...
+        tree = createParseTree("Scalar s = 1 + 2 * (5 + 2) / 4;");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.SCALAR);
+
+        // Check if the given ConstDecl have same types on LHS and RHS...
+        tree = createParseTree("Vector v = [1,2] + [2,3] * ([5,4] + [2,1]);");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.VECTOR);
+
+        // Check if the given ConstDecl have same types on LHS and RHS...
+        tree = createParseTree("Matrix m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.MATRIX);
+    }
+
 }

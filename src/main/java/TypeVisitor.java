@@ -94,7 +94,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitParens(TrinityParser.ParensContext ctx) {
-        return null;
+        return new Type(ctx.expr().accept(this).getType());
     }
 
     @Override
@@ -114,6 +114,20 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitAddSub(TrinityParser.AddSubContext ctx) {
+
+        // Type found in LHS expr
+        Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+
+        // Type found in RHS expr
+        Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
+
+
+        // Check if the two achieved types matches each other and react accordingly:
+        if (LHS.getType() == RHS.getType())
+            return LHS;
+        else
+            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+
         return null;
     }
 
@@ -149,6 +163,19 @@ public class TypeVisitor implements TrinityVisitor<Type> {
 
     @Override
     public Type visitMultDivMod(TrinityParser.MultDivModContext ctx) {
+
+        // Type found in LHS expr
+        Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+
+        // Type found in RHS expr
+        Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
+
+        // Check if the two achieved types matches each other and react accordingly:
+        if (LHS.getType() == RHS.getType())
+            return LHS;
+        else
+            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+
         return null;
     }
 

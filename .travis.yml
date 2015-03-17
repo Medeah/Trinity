@@ -1,1 +1,4 @@
 language: java
+notifications:
+  email:
+    - sw410f15@cs.aau.dk

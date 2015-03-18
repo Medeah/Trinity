@@ -173,18 +173,18 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     @Override
     public Type visitOr(TrinityParser.OrContext ctx) {
 
-        // Type found in LHS expr
+        // Type found in LHS expr must be boolean
         Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
 
-        // Type found in RHS expr
+        // Type found in RHS expr must be boolean
         Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
 
-        // Check if the two achieved types matches each other and return a boolean:
+        // Check if the two achieved types are boolean
         // If not boolean, then an error must be shown to the user
-        if (LHS.getType() == RHS.getType())
+        if (LHS.getType().equals(Type.TrinityType.BOOLEAN) && RHS.getType().equals(Type.TrinityType.BOOLEAN))
             return new Type(Type.TrinityType.BOOLEAN);
         else
-            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+            errorReporter.reportError("Type error at OR.");
 
         return null;
     }
@@ -225,25 +225,30 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     @Override
     public Type visitAnd(TrinityParser.AndContext ctx) {
 
-        // Type found in LHS expr
+
+        //System.out.println(ctx.expr().get(0).accept(this).getType());
+        //System.out.println(ctx.expr().get(1).accept(this).getType());
+
+        // Type found in LHS expr must be boolean
         Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+        //System.out.println(LHS.getType().equals(Type.TrinityType.BOOLEAN));
 
-        // Type found in RHS expr
+        // Type found in RHS expr must be boolean
         Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
+        //System.out.println(RHS.getType().equals(Type.TrinityType.BOOLEAN));
 
-        // Check if the two achieved types matches each other and return a boolean:
+        // Check if the two achieved types are boolean
         // If not boolean, then an error must be shown to the user
-        if (LHS.getType() == RHS.getType())
+        if (LHS.getType().equals(Type.TrinityType.BOOLEAN) && RHS.getType().equals(Type.TrinityType.BOOLEAN))
             return new Type(Type.TrinityType.BOOLEAN);
         else
-            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+            errorReporter.reportError("Type error at AND.");
 
-        return null;
+        return null;    // THIS MUST NOT RETURN NULL. TODO: FIND A WAY OUT! ABORT DURING TEST
     }
 
     @Override
     public Type visitEquality(TrinityParser.EqualityContext ctx) {
-        System.out.println(ctx.expr().get(0).getText());
 
         // Type found in LHS expr
         Type LHS = new Type(ctx.expr().get(0).accept(this).getType());

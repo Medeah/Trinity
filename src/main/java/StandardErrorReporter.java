@@ -1,17 +1,15 @@
-import java.util.ArrayList;
+public class StandardErrorReporter implements ErrorReporter {
+    private int errorAmount = 0;
+    private boolean failOnError;
 
-public class TestErrorReporter implements ErrorReporter {
-    private int errorAmount;
-    private ArrayList<String> errorList;
-
-    public TestErrorReporter() {
-        errorAmount = 0;
-        errorList = new ArrayList<>();
+    public StandardErrorReporter(boolean fail) {
+        failOnError = fail;
     }
 
-    public String getError(int i) {
-        return errorList.get(i);
+    public StandardErrorReporter() {
+        failOnError = true;
     }
+
 
     @Override
     public int getErrorAmount() {
@@ -19,8 +17,11 @@ public class TestErrorReporter implements ErrorReporter {
     }
 
     private void errorHandling(String message) {
-        errorList.add(message);
+        System.out.println(message);
         errorAmount++;
+        if (failOnError) {
+            System.exit(1);
+        }
     }
 
     @Override

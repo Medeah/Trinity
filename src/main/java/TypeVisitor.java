@@ -4,15 +4,15 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class TypeVisitor implements TrinityVisitor<Type> {
-    TypeVisitor(GenericErrorReporter genericErrorReporter) {
-        errorReporter = genericErrorReporter;
+    TypeVisitor(ErrorReporter errorReporter) {
+        this.errorReporter = errorReporter;
     }
 
     TypeVisitor() {
-        errorReporter = new ErrorReporter(true);
+        errorReporter = new StandardErrorReporter(true);
     }
 
-    private GenericErrorReporter errorReporter;
+    private ErrorReporter errorReporter;
 
     @Override
     public Type visitProg(TrinityParser.ProgContext ctx) {
@@ -97,8 +97,9 @@ public class TypeVisitor implements TrinityVisitor<Type> {
             return new Type(Type.TrinityType.BOOLEAN);
         else
             errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+        System.out.println("TEST");
 
-        return null;
+        return new Type(Type.TrinityType.BOOLEAN);
     }
 
     @Override
@@ -225,17 +226,11 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     @Override
     public Type visitAnd(TrinityParser.AndContext ctx) {
 
-
-        //System.out.println(ctx.expr().get(0).accept(this).getType());
-        //System.out.println(ctx.expr().get(1).accept(this).getType());
-
         // Type found in LHS expr must be boolean
         Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
-        //System.out.println(LHS.getType().equals(Type.TrinityType.BOOLEAN));
 
         // Type found in RHS expr must be boolean
         Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
-        //System.out.println(RHS.getType().equals(Type.TrinityType.BOOLEAN));
 
         // Check if the two achieved types are boolean
         // If not boolean, then an error must be shown to the user
@@ -244,7 +239,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
         else
             errorReporter.reportError("Type error at AND.");
 
-        return null;    // THIS MUST NOT RETURN NULL. TODO: FIND A WAY OUT! ABORT DURING TEST
+        return new Type(Type.TrinityType.BOOLEAN);
     }
 
     @Override
@@ -263,7 +258,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
         else
             errorReporter.reportTypeError(LHS.getType(), RHS.getType());
 
-        return null;
+        return new Type(Type.TrinityType.BOOLEAN);
     }
 
     @Override

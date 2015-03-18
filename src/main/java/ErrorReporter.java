@@ -1,36 +1,10 @@
-public class ErrorReporter implements GenericErrorReporter {
-    private int errorAmount = 0;
-    private boolean failOnError;
+public interface ErrorReporter {
 
-    public ErrorReporter(boolean fail) {
-        failOnError = fail;
-    }
+    public int getErrorAmount();
 
-    public ErrorReporter() {
-        failOnError = true;
-    }
+    // Default errors:
+    public void reportError(String message);
 
-
-    @Override
-    public int getErrorAmount() {
-        return errorAmount;
-    }
-
-    private void errorHandling(String message) {
-        System.out.println(message);
-        errorAmount++;
-        if (failOnError) {
-            System.exit(1);
-        }
-    }
-
-    @Override
-    public void reportError(String message) {
-        errorHandling("ERROR: " + message);
-    }
-
-    @Override
-    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType) {
-        errorHandling("TYPE ERROR: " + "Expected type " + expectedType + " but got " + receivedType);
-    }
+    // Type errors;
+    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType);
 }

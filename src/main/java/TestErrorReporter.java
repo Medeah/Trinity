@@ -6,7 +6,7 @@ public class TestErrorReporter implements ErrorReporter {
 
     public TestErrorReporter() {
         errorAmount = 0;
-        errorList = new ArrayList<>();
+        errorList = new ArrayList<String>();
     }
 
     public String getError(int i) {

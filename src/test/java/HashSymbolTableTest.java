@@ -24,11 +24,11 @@ public class HashSymbolTableTest {
 
     @Test
     public void testGetCurrentScopeLevel() throws Exception {
-        assertEquals(1, tab.getCurrentScopeLevel());
+        assertEquals(1, tab.getCurrentScopeDepth());
         tab.openScope();
-        assertEquals(2, tab.getCurrentScopeLevel());
+        assertEquals(2, tab.getCurrentScopeDepth());
         tab.closeScope();
-        assertEquals(1, tab.getCurrentScopeLevel());
+        assertEquals(1, tab.getCurrentScopeDepth());
     }
 
     @Test
@@ -85,5 +85,22 @@ public class HashSymbolTableTest {
         tab.openScope();
         assertFalse(tab.declaredLocally("x"));
         assertFalse(tab.declaredLocally("z"));
+    }
+
+    @Test
+    public void testNesting() throws Exception {
+        tab.openScope();
+        tab.enterSymbol("x", scalar);
+        tab.openScope();
+        tab.enterSymbol("x", vector);
+        tab.openScope();
+        tab.enterSymbol("x", matrix);
+        assertEquals(matrix, tab.retrieveSymbol("x"));
+        tab.closeScope();
+        assertEquals(vector, tab.retrieveSymbol("x"));
+        tab.closeScope();
+        assertEquals(scalar, tab.retrieveSymbol("x"));
+        tab.closeScope();
+        assertEquals(null, tab.retrieveSymbol("x"));
     }
 }

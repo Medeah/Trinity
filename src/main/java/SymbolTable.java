@@ -3,7 +3,7 @@ public interface SymbolTable {
 
     public void closeScope();
 
-    public int getCurrentScopeLevel();
+    public int getCurrentScopeDepth();
 
     public Type retrieveSymbol(String name);
 

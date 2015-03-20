@@ -1,7 +1,7 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog: (functionDecl /*| constDecl*/ | stmt)* ;
+prog: (functionDecl | stmt)* ;
 
 // Declarations
 

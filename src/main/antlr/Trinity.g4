@@ -7,7 +7,7 @@ prog: (functionDecl /*| constDecl*/ | stmt)* ;
 
 constDecl: TYPE ID '=' expr ';';
 
-functionDecl: TYPE ID '(' formalParameters? ')' block; // "void f(int x) {...}" ;
+functionDecl: TYPE ID '(' formalParameters? ')' block; // Scalar f(Vector x) {...} ;
 formalParameters: formalParameter (',' formalParameter)* ;
 formalParameter: TYPE ID;
 

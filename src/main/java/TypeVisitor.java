@@ -3,7 +3,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class TypeVisitor implements TrinityVisitor<Type> {
+public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
     TypeVisitor(ErrorReporter errorReporter) {
         this.errorReporter = errorReporter;
     }
@@ -15,18 +15,13 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     private ErrorReporter errorReporter;
 
     @Override
-    public Type visitProg(TrinityParser.ProgContext ctx) {
-        return null;
-    }
-
-    @Override
     public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
 
         // Declared (expected) type:
-        Type LHS = new Type(ctx.getChild(0).accept(this).getType());
+        Type LHS = ctx.TYPE().accept(this);
 
         // Type found in expr (RHS of declaration)
-        Type RHS = new Type(ctx.expr().accept(this).getType());
+        Type RHS = ctx.expr().accept(this);
 
         // Check if the two achieved types matches each other and react accordingly:
         if (LHS.getType() == RHS.getType())
@@ -43,22 +38,7 @@ public class TypeVisitor implements TrinityVisitor<Type> {
     }
 
     @Override
-    public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
-        return null;
-    }
-
-    @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Type visitStmt(TrinityParser.StmtContext ctx) {
         return null;
     }
 

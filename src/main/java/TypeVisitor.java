@@ -1,11 +1,16 @@
+import CustomExceptions.SymbolAlreadyDefinedException;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
-    TypeVisitor(ErrorReporter errorReporter) {
+    TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
         this.errorReporter = errorReporter;
+        this.symbolTable = symbolTable;
     }
 
     TypeVisitor() {
@@ -13,6 +18,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     private ErrorReporter errorReporter;
+    private SymbolTable symbolTable;
 
     @Override
     public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
@@ -24,8 +30,18 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type RHS = ctx.expr().accept(this);
 
         // Check if the two achieved types matches each other and react accordingly:
-        if (LHS.getType() == RHS.getType())
+        if (LHS.getType() == RHS.getType()) {
+
+            try {
+                symbolTable.enterSymbol(ctx.ID().getText(), LHS);
+
+            } catch (SymbolAlreadyDefinedException e) {
+
+                errorReporter.reportError("Symbol was already defined!");
+            }
+
             return LHS;
+        }
         else
             errorReporter.reportTypeError(LHS.getType(), RHS.getType());
 
@@ -34,11 +50,78 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
+
+        symbolTable.openScope();
+
+        Type TheBlock = ctx.block().accept(this);
+        Type FunctionType = ctx.TYPE().accept(this);
+        List<Type> formalParamters = new ArrayList<>();
+        for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
+            formalParamters.add(ctx.formalParameters().formalParameter(i).accept(this));
+        }
+
+        if (FunctionType == TheBlock) {
+            Type FunctionDecl = new Type(FunctionType, formalParamters);
+            try {
+                symbolTable.enterSymbol(ctx.ID().getText(), FunctionDecl);
+            } catch (SymbolAlreadyDefinedException e) {
+                errorReporter.reportError("Symbol was already defined!");
+            }
+        } else {
+            errorReporter.reportTypeError(FunctionType.getType(), TheBlock.getType());
+        }
+
+        symbolTable.closeScope();
+
         return null;
     }
 
     @Override
+    public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
+        System.out.println("Err");
+        System.out.println("and err");
+        System.out.println("and err again,");
+        System.out.println("but less");
+        System.out.println("and less");
+        System.out.println("and less.");
+
+        return null;
+    }
+
+    @Override
+    public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
+        Type parameterType = ctx.TYPE().accept(this);
+
+        try {
+            symbolTable.enterSymbol(ctx.ID().getText(), parameterType);
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("Symbol was already defined!");
+        }
+
+        return parameterType;
+    }
+
+    @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
+        Type stmtType = new Type();
+        List<Type> allStmtTypes = new ArrayList<>();
+
+        // Add all stmt types which are not null...
+        for (int i = 0; i < ctx.stmt().size(); i++) {
+            stmtType = ctx.stmt(i).accept(this);
+            if (stmtType.getType() != null) {
+                allStmtTypes.add(stmtType);
+            }
+        }
+
+        // Check if all stmtTypes are compatible...
+        Type decidingStmtType = allStmtTypes.get(0);
+        for (int i = 0; i < allStmtTypes.size(); i++) {
+            if (allStmtTypes.get(i) != decidingStmtType) {
+                errorReporter.reportError("");
+            }
+        }
+
         return null;
     }
 
@@ -77,7 +160,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             return new Type(Type.TrinityType.BOOLEAN);
         else
             errorReporter.reportTypeError(LHS.getType(), RHS.getType());
-        System.out.println("TEST");
 
         return new Type(Type.TrinityType.BOOLEAN);
     }

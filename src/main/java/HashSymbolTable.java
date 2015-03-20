@@ -1,18 +1,20 @@
+import CustomExceptions.SymbolAlreadyDefinedException;
+
 import java.util.*;
 
 public class HashSymbolTable implements SymbolTable {
 
     private static class tableEntry {
-        private String Name;
-        private Type Type;
-        private int Depth;
-        public tableEntry Var;
+        private String name;
+        private Type type;
+        private int depth;
+        public tableEntry outOfDeclaration;
 
         public tableEntry(String name, Type type, int depth) {
-            Name = name;
-            Type = type;
-            Depth = depth;
-            Var = null;
+            this.name = name;
+            this.type = type;
+            this.depth = depth;
+            outOfDeclaration = null;
         }
     }
 
@@ -41,22 +43,25 @@ public class HashSymbolTable implements SymbolTable {
     public void closeScope() {
         List<tableEntry> entries = scopeDisplay.pop();
         for(tableEntry sym : entries) {
-            hashTable.remove(sym.Name);
+            hashTable.remove(sym.name);
 
             // Restore outer scope
-            tableEntry prev = sym.Var;
+            tableEntry prev = sym.outOfDeclaration;
             if (prev != null) {
-                hashTable.put(prev.Name, prev);
+                hashTable.put(prev.name, prev);
             }
         }
     }
 
     /**
      * Enter the given symbol information into the symbol table. If the given
-     * symbol is already present at the current nest level, do whatever is most
-     * efficient, but do NOT throw any exceptions from this method.
+     * symbol is already present at the current nest level, Throw an exception.
      */
-    public void enterSymbol(String id, Type info) {
+    public void enterSymbol(String id, Type info) throws SymbolAlreadyDefinedException {
+        if (declaredLocally(id)) {
+            throw new SymbolAlreadyDefinedException();
+        }
+
         tableEntry newSym = new tableEntry(id, info, getCurrentScopeDepth());
 
         List<tableEntry> entries = scopeDisplay.peek();
@@ -65,7 +70,7 @@ public class HashSymbolTable implements SymbolTable {
         tableEntry oldSym = hashTable.get(id);
         if (oldSym != null) {
             hashTable.remove(id);
-            newSym.Var = oldSym;
+            newSym.outOfDeclaration = oldSym;
         }
         hashTable.put(id, newSym);
     }
@@ -76,7 +81,7 @@ public class HashSymbolTable implements SymbolTable {
      * return null. Do NOT throw any exceptions from this method.
      */
     public Type retrieveSymbol(String id) {
-        return hashTable.containsKey(id) ? hashTable.get(id).Type : null;
+        return hashTable.containsKey(id) ? hashTable.get(id).type : null;
     }
 
     /**
@@ -85,6 +90,6 @@ public class HashSymbolTable implements SymbolTable {
      * scope, or is not in the symbol table at all, false is returned.
      */
     public boolean declaredLocally(String id) {
-        return hashTable.containsKey(id) && hashTable.get(id).Depth == getCurrentScopeDepth();
+        return hashTable.containsKey(id) && hashTable.get(id).depth == getCurrentScopeDepth();
     }
 }

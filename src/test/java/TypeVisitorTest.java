@@ -21,11 +21,13 @@ public class TypeVisitorTest {
     TypeVisitor vis;
     ParseTree tree;
     TestErrorReporter er;
+    SymbolTable tab;
 
     @Before
     public void initialize() {
         er = new TestErrorReporter();
-        vis = new TypeVisitor(er);
+        tab = new HashSymbolTable();
+        vis = new TypeVisitor(er, tab);
     }
 
     @Test

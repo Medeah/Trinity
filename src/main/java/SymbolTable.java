@@ -1,3 +1,5 @@
+import CustomExceptions.SymbolAlreadyDefinedException;
+
 public interface SymbolTable {
     public void openScope();
 
@@ -7,7 +9,7 @@ public interface SymbolTable {
 
     public Type retrieveSymbol(String name);
 
-    public void enterSymbol(String name, Type type);
+    public void enterSymbol(String name, Type type) throws SymbolAlreadyDefinedException;
 
     public boolean declaredLocally(String name);
 }

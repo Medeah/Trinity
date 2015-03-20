@@ -1,5 +1,8 @@
+import CustomExceptions.SymbolAlreadyDefinedException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,6 +15,9 @@ public class HashSymbolTableTest {
     Type vector;
     Type matrix;
     Type bool;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void initialize() {
@@ -102,5 +108,14 @@ public class HashSymbolTableTest {
         assertEquals(scalar, tab.retrieveSymbol("x"));
         tab.closeScope();
         assertEquals(null, tab.retrieveSymbol("x"));
+    }
+
+    @Test
+    public void testSymbolAlreadyDefined() throws SymbolAlreadyDefinedException {
+        tab.enterSymbol("x", matrix);
+
+        exception.expect(SymbolAlreadyDefinedException.class);
+
+        tab.enterSymbol("x", matrix);
     }
 }

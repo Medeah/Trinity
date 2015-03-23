@@ -1,7 +1,6 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -36,6 +35,17 @@ public class Trinity {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
         ParseTree tree = parser.prog();
+
+        ErrorReporter reporter = new StandardErrorReporter();
+        SymbolTable table = new HashSymbolTable();
+
+        TypeVisitor typeChecker = new TypeVisitor(reporter, table);
+
+        typeChecker.visit(tree);
+        if (reporter.getErrorAmount() > 0) {
+            System.out.println("To many type errors aborting");
+            System.exit(1);
+        }
         return tree.toStringTree(parser);
     }
 }

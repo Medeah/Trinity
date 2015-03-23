@@ -8,13 +8,13 @@ public class HashSymbolTable implements SymbolTable {
         private String name;
         private Type type;
         private int depth;
-        public tableEntry outOfDeclaration;
+        public tableEntry outerDeclaration;
 
         public tableEntry(String name, Type type, int depth) {
             this.name = name;
             this.type = type;
             this.depth = depth;
-            outOfDeclaration = null;
+            this.outerDeclaration = null;
         }
     }
 
@@ -46,7 +46,7 @@ public class HashSymbolTable implements SymbolTable {
             hashTable.remove(sym.name);
 
             // Restore outer scope
-            tableEntry prev = sym.outOfDeclaration;
+            tableEntry prev = sym.outerDeclaration;
             if (prev != null) {
                 hashTable.put(prev.name, prev);
             }
@@ -70,7 +70,7 @@ public class HashSymbolTable implements SymbolTable {
         tableEntry oldSym = hashTable.get(id);
         if (oldSym != null) {
             hashTable.remove(id);
-            newSym.outOfDeclaration = oldSym;
+            newSym.outerDeclaration = oldSym;
         }
         hashTable.put(id, newSym);
     }

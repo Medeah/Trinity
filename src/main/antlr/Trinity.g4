@@ -34,8 +34,8 @@ elseStmt: 'else' 'do' stmt*;
 
 // TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
 expr: ID '(' exprList? ')'          # FunctionCall
-    | expr '[' expr ']'             # VectorIndexing
-    | expr '[' expr ',' expr ']'    # MatrixIndexing
+    | ID '[' expr ']'               # VectorIndexing
+    | ID '[' expr ',' expr ']'      # MatrixIndexing
     | '-' expr                      # Negate
     | '!' expr                      # Not
     | expr '\''                     # Transpose
@@ -60,5 +60,6 @@ vector: '[' (exprList | RANGE) ']' ;
 matrix: vector vector+ ; // [][]...[]
 
 size: '[' (NUMBER|ID) ',' (NUMBER|ID) ']'     # matrixSize
-    | '[' (NUMBER|ID) ']'                # vectorSize
+    | '[' (NUMBER|ID) ']'                     # vectorSize
     ;
+    

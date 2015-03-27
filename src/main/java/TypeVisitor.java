@@ -20,6 +20,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
+    private void expect (Type.TrinityType expected, Type.TrinityType actual) {
+        if (op1.getType() != Type.TrinityType.SCALAR) {
+            errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, op2.getType());
+        }
+    }
+
     @Override
     public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
 
@@ -41,8 +47,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
 
             return LHS;
-        }
-        else
+        } else
             errorReporter.reportTypeError(LHS.getType(), RHS.getType());
 
         return null;
@@ -55,7 +60,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         Type TheBlock = ctx.block().accept(this);
         Type FunctionType = ctx.TYPE().accept(this);
-        List<Type> formalParamters = new ArrayList<>();
+        List<Type> formalParamters = new ArrayList<Type>();
         for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
             formalParamters.add(ctx.formalParameters().formalParameter(i).accept(this));
         }
@@ -104,7 +109,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
         Type stmtType = new Type();
-        List<Type> allStmtTypes = new ArrayList<>();
+        List<Type> allStmtTypes = new ArrayList<Type>();
 
         // Add all stmt types which are not null...
         for (int i = 0; i < ctx.stmt().size(); i++) {
@@ -148,18 +153,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitRelation(TrinityParser.RelationContext ctx) {
 
-        // Type found in LHS expr
-        Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+        Type op1 = ctx.expr(0).accept(this);
+        Type op2 = ctx.expr(1).accept(this);
 
-        // Type found in RHS expr
-        Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
-
-        // Check if the two achieved types matches each other and return a boolean:
-        // If not boolean, then an error must be shown to the user
-        if (LHS.getType() == RHS.getType())
-            return new Type(Type.TrinityType.BOOLEAN);
-        else
-            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+        if (op1.getType() != Type.TrinityType.SCALAR) {
+            errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, op2.getType());
+        } else if (op2.getType() != Type.TrinityType.SCALAR) {
+            errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, op2.getType());
+        }
 
         return new Type(Type.TrinityType.BOOLEAN);
     }
@@ -171,7 +172,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitParens(TrinityParser.ParensContext ctx) {
-        return new Type(ctx.expr().accept(this).getType());
+        return ctx.expr().accept(this);
     }
 
     @Override
@@ -186,24 +187,26 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitTranspose(TrinityParser.TransposeContext ctx) {
+        Type exprT = ctx.expr().accept(this);
+
+        if (exprT.getType() == Type.TrinityType.MATRIX) {
+            return exprT;
+        } else {
+            errorReporter.reportTypeError(Type.TrinityType.MATRIX, exprT.getType());
+        }
         return null;
     }
 
     @Override
     public Type visitAddSub(TrinityParser.AddSubContext ctx) {
 
-        // Type found in LHS expr
-        Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+        Type op1 = ctx.expr(0).accept(this);
+        Type op2 = ctx.expr(1).accept(this);
 
-        // Type found in RHS expr
-        Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
-
-
-        // Check if the two achieved types matches each other and react accordingly:
-        if (LHS.getType() == RHS.getType())
-            return LHS;
+        if (op1.getType() == op2.getType() && op1.getType() != Type.TrinityType.BOOLEAN && op1.getType() != Type.TrinityType.BOOLEAN)
+            return op1;
         else
-            errorReporter.reportTypeError(LHS.getType(), RHS.getType());
+            errorReporter.reportTypeError(op1.getType(), op2.getType());
 
         return null;
     }
@@ -220,16 +223,29 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitNot(TrinityParser.NotContext ctx) {
+
+        Type exprT = ctx.expr().accept(this);
+        if (exprT.getType() == Type.TrinityType.BOOLEAN)
+            return exprT;
+        else
+            errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, exprT.getType());
+
         return null;
     }
 
     @Override
     public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
+        Type id = ctx.expr(0).accept(this);
+        Type x = ctx.expr(1).accept(this);
+        Type y = ctx.expr(2).accept(this);
+
+        //TODO
         return new Type(Type.TrinityType.MATRIX);
     }
 
     @Override
     public Type visitExponent(TrinityParser.ExponentContext ctx) {
+        //TODO
         return null;
     }
 
@@ -237,10 +253,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitOr(TrinityParser.OrContext ctx) {
 
         // Type found in LHS expr must be boolean
-        Type LHS = new Type(ctx.expr().get(0).accept(this).getType());
+        Type LHS = ctx.expr(0).accept(this);
 
         // Type found in RHS expr must be boolean
-        Type RHS = new Type(ctx.expr().get(1).accept(this).getType());
+        Type RHS = ctx.expr(1).accept(this);
 
         // Check if the two achieved types are boolean
         // If not boolean, then an error must be shown to the user

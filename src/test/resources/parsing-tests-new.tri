@@ -47,6 +47,12 @@ Matrix f(Scalar s1, Scalar s2) do
     return m;
 end
 
+Matrix[N,N] matrixMul( Matrix[N,N] A, Matrix[N,N] B) do
+	return A * B;
+end
+
 # Functions calls
 Matrix n = f(5,20 +3);
 fire(parma, skinke, gideon, 2 +2e3, xz/lol-(os),arnejohn);
+Matrix[3,3] mat = [1,2,3][4,5,6][7,8,9];
+matrixMul(mat, mat');

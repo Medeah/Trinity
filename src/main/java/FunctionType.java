@@ -1,0 +1,31 @@
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+
+public class FunctionType extends Type {
+
+    final private Type returnType;
+    final private List<Type> parameterTypes;
+
+    public FunctionType(Type returntype, List<Type> formalParameterTypes) {
+        this.returnType = returntype;
+        this.parameterTypes = ImmutableList.copyOf(formalParameterTypes);
+    }
+
+    public List<Type> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    @Override public boolean equals(Object other) {
+        boolean result = false;
+        if (other instanceof FunctionType) {
+            FunctionType that = (FunctionType) other;
+            result = (this.parameterTypes.equals(that.parameterTypes) && this.returnType.equals(that.returnType));
+        }
+        return result;
+    }
+
+    @Override public int hashCode() {
+        return returnType.hashCode() ^ parameterTypes.hashCode();
+    }
+}

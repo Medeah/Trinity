@@ -20,8 +20,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
-    private void expect (Type.TrinityType expected, Type.TrinityType actual) {
-        if (op1.getType() != Type.TrinityType.SCALAR) {
+    private void expect (Type expected, Type actual) {
+        if (expected.equals(actual)) {
             errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, op2.getType());
         }
     }

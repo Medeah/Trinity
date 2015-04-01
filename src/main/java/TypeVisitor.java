@@ -22,7 +22,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     private void expect (Type expected, Type actual) {
         if (expected.equals(actual)) {
-            errorReporter.reportTypeError(Type.TrinityType.BOOLEAN, op2.getType());
+            errorReporter.reportTypeError(expected, actual);
         }
     }
 

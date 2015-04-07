@@ -1,4 +1,5 @@
 import CustomExceptions.SymbolAlreadyDefinedException;
+import CustomExceptions.SymbolNotFoundException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,10 +23,10 @@ public class HashSymbolTableTest {
     @Before
     public void initialize() {
         tab = new HashSymbolTable();
-        scalar = new Type(Type.TrinityType.SCALAR);
-        vector = new Type(Type.TrinityType.VECTOR);
-        matrix = new Type(Type.TrinityType.MATRIX);
-        bool = new Type(Type.TrinityType.BOOLEAN);
+        scalar = new PrimitiveType(EnumType.SCALAR);
+        vector = new VectorType(2);
+        matrix = new MatrixType(2,2);
+        bool = new PrimitiveType(EnumType.BOOLEAN);
     }
 
     @Test
@@ -46,8 +47,10 @@ public class HashSymbolTableTest {
     @Test
     public void testRetrieveSymbol() throws Exception {
         tab.enterSymbol("x", scalar);
+
         assertEquals(scalar, tab.retrieveSymbol("x"));
-        assertEquals(null, tab.retrieveSymbol("y"));
+        exception.expect(SymbolNotFoundException.class);
+        tab.retrieveSymbol("y");
     }
 
     @Test
@@ -107,7 +110,9 @@ public class HashSymbolTableTest {
         tab.closeScope();
         assertEquals(scalar, tab.retrieveSymbol("x"));
         tab.closeScope();
-        assertEquals(null, tab.retrieveSymbol("x"));
+
+        exception.expect(SymbolNotFoundException.class);
+        tab.retrieveSymbol("x");
     }
 
     @Test

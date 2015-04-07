@@ -6,5 +6,5 @@ public interface ErrorReporter {
     public void reportError(String message);
 
     // Type errors;
-    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType);
+    public void reportTypeError(Type expectedType, Type receivedType);
 }

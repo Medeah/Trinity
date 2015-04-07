@@ -5,11 +5,13 @@ prog: (functionDecl | stmt)* ;
 
 // Declarations
 
-constDecl: TYPE size? ID '=' expr ';';
+constDecl: type ID '=' expr ';';
 
-functionDecl: TYPE size? ID '(' formalParameters? ')' block; // Scalar f(Vector x) {...} ;
+functionDecl: type ID '(' formalParameters? ')' block; // Scalar f(Vector x) {...} ;
 formalParameters: formalParameter (',' formalParameter)* ;
-formalParameter: TYPE size? ID;
+formalParameter: type ID;
+
+type: TYPE size? ;
 
 // Statements
 
@@ -59,7 +61,7 @@ exprList: expr (',' expr)* ;
 vector: '[' (exprList | RANGE) ']' ;
 matrix: vector vector+ ; // [][]...[]
 
-size: '[' (NUMBER|ID) ',' (NUMBER|ID) ']'     # matrixSize
-    | '[' (NUMBER|ID) ']'                     # vectorSize
+size: '[' (NUMBER|ID) ',' (NUMBER|ID) ']'     # MatrixSize
+    | '[' (NUMBER|ID) ']'                     # VectorSize
     ;
     

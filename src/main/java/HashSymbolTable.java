@@ -1,4 +1,4 @@
-import CustomExceptions.SymbolAlreadyDefinedException;
+import CustomExceptions.*;
 
 import java.util.*;
 
@@ -80,8 +80,11 @@ public class HashSymbolTable implements SymbolTable {
      * declaration of the given symbol. If there is no such valid declaration,
      * return null. Do NOT throw any exceptions from this method.
      */
-    public Type retrieveSymbol(String id) {
-        return hashTable.containsKey(id) ? hashTable.get(id).type : null;
+    public Type retrieveSymbol(String id) throws SymbolNotFoundException {
+        if ( hashTable.containsKey(id))  {
+            return hashTable.get(id).type;
+        }
+        throw new SymbolNotFoundException();
     }
 
     /**

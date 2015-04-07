@@ -29,7 +29,7 @@ public class TestErrorReporter implements ErrorReporter {
     }
 
     @Override
-    public void reportTypeError(Type.TrinityType expectedType, Type.TrinityType receivedType) {
+    public void reportTypeError(Type expectedType, Type receivedType) {
         errorHandling("TYPE ERROR: " + "Expected type " + expectedType + " but got " + receivedType);
     }
 }

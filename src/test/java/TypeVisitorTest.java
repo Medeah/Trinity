@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class TypeVisitorTest {
 
-    private ParseTree createParseTree(String str) {
+    private TrinityParser.ProgContext createParseTree(String str) {
         ANTLRInputStream input = new ANTLRInputStream(str);
         TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -18,6 +18,8 @@ public class TypeVisitorTest {
         return parser.prog();
     }
 
+    private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
+    private final Type scal = new PrimitiveType(EnumType.SCALAR);
     TypeVisitor vis;
     ParseTree tree;
     TestErrorReporter er;
@@ -29,18 +31,18 @@ public class TypeVisitorTest {
         tab = new HashSymbolTable();
         vis = new TypeVisitor(er, tab);
     }
-
+/*
     @Test
     public void testConstDecl() throws Exception {
         // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Boolean b = true;");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.BOOLEAN);
+        assertEquals(bool, tree.getChild(0).getChild(0).accept(vis));
         tree = createParseTree("Scalar s = 1;");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.SCALAR);
-        tree = createParseTree("Vector v = [1,2];");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.VECTOR);
-        tree = createParseTree("Matrix m = [1,2][3,4];");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.MATRIX);
+        assertEquals(scal ,tree.getChild(0).getChild(0).accept(vis));
+        tree = createParseTree("Vector[2] v = [1,2];");
+        assertEquals(new VectorType(2), tree.getChild(0).getChild(0).accept(vis));
+        tree = createParseTree("Matrix[2,2] m = [1,2][3,4];");
+        assertEquals(new MatrixType(2,2),tree.getChild(0).getChild(0).accept(vis));
     }
 
     @Test
@@ -158,20 +160,16 @@ public class TypeVisitorTest {
     @Test
     public void testComplexConstDecl() throws Exception {
         // Check if the given ConstDecl have same types on LHS and RHS...
-        tree = createParseTree("Boolean b = [5,4][1,5] <= [3,7][8,8] and ([4] == [7]) or 3 != 2;");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.BOOLEAN);
-
-        // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Scalar s = 1 + 2 * (5 + 2) / 4;");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.SCALAR);
+        assertEquals(tree.getChild(0).getChild(0).accept(vis), scal);
 
         // Check if the given ConstDecl have same types on LHS and RHS...
-        tree = createParseTree("Vector v = [1,2] + [2,3] * ([5,4] + [2,1]);");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.VECTOR);
+        tree = createParseTree("Vector[2] v = [1,2] + [2,3] - ([5,4] + [2,1]);");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis), new VectorType(2));
 
         // Check if the given ConstDecl have same types on LHS and RHS...
-        tree = createParseTree("Matrix m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis).getType(), Type.TrinityType.MATRIX);
+        tree = createParseTree("Matrix[2,2] m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);");
+        assertEquals(tree.getChild(0).getChild(0).accept(vis), new MatrixType(2,2));
     }
 
     @Test
@@ -181,5 +179,5 @@ public class TypeVisitorTest {
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(0).equals("ERROR: Type error at AND."));
     }
-
+*/
 }

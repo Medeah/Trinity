@@ -1,6 +1,8 @@
+import CustomExceptions.SymbolAlreadyDefinedException;
 import CustomExceptions.SymbolNotFoundException;
 import org.antlr.v4.runtime.tree.ErrorNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
@@ -56,33 +58,33 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return null;
     }*/
 
-    /*@Override
+    @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
 
         symbolTable.openScope();
 
-        Type TheBlock = ctx.block().accept(this);
-        Type FunctionType = ctx.TYPE().accept(this);
-        List<Type> formalParamters = new ArrayList<Type>();
+        Type funcType = ctx.type().accept(this);
+
+        List<Type> formalParamterTypes = new ArrayList<Type>();
         for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
-            formalParamters.add(ctx.formalParameters().formalParameter(i).accept(this));
+            formalParamterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
         }
 
-        if (FunctionType == TheBlock) {
-            Type FunctionDecl = new Type(FunctionType, formalParamters);
+        Type blockType = ctx.block().accept(this);
+
+        if (expect(funcType, blockType)) {
+            Type functionDecl = new FunctionType(funcType, formalParamterTypes);
             try {
-                symbolTable.enterSymbol(ctx.ID().getText(), FunctionDecl);
+                symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
             } catch (SymbolAlreadyDefinedException e) {
                 errorReporter.reportError("Symbol was already defined!");
             }
-        } else {
-            errorReporter.reportTypeError(FunctionType.getType(), TheBlock.getType());
         }
 
         symbolTable.closeScope();
 
         return null;
-    }*/
+    }
 
     @Override
     public Type visitFunctionCall(TrinityParser.FunctionCallContext ctx) {

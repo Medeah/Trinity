@@ -5,7 +5,7 @@ prog: (functionDecl | stmt)* ;
 
 // Declarations
 
-constDecl: type ID '=' expr ';';
+constDecl: type ID '=' expr ;
 
 functionDecl: type ID '(' formalParameters? ')' block; // Scalar f(Vector x) {...} ;
 formalParameters: formalParameter (',' formalParameter)* ;
@@ -17,13 +17,14 @@ type: TYPE size? ;
 
 block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
 
-stmt: block             // mega nice block scope
+/*stmt: block             // mega nice block scope
     | constDecl
     | 'for' TYPE ID 'in' expr ('by' NUMBER)? block
     | ifBlock
-    | 'return' expr? ';'
+  //  | 'return' expr? ';'
     |  expr ';' // including function call
-    ;
+    ;*/
+stmt: expr ;
 
 // TODO: inconsistent grammar design
 ifBlock: ifStmt elseIfStmt* elseStmt? 'end' ;
@@ -54,6 +55,11 @@ expr: ID '(' exprList? ')'          # FunctionCall
     | matrix                        # MatrixLit
     | vector                        # VectorLit // TODO: naming
     | '(' expr ')'                  # Parens
+    | constDecl                     # ConstDeclaration
+    | 'for' TYPE ID 'in' expr ('by' NUMBER)? block #ForLoop
+    | ifBlock                       # If
+    | block                         # BlockExpression
+ //   |  expr ';' // including function call
     ;
 
 exprList: expr (',' expr)* ;

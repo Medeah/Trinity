@@ -1,9 +1,6 @@
-import CustomExceptions.SymbolAlreadyDefinedException;
 import CustomExceptions.SymbolNotFoundException;
 import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
@@ -19,12 +16,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
+    private Type scalar = new PrimitiveType(EnumType.SCALAR);
+    private Type bool = new PrimitiveType(EnumType.BOOLEAN);
+
+
     private boolean expect(Type expected, Type actual) {
         if (expected.equals(actual)) {
             return true;
-        } else
-
-        {
+        } else {
             errorReporter.reportTypeError(expected, actual);
             return false;
         }
@@ -116,9 +115,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         System.out.println("and less.");
 
         return nullllllllllll;
-    }*/
+    }
 
-    /*@Override
+    @Override
     public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         Type parameterType = ctx.TYPE().accept(this);
 
@@ -129,7 +128,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         return parameterType;
-    }*/
+    }
 /*
 
     @Override
@@ -184,11 +183,18 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitVector(TrinityParser.VectorContext ctx) {
+        // TODO check range
         List<TrinityParser.ExprContext> exprs = ctx.exprList().expr();
         for (TrinityParser.ExprContext expr : exprs) {
-            expect(new PrimitiveType(EnumType.SCALAR), expr.accept(this));
+            expect(scalar, expr.accept(this));
         }
         return new VectorType(exprs.size());
+    }
+
+    @Override
+    public Type visitExprList(TrinityParser.ExprListContext ctx) {
+        errorReporter.reportError("what?");
+        return null;
     }
 
     @Override
@@ -289,8 +295,11 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.SCALAR), op1);
-        expect(new PrimitiveType(EnumType.SCALAR), op2);
+        expect(op1, op2);
+
+        if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
+            errorReporter.reportError("cannot compare booleans");
+        }
 
         return new PrimitiveType(EnumType.BOOLEAN);
     }
@@ -301,6 +310,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op2 = ctx.expr(1).accept(this);
 
         expect(op1, op2);
+
+        if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
+            errorReporter.reportError("cannot compare booleans");
+        }
 
         return new PrimitiveType(EnumType.BOOLEAN);
     }
@@ -365,37 +378,108 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         return null;
     }
-/*
+
     @Override
     public Type visitMultDivMod(TrinityParser.MultDivModContext ctx) {
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
+        String operator = ctx.getChild(1).getText(); // TODO måske ikke det rigte måde at få operator ud
 
-        expect(op1, op2);
+        if (operator.equals("*")) {
+            if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op2.equals(new PrimitiveType(EnumType.BOOLEAN))) {
+                errorReporter.reportError("cannot mult or div boolean");
+                return null;
+            }
 
-        if (op1.equals(new PrimiiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("cannot use operator mul/div on boolean values");
+            if (op1.equals(scalar)) {
+                return op2;
+            }
+            // Nx1
+            if (op1 instanceof VectorType) {
+                int size = ((VectorType)op1).getNumElems();
+                if (op2.equals(scalar)) {
+                    return new VectorType(size);
+                } else if (op2.equals(op1) ) {
+                    return scalar;
+                } else if (op2 instanceof MatrixType) {
+                    MatrixType mt = (MatrixType)op2;
+                    if (mt.getRows() == 1) {
+                        return new MatrixType(size, mt.getCols());
+                    } else {
+                        errorReporter.reportError("size mismatch");
+                        return null;
+                    }
+                } else {
+                    errorReporter.reportError("cannot multiply vector with " + op2);
+                    return null;
+                }
+            } else if (op1 instanceof MatrixType) {
+                if (op2.equals(scalar)) {
+                    return op1;
+                } else if (op2 instanceof VectorType ) {
+                    // NxM * Lx1 = Nx1
+                    int N = ((MatrixType) op1).getRows();
+                    int M = ((MatrixType) op1).getCols();
+                    int L = ((VectorType) op2).getNumElems();
+                    if (M == L) {
+                        return new VectorType(N);
+                    } else {
+                        errorReporter.reportError("size mismatch");
+                        return null;
+                    }
+                } else if (op2 instanceof MatrixType) {
+                    if (((MatrixType) op1).getCols() == ((MatrixType) op2).getRows()) {
+                        return new MatrixType(((MatrixType) op1).getRows(), ((MatrixType) op2).getCols());
+                    } else {
+                        errorReporter.reportError("size mismatch");
+                        return null;
+                    }
+                } else {
+                    errorReporter.reportError("cannot multiply matrix with " + op2);
+                    return null;
+                }
+            }
+        } else if (operator.equals("/")) {
+            expect(scalar, op1);
+            expect(scalar, op2);
+            return scalar;
+
+        } else if (operator.equals("/")) {
+            // TODO
         } else {
-            return op1;
+            errorReporter.reportError("what?");
         }
 
+
         return null;
+
+
     }
-*/
+
     @Override
-    public Type visitConst(TrinityParser.ConstContext ctx) {
-        return null;
+    public Type visitIdentifier(TrinityParser.IdentifierContext ctx) {
+        try {
+            return symbolTable.retrieveSymbol(ctx.ID().getText());
+        } catch (SymbolNotFoundException e) {
+            errorReporter.reportError("Symbol not found");
+            return null;
+        }
     }
+
 
     @Override
     public Type visitNegate(TrinityParser.NegateContext ctx) {
-        return null;
+        Type op = ctx.expr().accept(this);
+        if (op.equals(bool)) {
+            errorReporter.reportError("cannot negate bool");
+            return bool;
+        }
+
+        return op;
     }
 
-    @Override
-    public Type visitExprList(TrinityParser.ExprListContext ctx) {
-        return null;
-    }
+
+
 
     @Override
     public Type visitType(TrinityParser.TypeContext ctx) {
@@ -422,7 +506,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 return null;
 
             }
-            if(size.getRuleIndex() == 0) {
+            if (size.getRuleIndex() == 0) {
                 errorReporter.reportError("Vector needs size of one dim");
                 return null;
             }
@@ -430,13 +514,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             return new VectorType(3);
         } else if (prim.contentEquals("Matrix")) {
             // TODO
-            return new MatrixType(3,3);
+            return new MatrixType(3, 3);
         } else {
             errorReporter.reportError("Type not know, must be one of Matrix, Scalar, Vector or Boolean");
             return null;
         }
     }
 
+    // TODO find ud af hvornår dette sker
     @Override
     public Type visitErrorNode(ErrorNode node) {
         return null;

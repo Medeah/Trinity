@@ -48,7 +48,7 @@ expr: ID '(' exprList? ')'          # FunctionCall
     | expr ('=='|'!=') expr         # Equality
     | expr 'and' expr               # And
     | expr 'or' expr                # Or
-    | ID                            # Const
+    | ID                            # Identifier
     | NUMBER                        # Number
     | BOOL                          # Boolean
     | matrix                        # MatrixLit

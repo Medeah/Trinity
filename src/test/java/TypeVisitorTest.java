@@ -9,19 +9,22 @@ import static org.junit.Assert.*;
 
 public class TypeVisitorTest {
 
-    private TrinityParser.ProgContext createParseTree(String str) {
+    private boolean TypeCheck(String str) {
         ANTLRInputStream input = new ANTLRInputStream(str);
         TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
+        parser.prog().accept(vis);
 
-        return parser.prog();
+        //check parse errors
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+
+        return er.getErrorAmount() == 0;
     }
 
     private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
     private final Type scal = new PrimitiveType(EnumType.SCALAR);
     TypeVisitor vis;
-    ParseTree tree;
     TestErrorReporter er;
     SymbolTable tab;
 
@@ -31,6 +34,18 @@ public class TypeVisitorTest {
         tab = new HashSymbolTable();
         vis = new TypeVisitor(er, tab);
     }
+
+    @Test
+    public void testSimpleDcl() {
+        assertTrue(TypeCheck("Scalar q = 2;"));
+        assertFalse(TypeCheck("Vector q = [3,3,4];"));
+    }
+
+    @Test
+    public void testMul() {
+        assertTrue(TypeCheck("Scalar q = 2 * 2;"));
+    }
+
 /*
     @Test
     public void testConstDecl() throws Exception {

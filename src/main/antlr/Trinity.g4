@@ -1,7 +1,7 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog: (functionDecl | stmt)* ;
+prog: (functionDecl | expr)* ;
 
 // Declarations
 
@@ -15,7 +15,7 @@ type: TYPE size? ;
 
 // Statements
 
-block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
+block: BLOCKSTART expr* BLOCKEND ; // possibly empty statement block
 
 /*stmt: block             // mega nice block scope
     | constDecl
@@ -24,41 +24,42 @@ block: BLOCKSTART stmt* BLOCKEND ; // possibly empty statement block
   //  | 'return' expr? ';'
     |  expr ';' // including function call
     ;*/
-stmt: expr ;
+//stmt: expr ;
 
 // TODO: inconsistent grammar design
 ifBlock: ifStmt elseIfStmt* elseStmt? 'end' ;
-ifStmt: 'if' expr 'do' stmt* ;
-elseIfStmt: 'elseif' expr 'do' stmt* ;
-elseStmt: 'else' 'do' stmt*;
+ifStmt: 'if' expr 'do' expr* ;
+elseIfStmt: 'elseif' expr 'do' expr* ;
+elseStmt: 'else' 'do' expr*;
 
 
 // Expressions
 
 // TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
-expr: ID '(' exprList? ')'          # FunctionCall
-    | ID '[' expr ']'               # VectorIndexing
-    | ID '[' expr ',' expr ']'      # MatrixIndexing
-    | '-' expr                      # Negate
-    | '!' expr                      # Not
-    | expr '\''                     # Transpose
-    | <assoc=right> expr '^' expr   # Exponent
-    | expr ('*'|'/'|'%') expr       # MultDivMod
-    | expr ('+'|'-') expr           # AddSub
-    | expr ('<'|'>'|'<='|'>=') expr # Relation
-    | expr ('=='|'!=') expr         # Equality
-    | expr 'and' expr               # And
-    | expr 'or' expr                # Or
-    | ID                            # Identifier
-    | NUMBER                        # Number
-    | BOOL                          # Boolean
-    | matrix                        # MatrixLit
-    | vector                        # VectorLit // TODO: naming
-    | '(' expr ')'                  # Parens
-    | constDecl                     # ConstDeclaration
-    | 'for' TYPE ID 'in' expr ('by' NUMBER)? block #ForLoop
-    | ifBlock                       # If
-    | block                         # BlockExpression
+expr: ID '(' exprList? ')'              # FunctionCall
+    | ID '[' expr ']'                   # VectorIndexing
+    | ID '[' expr ',' expr ']'          # MatrixIndexing
+    | '-' expr                          # Negate
+    | '!' expr                          # Not
+    | expr '\''                         # Transpose
+    | <assoc=right> expr op='^' expr    # Exponent
+    | expr op=('*'|'/'|'%') expr        # MultDivMod
+    | expr op=('+'|'-') expr            # AddSub
+    | expr op=('<'|'>'|'<='|'>=') expr  # Relation
+    | expr op=('=='|'!=') expr          # Equality
+    | expr op='and' expr                # And
+    | expr op='or' expr                 # Or
+    | ID                                # Identifier
+    | NUMBER                            # Number
+    | BOOL                              # Boolean
+    | matrix                            # MatrixLit
+    | vector                            # VectorLit // TODO: naming
+    | '(' expr ')'                      # Parens
+    | constDecl                         # ConstDeclaration
+    //| 'for' type ID 'in' expr ('by' NUMBER)? block #ForLoop
+    | 'for' type ID 'in' expr block     #ForLoop
+    | ifBlock                           # If
+    | block                             # BlockExpression
  //   |  expr ';' // including function call
     ;
 

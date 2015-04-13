@@ -14,15 +14,13 @@ m^2
 m'
 
 # Loops and enumeration
-for Scalar s in [1..9] by 2 do
-    print(s)
-end
-
 for Scalar s in v do
     print(s)
 end
 
 for Vector v in [1,2,3] do print(0) end
+
+for Vector v in [1..5] do print(0) end
 
 # Conditionals
 if m == v * v do
@@ -49,6 +47,10 @@ end
 
 Matrix[N,N] matrixMul( Matrix[N,N] A, Matrix[N,N] B) do
 	 A * B
+end
+
+Scalar sf() do
+    2 + 2
 end
 
 # Functions calls

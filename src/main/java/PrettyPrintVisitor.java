@@ -4,8 +4,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.Iterator;
-
 public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVisitor {
 
     private int indentLevel = 0;
@@ -23,12 +21,12 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
     }
 
     private void indent() {
-       print(Strings.repeat("\t", indentLevel));
+        print(Strings.repeat("\t", indentLevel));
     }
 
     @Override
     public Object visitProg(TrinityParser.ProgContext ctx) {
-        for(ParseTree child : ctx.children) {
+        for (ParseTree child : ctx.children) {
             child.accept(this);
             print(System.lineSeparator());
         }
@@ -88,31 +86,32 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
         print("do");
         print(System.lineSeparator());
         this.indentLevel++;
-        for(int i = 0; i < ctx.expr().size(); i++) {
+        for (int i = 0; i < ctx.expr().size(); i++) {
             indent();
             ctx.expr(i).accept(this);
             print(System.lineSeparator());
         }
         this.indentLevel--;
+        indent();
         print("end");
-        //print(System.lineSeparator());
         return null;
     }
 
     @Override
     public Object visitIfBlock(TrinityParser.IfBlockContext ctx) {
-        //TODO: if within if
-        //visitChildren(ctx);
-        this.indentLevel++;
         ctx.ifStmt().accept(this);
-        for(TrinityParser.ElseIfStmtContext elseif : ctx.elseIfStmt()) {
+        for (TrinityParser.ElseIfStmtContext elseif : ctx.elseIfStmt()) {
+            print(System.lineSeparator());
+            indent();
             elseif.accept(this);
         }
-        if(ctx.elseStmt() != null) {
+        if (ctx.elseStmt() != null) {
+            print(System.lineSeparator());
+            indent();
             ctx.elseStmt().accept(this);
         }
         print(System.lineSeparator());
-        this.indentLevel--;
+        indent();
         print("end");
         return null;
     }
@@ -123,36 +122,40 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
         ctx.expr(0).accept(this);
         print(" do");
         print(System.lineSeparator());
-        for(int i = 1; i < ctx.expr().size(); i++) {
+        this.indentLevel++;
+        for (int i = 1; i < ctx.expr().size(); i++) {
             indent();
             ctx.expr(i).accept(this);
         }
+        this.indentLevel--;
         return null;
     }
 
     @Override
     public Object visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
-        print(System.lineSeparator());
         print("elseif ");
         ctx.expr(0).accept(this);
         print(" do");
         print(System.lineSeparator());
-        for(int i = 1; i < ctx.expr().size(); i++) {
+        this.indentLevel++;
+        for (int i = 1; i < ctx.expr().size(); i++) {
             indent();
             ctx.expr(i).accept(this);
         }
+        this.indentLevel--;
         return null;
     }
 
     @Override
     public Object visitElseStmt(TrinityParser.ElseStmtContext ctx) {
-        print(System.lineSeparator());
         print("else do");
         print(System.lineSeparator());
-        for(TrinityParser.ExprContext expr : ctx.expr()) {
+        this.indentLevel++;
+        for (TrinityParser.ExprContext expr : ctx.expr()) {
             indent();
             expr.accept(this);
         }
+        this.indentLevel--;
         return null;
     }
 
@@ -316,12 +319,10 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
 
     @Override
     public Object visitExprList(TrinityParser.ExprListContext ctx) {
-        // Iterators, because it's bad.
-        Iterator<TrinityParser.ExprContext> it = ctx.expr().iterator();
-        it.next().accept(this);
-        while (it.hasNext()) {
+        ctx.expr(0).accept(this);
+        for(int i = 1; i < ctx.expr().size(); i++) {
             print(", ");
-            it.next().accept(this);
+            ctx.expr(i).accept(this);
         }
         return null;
     }
@@ -330,7 +331,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
     public Object visitVector(TrinityParser.VectorContext ctx) {
         print("[");
         ParseTree child = ctx.getChild(1); //.accept(this);
-        if(ctx.exprList() != null) {
+        if (ctx.exprList() != null) {
             ctx.exprList().accept(this);
         } else {
             // RANGE
@@ -367,4 +368,27 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
     public Object visitErrorNode(ErrorNode node) {
         return null;
     }
+
+    // TODO: comment stuff / remove
+//    BufferedTokenStream tokens;
+//    TokenStreamRewriter rewriter;
+//
+//    public PrettyPrintVisitor(BufferedTokenStream tokens) {
+//        this.tokens = tokens;
+//        rewriter = new TokenStreamRewriter(tokens);
+//    }
+
+//        Token semi = ctx.getStop();
+//        int i = semi.getTokenIndex();
+//        List<Token> cmtChannel = tokens.getHiddenTokensToRight(i, TrinityLexer.COMMENT);
+//        if (cmtChannel != null) {
+//            Token cmt = cmtChannel.get(0);
+//            if (cmt != null) {
+//                String txt = cmt.getText().substring(2);
+//                String newCmt = "/* " + txt.trim() + " */\n";
+//                rewriter.insertBefore(ctx.start, newCmt);
+//                rewriter.replace(cmt, "\n");
+//            }
+//        }
+
 }

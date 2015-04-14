@@ -2,6 +2,7 @@
 
 # Types and declarations (and comments)
 Boolean t = true
+# and stuff
 Scalar s = 1
 Vector v = [1,5,6]
 Matrix m = [1,2][4,5]
@@ -20,7 +21,7 @@ end
 
 for Vector v in [1,2,3] do print(0) end
 
-for Vector v in [1..5] do print(0) end
+for Vector v in [1..5] do for Scalar x in [1,2] do print(0) end end
 
 # Conditionals
 if m == v * v do
@@ -34,9 +35,9 @@ else do
 end
 
 if !something do
-
+    if somethingElse do this() elseif true do that(1+2) elseif [1,2] == 3 do hello else do 1+1 end
 else do
-
+ Scalar a=1+2*2^1-1
 end
 
 # Function declaration
@@ -58,3 +59,4 @@ Matrix n = f(5,20 +3)
 fire(parma, skinke, gideon, 2 +2e3, xz/lol-(os),arnejohn)
 Matrix[3,3] mat = [1,2,3][4,5,6][7,8,9]
 matrixMul(mat, mat')
+# ending comment

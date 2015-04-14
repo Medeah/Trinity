@@ -9,13 +9,12 @@ import java.nio.file.Paths;
 public class Trinity {
 
     public static void main(String[] args) throws Exception {
-        /*if (args.length != 1) {
+        if (args.length != 1) {
             showUsage();
-        }*/
+        }
 
         try {
-            //byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-            byte[] encoded = Files.readAllBytes(Paths.get("/Users/mathias/Documents/Github/Trinity/src/test/resources/parsing-tests-new.tri"));
+            byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
 
             String is = new String(encoded, Charset.defaultCharset());
             //String out = compile(is);
@@ -62,7 +61,5 @@ public class Trinity {
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor();
 
         prettyPrinter.visit(tree);
-
-        //return tree.toStringTree(parser);
     }
 }

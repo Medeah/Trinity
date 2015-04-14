@@ -1,3 +1,5 @@
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
@@ -5,31 +7,47 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Trinity {
 
-    public static void main(String[] args) throws Exception {
-        /*if (args.length != 1) {
-            showUsage();
-        }*/
+    private static class CommandLineOptions {
+        @Parameter(description = "filename")
+        private List<String> files = new ArrayList<String>();
 
-        try {
-            //byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-            byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/parsing-tests-new.tri"));
-
-            String is = new String(encoded, Charset.defaultCharset());
-            //String out = compile(is);
-            prettyPrint(is);
-            //System.out.println(out);
-        } catch (NoSuchFileException ex) {
-            System.out.println("File Not Found: " + ex.getMessage());
-            showUsage();
-        }
+        @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
+        private boolean prettyPrint;
     }
 
-    private static void showUsage() {
-        System.out.println("Usage: Trinity <source file>");
-        System.exit(1);
+    public static void main(String[] args) throws Exception {
+        CommandLineOptions options = new CommandLineOptions();
+        JCommander jc = new JCommander(options, args);
+
+        if (options.files.size() == 0) {
+            jc.usage();
+            System.exit(1);
+        }
+
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+            //byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/parsing-tests-new.tri"));
+
+            String is = new String(encoded, Charset.defaultCharset());
+
+            if(options.prettyPrint) {
+                prettyPrint(is);
+            } else {
+                String out = compile(is);
+                System.out.println(out);
+            }
+
+        } catch (NoSuchFileException ex) {
+            System.out.println("File not found: " + ex.getMessage());
+            System.exit(1);
+            //jc.usage();
+        }
+
     }
 
     private static String compile(String is) {

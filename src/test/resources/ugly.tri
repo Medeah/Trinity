@@ -4,20 +4,20 @@
 Boolean t = true
 # and stuff
 Scalar s = 1
-Vector v = [1,5,6]
-Vector w = [1.. 9]
-Matrix m = [1,2][4,5]
+Vector v=[1,5,6]
+Vector w=[1.. 9]
+Matrix m= [1,2][4,5]
 
 # Expressions
-Scalar s = 1 + 2 * (3 + 4) / 1.5 - s
-Scalar t = v[2]
-Scalar u = m[2,3]
+Scalar s = 1+ 2 * (3    + 4) /1.5 - s
+Scalar t = v[2  ]
+Scalar u = m[2, 3]
 m^2
 m'
 
 # Loops and enumeration
 for Scalar s in v do
-    print(s)
+ print(s)
 end
 
 for Vector v in [1,2,3] do print(0) end
@@ -29,15 +29,11 @@ if frederik do for Scalar s in [1..10] do print(10) end else do for Vector v in 
 end
 
 # Conditionals
-if m == v * v do
-    Matrix x = [1][0]
-elseif 1 + 2 != 4 or 5 == 2 + 2 do
-    print(m)
-elseif true and false do
-    print(m)
-else do
-    Scalar leet = 1337
-end
+if m == v * v do   Matrix x = [1][0]
+elseif 1 +2 != 4 or 5 ==2 + 2 do
+print(m)
+elseif true and false do print(  m) else do
+    Scalar leet = 1337 end
 
 if !something do
     if somethingElse do this() elseif true do that(1+2) elseif [1,2] == 3 do hello else do 1+1 end
@@ -47,21 +43,19 @@ end
 
 # Function declaration
 Matrix f(Scalar s1, Scalar s2) do
-    Matrix m = [s1][s2]
-     m
+    Matrix m = [s1] [s2]
+        m
 end
 
-Matrix[N,N] matrixMul( Matrix[N,N] A, Matrix[N,N] B) do
-	 A * B
+Matrix[N,  N ] matrixMul( Matrix[N,N]   A,   Matrix[N,N] B) do
+ A *B
 end
 
-Scalar sf() do
-    2 + 2
+Scalar sf() do 2 + 2
 end
-
 # Functions calls
-Matrix n = f(5,20 +3)
-fire(parma, skinke, gideon, 2 +2e3, xz/lol-(os),arnejohn)
-Matrix[3,3] mat = [1,2,3][4,5,6][7,8,9]
-matrixMul(mat, mat')
+Matrix n = f(5,20  +3)
+fire(parma,skinke, gideon, 2 +2e3, xz/lol-(os),arnejohn)
+Matrix[  3,3] mat = [1,2,  3][4,5,6][  7,8, 9]
+matrixMul(mat,   mat')
 # ending comment

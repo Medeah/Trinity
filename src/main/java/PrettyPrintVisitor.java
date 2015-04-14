@@ -4,14 +4,20 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Objects;
 
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
     private int indentLevel = 0;
+    private int spaces = 0;
+    private String lorteString = "";
 
     private void print(String string) {
         System.out.print(string);
+        lorteString += string;
     }
 
     private void print(ParseTree node) {
@@ -23,7 +29,20 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     private void indent() {
-        print(Strings.repeat("\t", indentLevel));
+        print(Strings.repeat(" ", indentLevel * spaces));
+    }
+
+    public PrettyPrintVisitor() {
+        this(4);
+    }
+
+    public PrettyPrintVisitor(int spaces) {
+        this.spaces = spaces;
+    }
+
+    public String gogogo(ParseTree tree) {
+        this.visit(tree);
+        return lorteString;
     }
 
     @Override

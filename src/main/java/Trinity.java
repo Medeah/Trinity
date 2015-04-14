@@ -15,7 +15,7 @@ public class Trinity {
 
         try {
             //byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-            byte[] encoded = Files.readAllBytes(Paths.get("/Users/mathias/Documents/Github/Trinity/src/test/resources/parsing-tests-new.tri"));
+            byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/parsing-tests-new.tri"));
 
             String is = new String(encoded, Charset.defaultCharset());
             //String out = compile(is);

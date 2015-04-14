@@ -335,10 +335,17 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         if(ctx.exprList() != null) {
             ctx.exprList().accept(this);
         } else {
-            // RANGE
-            print(ctx.getChild(1));
+            ctx.range().accept(this);
         }
         print("]");
+        return null;
+    }
+
+    @Override
+    public Object visitRange (TrinityParser.RangeContext ctx) {
+        print(ctx.NUMBER(0));
+        print("..");
+        print(ctx.NUMBER(1));
         return null;
     }
 

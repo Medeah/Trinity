@@ -65,8 +65,9 @@ expr: ID '(' exprList? ')'              # FunctionCall
 
 exprList: expr (',' expr)* ;
 
-vector: '[' (exprList | RANGE) ']' ;
+vector: '[' (exprList | range) ']' ;
 matrix: vector vector+ ; // [][]...[]
+range:   NUMBER '..' NUMBER ;
 
 size: '[' (NUMBER|ID) ',' (NUMBER|ID) ']'     # MatrixSize
     | '[' (NUMBER|ID) ']'                     # VectorSize

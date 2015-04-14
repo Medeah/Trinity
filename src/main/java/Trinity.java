@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 public class Trinity {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
+        /*if (args.length != 1) {
             showUsage();
-        }
+        }*/
 
         try {
             //byte[] encoded = Files.readAllBytes(Paths.get(args[0]));

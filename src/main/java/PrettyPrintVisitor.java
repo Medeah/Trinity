@@ -4,7 +4,9 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVisitor {
+import java.util.Objects;
+
+public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
     private int indentLevel = 0;
 

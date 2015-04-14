@@ -330,8 +330,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor implements TrinityVis
     @Override
     public Object visitVector(TrinityParser.VectorContext ctx) {
         print("[");
-        ParseTree child = ctx.getChild(1); //.accept(this);
-        if (ctx.exprList() != null) {
+        if(ctx.exprList() != null) {
             ctx.exprList().accept(this);
         } else {
             // RANGE

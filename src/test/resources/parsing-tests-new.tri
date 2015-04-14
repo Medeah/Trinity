@@ -5,6 +5,7 @@ Boolean t = true
 # and stuff
 Scalar s = 1
 Vector v = [1,5,6]
+Vector w = [1.. 9]
 Matrix m = [1,2][4,5]
 
 # Expressions

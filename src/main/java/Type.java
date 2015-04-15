@@ -1,23 +1,7 @@
 // Class for representing and handling types in Trinity
 
-public class Type {
-    public Type(TrinityType input) {
-        setType(input);
-    }
+import java.util.List;
 
-    public Type() {
-        setType(null);
-    }
-
-    public TrinityType getType() {
-        return type;
-    }
-
-    public void setType(TrinityType type) {
-        this.type = type;
-    }
-
-    public enum TrinityType {BOOLEAN, SCALAR, VECTOR, MATRIX}
-
-    private TrinityType type;
+public abstract class Type {
+    //public String getName();
 }

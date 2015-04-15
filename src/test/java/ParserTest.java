@@ -1,5 +1,7 @@
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +13,13 @@ public class ParserTest {
 
     @Test
     public void correctSyntax_parseFile() throws Exception  {
-        InputStream is = this.getClass().getResourceAsStream("parsing-tests-new.tri");
+        InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
         TrinityParser parser = createParser(is);
-        ParseTree tree = parser.prog();
+
+        parser.removeErrorListeners();
+        parser.addErrorListener(new DiagnosticErrorListener());
+        parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+        parser.prog();
         assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 

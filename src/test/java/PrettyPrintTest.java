@@ -23,14 +23,14 @@ public class PrettyPrintTest {
 
     @Test
     public void testPrettyPrinter() throws Exception  {
-        URL url = Resources.getResource("pretty.tri");
+        URL url = Resources.getResource("parsing-tests.tri");
         String pretty = Resources.toString(url, Charsets.UTF_8);
 
         TrinityParser parser = createParser("ugly.tri");
         ParseTree tree = parser.prog();
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor();
 
-        String prettyPrinted = prettyPrinter.gogogo(tree);
+        String prettyPrinted = prettyPrinter.prettyfy(tree);
 
         assertEquals(pretty, prettyPrinted);
     }

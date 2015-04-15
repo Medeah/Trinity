@@ -1,37 +1,32 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
-prog: (functionDecl | expr)* ;
+prog: (functionDecl | stmt)* ;
 
 // Declarations
 
-constDecl: type ID '=' expr ;
+constDecl: type ID '=' semiExpr;
 
-functionDecl: type ID '(' formalParameters? ')' block; // Scalar f(Vector x) {...} ;
+functionDecl: type ID '(' formalParameters? ')' 'do' block 'end' ;
 formalParameters: formalParameter (',' formalParameter)* ;
-formalParameter: type ID;
+formalParameter: type ID ;
 
 type: TYPE size? ;
 
 // Statements
 
-block: BLOCKSTART expr* BLOCKEND ; // possibly empty statement block
+block: stmt* ('return' semiExpr)? ;
 
-/*stmt: block             // mega nice block scope
-    | constDecl
-    | 'for' TYPE ID 'in' expr ('by' NUMBER)? block
-    | ifBlock
-  //  | 'return' expr? ';'
-    |  expr ';' // including function call
-    ;*/
-//stmt: expr ;
+semiExpr: expr LINETERMINATOR;
 
-// TODO: inconsistent grammar design
-ifBlock: ifStmt elseIfStmt* elseStmt? 'end' ;
-ifStmt: 'if' expr 'do' expr* ;
-elseIfStmt: 'elseif' expr 'do' expr* ;
-elseStmt: 'else' 'do' expr*;
-
+stmt: constDecl                       # ConstDeclaration
+    | semiExpr                         # SingleExpression
+    | 'for' type ID 'in' expr 'do' block 'end'      # ForLoop
+    | 'if' expr 'then' block
+      ('elseif' expr 'then' block)*
+      ('else' block)? 'end'                         # IfStatement
+    | 'do' block 'end'                              # BlockStatement
+    ;
 
 // Expressions
 
@@ -55,11 +50,6 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | matrix                            # MatrixLit
     | vector                            # VectorLit // TODO: naming
     | '(' expr ')'                      # Parens
-    | constDecl                         # ConstDeclaration
-    //| 'for' type ID 'in' expr ('by' NUMBER)? block #ForLoop
-    | 'for' type ID 'in' expr block     #ForLoop
-    | ifBlock                           # If
-    | block                             # BlockExpression
  //   |  expr ';' // including function call
     ;
 

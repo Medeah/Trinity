@@ -13,7 +13,7 @@ public class ParserTest {
 
     @Test
     public void correctSyntax_parseFile() throws Exception  {
-        InputStream is = this.getClass().getResourceAsStream("parsing-tests-new.tri");
+        InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
         TrinityParser parser = createParser(is);
 
         parser.removeErrorListeners();

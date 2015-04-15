@@ -8,6 +8,7 @@ ELSE: 'else' ;
 ELSEIF: 'elseif' ;
 RETURN: 'return' ;
 
+
 TYPE
    :   'Boolean'
    |   'Scalar'
@@ -23,6 +24,9 @@ ID  :   [a-zA-Z][a-zA-Z0-9]* ;
 
 COMMENT : '#' ~'\n'* -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;
+
+LINETERMINATOR: ';' ; //('\n' '\r'?)+ ;
+
 
 fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
 fragment EXP :   [Ee] [+\-]? INT ;

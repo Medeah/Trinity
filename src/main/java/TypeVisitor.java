@@ -157,7 +157,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return null;
     }
 */
-    @Override
+   /* @Override
     public Type visitIfBlock(TrinityParser.IfBlockContext ctx) {
         return null;
     }
@@ -175,7 +175,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitElseStmt(TrinityParser.ElseStmtContext ctx) {
         return null;
-    }
+    }*/
 
 
     @Override

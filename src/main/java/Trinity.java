@@ -24,14 +24,14 @@ public class Trinity {
         CommandLineOptions options = new CommandLineOptions();
         JCommander jc = new JCommander(options, args);
 
-        if (options.files.size() == 0) {
+        /*if (options.files.size() == 0) {
             jc.usage();
             System.exit(1);
-        }
+        }*/ options.prettyPrint = true;
 
         try {
-            byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-            //byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/parsing-tests-new.tri"));
+            //byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+            byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/ugly-semi.tri"));
 
             String is = new String(encoded, Charset.defaultCharset());
 

@@ -1,9 +1,13 @@
+package trinity.tests;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
+import trinity.*;
+import trinity.visitors.PrettyPrintVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +27,10 @@ public class PrettyPrintTest {
 
     @Test
     public void testPrettyPrinter() throws Exception  {
-        URL url = Resources.getResource("parsing-tests.tri");
+        URL url = Resources.getResource(this.getClass(), "/trinity/tests/parsing-tests.tri");
         String pretty = Resources.toString(url, Charsets.UTF_8);
 
-        TrinityParser parser = createParser("ugly.tri");
+        TrinityParser parser = createParser("/trinity/tests/ugly.tri");
         ParseTree tree = parser.prog();
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor();
 

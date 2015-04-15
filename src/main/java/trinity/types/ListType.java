@@ -1,4 +1,7 @@
+package trinity.types;
+
 import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 public class ListType extends Type {

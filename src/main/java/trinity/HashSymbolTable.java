@@ -1,4 +1,8 @@
-import CustomExceptions.*;
+package trinity;
+
+import trinity.CustomExceptions.SymbolAlreadyDefinedException;
+import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.Type;
 
 import java.util.*;
 
@@ -88,7 +92,7 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     /**
-     * tests whether name is present in the symbol table’s
+     * trinity whether name is present in the symbol table’s
      * current (innermost) scope. If it is, true is returned. If name is in an outer
      * scope, or is not in the symbol table at all, false is returned.
      */

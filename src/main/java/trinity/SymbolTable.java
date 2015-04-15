@@ -1,5 +1,8 @@
-import CustomExceptions.SymbolAlreadyDefinedException;
-import CustomExceptions.SymbolNotFoundException;
+package trinity;
+
+import trinity.CustomExceptions.SymbolAlreadyDefinedException;
+import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.Type;
 
 public interface SymbolTable {
     public void openScope();

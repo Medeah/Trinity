@@ -1,4 +1,4 @@
-package CustomExceptions;
+package trinity.CustomExceptions;
 
 public class SymbolAlreadyDefinedException extends Exception {
 

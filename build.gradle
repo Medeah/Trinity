@@ -4,7 +4,7 @@ apply plugin: 'application'
 
 version = '0.1'
 
-mainClassName = 'Trinity'
+mainClassName = 'trinity.Trinity'
 
 task wrapper(type: Wrapper) {
   gradleVersion = '2.3'
@@ -22,8 +22,8 @@ dependencies {
 }
 
 generateGrammarSource {
-    outputDirectory = file("src/main/generated")
-    arguments = ["-visitor"]
+    outputDirectory = file("src/main/generated/trinity")
+    arguments = ["-visitor", "-no-listener", "-package", "trinity"]
 }
 
 sourceSets {

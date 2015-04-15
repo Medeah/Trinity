@@ -1,3 +1,5 @@
+package trinity.types;
+
 public class PrimitiveType extends Type {
     final private EnumType ptype;
 

@@ -42,8 +42,8 @@ else
 end
 
 # blawks!
-do call() end
-do stuff() do 1+2 end end
+do call(); end
+do stuff(); do 1+2; end end
 
 # Function declaration
 Matrix f(Scalar s1, Scalar s2) do
@@ -57,6 +57,9 @@ end
 
 Scalar sf() do 2 + 2;
 end
+
+Vector v(Scalar a) do 1+1; return true; end
+
 # Functions calls
 Matrix n = f(5,20  +3);
 fire(parma,skinke, gideon, 2 +2e3, xz/lol-(os),arnejohn);

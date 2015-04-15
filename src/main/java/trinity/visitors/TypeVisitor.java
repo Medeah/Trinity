@@ -1,17 +1,21 @@
-import CustomExceptions.SymbolAlreadyDefinedException;
-import CustomExceptions.SymbolNotFoundException;
+package trinity.visitors;
+
 import org.antlr.v4.runtime.tree.ErrorNode;
+import trinity.*;
+import trinity.CustomExceptions.SymbolAlreadyDefinedException;
+import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
-    TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
+    public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
         this.errorReporter = errorReporter;
         this.symbolTable = symbolTable;
     }
 
-    TypeVisitor() {
+    public TypeVisitor() {
         errorReporter = new StandardErrorReporter(true);
     }
 
@@ -32,12 +36,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     /*@Override
-    public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
+    public trinity.types.Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         // Declared (expected) type:
-        Type LHS = ctx.TYPE().accept(this);
+        trinity.types.Type LHS = ctx.TYPE().accept(this);
 
-        // Type found in expr (RHS of declaration)
-        Type RHS = ctx.expr().accept(this);
+        // trinity.types.Type found in expr (RHS of declaration)
+        trinity.types.Type RHS = ctx.expr().accept(this);
 
         // Check if the two achieved types matches each other and react accordingly:
         if (LHS.equals(RHS)) {
@@ -108,7 +112,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     /*@Override
-    public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
+    public trinity.types.Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
         System.out.println("Err");
         System.out.println("and err");
         System.out.println("and err again,");
@@ -120,8 +124,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
-        Type parameterType = ctx.TYPE().accept(this);
+    public trinity.types.Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
+        trinity.types.Type parameterType = ctx.TYPE().accept(this);
 
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), parameterType);
@@ -134,9 +138,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 /*
 
     @Override
-    public Type visitBlock(TrinityParser.BlockContext ctx) {
-        Type stmtType = new Type();
-        List<Type> allStmtTypes = new ArrayList<Type>();
+    public trinity.types.Type visitBlock(TrinityParser.BlockContext ctx) {
+        trinity.types.Type stmtType = new trinity.types.Type();
+        List<trinity.types.Type> allStmtTypes = new ArrayList<trinity.types.Type>();
 
         // Add all stmt types which are not null...
         for (int i = 0; i < ctx.stmt().size(); i++) {
@@ -147,7 +151,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         // Check if all stmtTypes are compatible...
-        Type decidingStmtType = allStmtTypes.get(0);
+        trinity.types.Type decidingStmtType = allStmtTypes.get(0);
         for (int i = 0; i < allStmtTypes.size(); i++) {
             if (allStmtTypes.get(i) != decidingStmtType) {
                 errorReporter.reportError("");
@@ -158,22 +162,22 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 */
    /* @Override
-    public Type visitIfBlock(TrinityParser.IfBlockContext ctx) {
+    public trinity.types.Type visitIfBlock(TrinityParser.IfBlockContext ctx) {
         return null;
     }
 
     @Override
-    public Type visitIfStmt(TrinityParser.IfStmtContext ctx) {
+    public trinity.types.Type visitIfStmt(TrinityParser.IfStmtContext ctx) {
         return null;
     }
 
     @Override
-    public Type visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
+    public trinity.types.Type visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
         return null;
     }
 
     @Override
-    public Type visitElseStmt(TrinityParser.ElseStmtContext ctx) {
+    public trinity.types.Type visitElseStmt(TrinityParser.ElseStmtContext ctx) {
         return null;
     }*/
 
@@ -518,7 +522,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             // TODO
             return new MatrixType(3, 3);
         } else {
-            errorReporter.reportError("Type not know, must be one of Matrix, Scalar, Vector or Boolean");
+            errorReporter.reportError("trinity.types.Type not know, must be one of Matrix, Scalar, Vector or Boolean");
             return null;
         }
     }

@@ -1,11 +1,14 @@
+package trinity.tests;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Test;
+import trinity.*;
 
 import static org.junit.Assert.*;
 
@@ -13,7 +16,7 @@ public class ParserTest {
 
     @Test
     public void correctSyntax_parseFile() throws Exception  {
-        InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
+        InputStream is = this.getClass().getResourceAsStream("/trinity/tests/parsing-tests.tri");
         TrinityParser parser = createParser(is);
 
         parser.removeErrorListeners();

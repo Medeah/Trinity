@@ -1,3 +1,5 @@
+package trinity.types;
+
 public class MatrixType extends Type {
     final private int rows;
     final private int cols;

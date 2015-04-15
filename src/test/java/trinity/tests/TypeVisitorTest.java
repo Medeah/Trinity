@@ -1,9 +1,16 @@
-import org.antlr.v4.runtime.tree.ParseTree;
+package trinity.tests;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import org.junit.Before;
 import org.junit.Test;
+import trinity.*;
+import trinity.types.EnumType;
+import trinity.types.PrimitiveType;
+import trinity.types.Type;
+import trinity.visitors.TypeVisitor;
+
 
 import static org.junit.Assert.*;
 
@@ -55,9 +62,9 @@ public class TypeVisitorTest {
         tree = createParseTree("Scalar s = 1;");
         assertEquals(scal ,tree.getChild(0).getChild(0).accept(vis));
         tree = createParseTree("Vector[2] v = [1,2];");
-        assertEquals(new VectorType(2), tree.getChild(0).getChild(0).accept(vis));
+        assertEquals(new trinity.types.VectorType(2), tree.getChild(0).getChild(0).accept(vis));
         tree = createParseTree("Matrix[2,2] m = [1,2][3,4];");
-        assertEquals(new MatrixType(2,2),tree.getChild(0).getChild(0).accept(vis));
+        assertEquals(new trinity.types.MatrixType(2,2),tree.getChild(0).getChild(0).accept(vis));
     }
 
     @Test
@@ -67,25 +74,25 @@ public class TypeVisitorTest {
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.BOOLEAN
+                        + trinity.types.Type.TrinityType.BOOLEAN
                         + " but got "
-                        + Type.TrinityType.SCALAR));
+                        + trinity.types.Type.TrinityType.SCALAR));
 
         tree = createParseTree("Boolean b = [1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.BOOLEAN
+                        + trinity.types.Type.TrinityType.BOOLEAN
                         + " but got "
-                        + Type.TrinityType.VECTOR));
+                        + trinity.types.Type.TrinityType.VECTOR));
 
         tree = createParseTree("Boolean b = [1][1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.BOOLEAN
+                        + trinity.types.Type.TrinityType.BOOLEAN
                         + " but got "
-                        + Type.TrinityType.MATRIX));
+                        + trinity.types.Type.TrinityType.MATRIX));
     }
 
     @Test
@@ -95,25 +102,25 @@ public class TypeVisitorTest {
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.SCALAR
+                        + trinity.types.Type.TrinityType.SCALAR
                         + " but got "
-                        + Type.TrinityType.BOOLEAN));
+                        + trinity.types.Type.TrinityType.BOOLEAN));
 
         tree = createParseTree("Scalar s = [1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.SCALAR
+                        + trinity.types.Type.TrinityType.SCALAR
                         + " but got "
-                        + Type.TrinityType.VECTOR));
+                        + trinity.types.Type.TrinityType.VECTOR));
 
         tree = createParseTree("Scalar s = [1][1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.SCALAR
+                        + trinity.types.Type.TrinityType.SCALAR
                         + " but got "
-                        + Type.TrinityType.MATRIX));
+                        + trinity.types.Type.TrinityType.MATRIX));
     }
 
     @Test
@@ -123,25 +130,25 @@ public class TypeVisitorTest {
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.VECTOR
+                        + trinity.types.Type.TrinityType.VECTOR
                         + " but got "
-                        + Type.TrinityType.BOOLEAN));
+                        + trinity.types.Type.TrinityType.BOOLEAN));
 
         tree = createParseTree("Vector v = 1;");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.VECTOR
+                        + trinity.types.Type.TrinityType.VECTOR
                         + " but got "
-                        + Type.TrinityType.SCALAR));
+                        + trinity.types.Type.TrinityType.SCALAR));
 
         tree = createParseTree("Vector v = [1][1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.VECTOR
+                        + trinity.types.Type.TrinityType.VECTOR
                         + " but got "
-                        + Type.TrinityType.MATRIX));
+                        + trinity.types.Type.TrinityType.MATRIX));
     }
 
     @Test
@@ -151,25 +158,25 @@ public class TypeVisitorTest {
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.MATRIX
+                        + trinity.types.Type.TrinityType.MATRIX
                         + " but got "
-                        + Type.TrinityType.BOOLEAN));
+                        + trinity.types.Type.TrinityType.BOOLEAN));
 
         tree = createParseTree("Matrix m = 1;");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.MATRIX
+                        + trinity.types.Type.TrinityType.MATRIX
                         + " but got "
-                        + Type.TrinityType.SCALAR));
+                        + trinity.types.Type.TrinityType.SCALAR));
 
         tree = createParseTree("Matrix m = [1];");
         tree.getChild(0).getChild(0).accept(vis);
         assertTrue(er.getError(er.getErrorAmount() - 1)
                 .equals("TYPE ERROR: Expected type "
-                        + Type.TrinityType.MATRIX
+                        + trinity.types.Type.TrinityType.MATRIX
                         + " but got "
-                        + Type.TrinityType.VECTOR));
+                        + trinity.types.Type.TrinityType.VECTOR));
     }
 
     @Test
@@ -180,11 +187,11 @@ public class TypeVisitorTest {
 
         // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Vector[2] v = [1,2] + [2,3] - ([5,4] + [2,1]);");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis), new VectorType(2));
+        assertEquals(tree.getChild(0).getChild(0).accept(vis), new trinity.types.VectorType(2));
 
         // Check if the given ConstDecl have same types on LHS and RHS...
         tree = createParseTree("Matrix[2,2] m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);");
-        assertEquals(tree.getChild(0).getChild(0).accept(vis), new MatrixType(2,2));
+        assertEquals(tree.getChild(0).getChild(0).accept(vis), new trinity.types.MatrixType(2,2));
     }
 
     @Test
@@ -192,7 +199,7 @@ public class TypeVisitorTest {
         // Check if the correct ErrorReport is thrown...
         tree = createParseTree("Boolean b = 4 <= (8 and 4) == 7 or 3 != 2;");
         tree.getChild(0).getChild(0).accept(vis);
-        assertTrue(er.getError(0).equals("ERROR: Type error at AND."));
+        assertTrue(er.getError(0).equals("ERROR: trinity.types.Type error at AND."));
     }
 */
 }

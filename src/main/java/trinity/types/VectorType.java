@@ -1,3 +1,5 @@
+package trinity.types;
+
 public class VectorType extends Type {
     final private int numElems;
     public VectorType(int numElems)

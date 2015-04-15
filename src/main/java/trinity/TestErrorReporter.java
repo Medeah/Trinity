@@ -1,15 +1,21 @@
-public class StandardErrorReporter implements ErrorReporter {
-    private int errorAmount = 0;
-    private boolean failOnError;
+package trinity;
 
-    public StandardErrorReporter(boolean fail) {
-        failOnError = fail;
+import trinity.types.Type;
+
+import java.util.ArrayList;
+
+public class TestErrorReporter implements ErrorReporter {
+    private int errorAmount;
+    private ArrayList<String> errorList;
+
+    public TestErrorReporter() {
+        errorAmount = 0;
+        errorList = new ArrayList<String>();
     }
 
-    public StandardErrorReporter() {
-        failOnError = true;
+    public String getError(int i) {
+        return errorList.get(i);
     }
-
 
     @Override
     public int getErrorAmount() {
@@ -17,11 +23,8 @@ public class StandardErrorReporter implements ErrorReporter {
     }
 
     private void errorHandling(String message) {
-        System.out.println(message);
+        errorList.add(message);
         errorAmount++;
-        if (failOnError) {
-            System.exit(1);
-        }
     }
 
     @Override

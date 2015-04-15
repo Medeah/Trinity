@@ -1,9 +1,13 @@
-import CustomExceptions.SymbolAlreadyDefinedException;
-import CustomExceptions.SymbolNotFoundException;
+package trinity.tests;
+
+import trinity.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import trinity.CustomExceptions.SymbolAlreadyDefinedException;
+import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

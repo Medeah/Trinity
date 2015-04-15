@@ -1,8 +1,13 @@
+package trinity.visitors;
+
 import com.google.common.base.Strings;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import trinity.TrinityBaseVisitor;
+import trinity.TrinityParser;
+import trinity.TrinityVisitor;
 
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
@@ -112,6 +117,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
             indent();
             print("return ");
             ctx.semiExpr().accept(this);
+            print(System.lineSeparator());
         }
         this.indentLevel--;
         indent();
@@ -378,7 +384,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 //    BufferedTokenStream tokens;
 //    TokenStreamRewriter rewriter;
 //
-//    public PrettyPrintVisitor(BufferedTokenStream tokens) {
+//    public trinity.visitors.PrettyPrintVisitor(BufferedTokenStream tokens) {
 //        this.tokens = tokens;
 //        rewriter = new TokenStreamRewriter(tokens);
 //    }

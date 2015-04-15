@@ -71,6 +71,10 @@ end
 Scalar sf () do
     2 + 2;
 end
+Vector v (Scalar a) do
+    1 + 1;
+    return true;
+end
 Matrix n = f(5, 20 + 3);
 fire(parma, skinke, gideon, 2 + 2e3, xz / lol - (os), arnejohn);
 Matrix[3, 3] mat = [1, 2, 3][4, 5, 6][7, 8, 9];

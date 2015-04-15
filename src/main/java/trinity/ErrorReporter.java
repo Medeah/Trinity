@@ -1,3 +1,7 @@
+package trinity;
+
+import trinity.types.Type;
+
 public interface ErrorReporter {
 
     public int getErrorAmount();
@@ -5,6 +9,6 @@ public interface ErrorReporter {
     // Default errors:
     public void reportError(String message);
 
-    // Type errors;
+    // trinity.types.Type errors;
     public void reportTypeError(Type expectedType, Type receivedType);
 }

@@ -31,26 +31,25 @@ stmt: constDecl                       # ConstDeclaration
 // Expressions
 
 // TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
-expr: ID '(' exprList? ')'              # FunctionCall
-    | ID '[' expr ']'                   # VectorIndexing
-    | ID '[' expr ',' expr ']'          # MatrixIndexing
-    | '-' expr                          # Negate
-    | '!' expr                          # Not
-    | expr '\''                         # Transpose
-    | <assoc=right> expr op='^' expr    # Exponent
-    | expr op=('*'|'/'|'%') expr        # MultDivMod
-    | expr op=('+'|'-') expr            # AddSub
-    | expr op=('<'|'>'|'<='|'>=') expr  # Relation
-    | expr op=('=='|'!=') expr          # Equality
-    | expr op='and' expr                # And
-    | expr op='or' expr                 # Or
-    | ID                                # Identifier
-    | NUMBER                            # Number
-    | BOOL                              # Boolean
-    | matrix                            # MatrixLit
-    | vector                            # VectorLit // TODO: naming
-    | '(' expr ')'                      # Parens
- //   |  expr ';' // including function call
+expr: ID '(' exprList? ')'          # FunctionCall
+    | ID '[' expr ']'               # VectorIndexing
+    | ID '[' expr ',' expr ']'      # MatrixIndexing
+    | '-' expr                      # Negate
+    | '!' expr                      # Not
+    | expr '\''                     # Transpose
+    | <assoc=right> expr '^' expr   # Exponent
+    | expr ('*'|'/'|'%') expr       # MultDivMod
+    | expr ('+'|'-') expr           # AddSub
+    | expr ('<'|'>'|'<='|'>=') expr # Relation
+    | expr ('=='|'!=') expr         # Equality
+    | expr 'and' expr               # And
+    | expr 'or' expr                # Or
+    | ID                            # Const
+    | NUMBER                        # Number
+    | BOOL                          # Boolean
+    | matrix                        # MatrixLit
+    | vector                        # VectorLit // TODO: naming
+    | '(' expr ')'                  # Parens
     ;
 
 exprList: expr (',' expr)* ;

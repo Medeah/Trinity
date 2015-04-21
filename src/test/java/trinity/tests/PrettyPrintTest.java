@@ -38,6 +38,4 @@ public class PrettyPrintTest {
 
         assertEquals(pretty, prettyPrinted);
     }
-
-
 }

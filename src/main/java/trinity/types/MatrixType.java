@@ -29,4 +29,8 @@ public class MatrixType extends Type {
     @Override public int hashCode() {
         return new Integer(this.rows).hashCode() ^ new Integer(this.cols).hashCode();
     }
+
+    @Override public String toString() {
+        return "Matrix[" + rows + "," + cols + "]";
+    }
 }

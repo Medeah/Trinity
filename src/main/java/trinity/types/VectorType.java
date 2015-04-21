@@ -22,5 +22,7 @@ public class VectorType extends Type {
     @Override public int hashCode() {
         return new Integer(this.numElems).hashCode();
     }
-
+    @Override public String toString() {
+        return "Matrix[" + numElems + "]";
+    }
 }

@@ -2,18 +2,23 @@ package trinity;
 
 import trinity.CustomExceptions.SymbolAlreadyDefinedException;
 import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.FunctionType;
 import trinity.types.Type;
 
 public interface SymbolTable {
-    public void openScope();
+    void openScope();
 
-    public void closeScope();
+    void closeScope();
 
-    public int getCurrentScopeDepth();
+    int getCurrentScopeDepth();
 
-    public Type retrieveSymbol(String name) throws SymbolNotFoundException;
+    Type retrieveSymbol(String name) throws SymbolNotFoundException;
 
-    public void enterSymbol(String name, Type type) throws SymbolAlreadyDefinedException;
+    void enterSymbol(String name, Type type) throws SymbolAlreadyDefinedException;
 
-    public boolean declaredLocally(String name);
+    boolean declaredLocally(String name);
+
+    FunctionType getfunc();
+
+    void setfunc(FunctionType inp);
 }

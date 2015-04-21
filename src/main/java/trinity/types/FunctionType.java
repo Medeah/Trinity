@@ -30,4 +30,12 @@ public class FunctionType extends Type {
     @Override public int hashCode() {
         return returnType.hashCode() ^ parameterTypes.hashCode();
     }
+
+    @Override public String toString() {
+        String out = returnType.toString();
+        for (Type t : parameterTypes) {
+            out+= t.toString();
+        }
+        return out;
+    }
 }

@@ -8,14 +8,6 @@ ELSE: 'else' ;
 ELSEIF: 'elseif' ;
 RETURN: 'return' ;
 
-
-TYPE
-   :   'Boolean'
-   |   'Scalar'
-   |   'Vector'
-   |   'Matrix'
-   ;
-
 BOOL:   'true' | 'false' ;
 
 NUMBER:   INT ('.' [0-9]+)? EXP? ; // 3, 1.35, 1.3e9, 1E10

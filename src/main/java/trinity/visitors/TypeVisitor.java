@@ -35,22 +35,25 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
     }
 
-    /*@Override
-    public trinity.types.Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
+    @Override
+    public Type visitProg(TrinityParser.ProgContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         // Declared (expected) type:
-        trinity.types.Type LHS = ctx.TYPE().accept(this);
+        Type LHS = ctx.type().accept(this);
 
         // trinity.types.Type found in expr (RHS of declaration)
-        trinity.types.Type RHS = ctx.expr().accept(this);
+        Type RHS = ctx.semiExpr().accept(this);
 
         // Check if the two achieved types matches each other and react accordingly:
         if (LHS.equals(RHS)) {
 
             try {
                 symbolTable.enterSymbol(ctx.ID().getText(), LHS);
-
             } catch (SymbolAlreadyDefinedException e) {
-
                 errorReporter.reportError("Symbol was already defined!");
             }
 
@@ -60,7 +63,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         return null;
-    }*/
+    }
 
     @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
@@ -74,16 +77,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             formalParamterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
         }
 
-        Type blockType = ctx.block().accept(this);
-
-        if (expect(funcType, blockType)) {
-            Type functionDecl = new FunctionType(funcType, formalParamterTypes);
-            try {
-                symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
-            } catch (SymbolAlreadyDefinedException e) {
-                errorReporter.reportError("Symbol was already defined!");
-            }
+        FunctionType functionDecl = new FunctionType(funcType, formalParamterTypes);
+        try {
+            symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("Symbol was already defined!");
         }
+        symbolTable.setfunc(functionDecl);
+        ctx.block().accept(this);
 
         symbolTable.closeScope();
 
@@ -111,21 +112,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     }
 
-    /*@Override
-    public trinity.types.Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
-        System.out.println("Err");
-        System.out.println("and err");
-        System.out.println("and err again,");
-        System.out.println("but less");
-        System.out.println("and less");
-        System.out.println("and less.");
+    @Override
+    public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
+        errorReporter.reportError("internal compiler error. visitFormalParameters should never be called");
 
-        return nullllllllllll;
+        return null;
     }
 
     @Override
-    public trinity.types.Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
-        trinity.types.Type parameterType = ctx.TYPE().accept(this);
+    public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
+        Type parameterType = ctx.type().accept(this);
 
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), parameterType);
@@ -135,71 +131,64 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         return parameterType;
     }
-/*
 
     @Override
-    public trinity.types.Type visitBlock(TrinityParser.BlockContext ctx) {
-        trinity.types.Type stmtType = new trinity.types.Type();
-        List<trinity.types.Type> allStmtTypes = new ArrayList<trinity.types.Type>();
-
-        // Add all stmt types which are not null...
+    public Type visitBlock(TrinityParser.BlockContext ctx) {
+        symbolTable.openScope();
         for (int i = 0; i < ctx.stmt().size(); i++) {
-            stmtType = ctx.stmt(i).accept(this);
-            if (stmtType.getType() != null) {
-                allStmtTypes.add(stmtType);
-            }
+            ctx.stmt(i).accept(this);
         }
 
-        // Check if all stmtTypes are compatible...
-        trinity.types.Type decidingStmtType = allStmtTypes.get(0);
-        for (int i = 0; i < allStmtTypes.size(); i++) {
-            if (allStmtTypes.get(i) != decidingStmtType) {
-                errorReporter.reportError("");
-            }
+        if (ctx.semiExpr() != null) {
+            ctx.semiExpr().accept(this);
         }
-
-        return null;
-    }
-*/
-   /* @Override
-    public trinity.types.Type visitIfBlock(TrinityParser.IfBlockContext ctx) {
+        symbolTable.closeScope();
         return null;
     }
 
     @Override
-    public trinity.types.Type visitIfStmt(TrinityParser.IfStmtContext ctx) {
+    public Type visitSemiExpr(TrinityParser.SemiExprContext ctx) {
+        return ctx.expr().accept(this);
+    }
+
+    //TODO
+    @Override
+    public Type visitForLoop(TrinityParser.ForLoopContext ctx) {
         return null;
     }
 
+    //TODO
     @Override
-    public trinity.types.Type visitElseIfStmt(TrinityParser.ElseIfStmtContext ctx) {
+    public Type visitIfStatement(TrinityParser.IfStatementContext ctx) {
         return null;
-    }
-
-    @Override
-    public trinity.types.Type visitElseStmt(TrinityParser.ElseStmtContext ctx) {
-        return null;
-    }*/
-
-
-    @Override
-    public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
-        return ctx.vector().accept(this);
     }
 
     @Override
     public Type visitVector(TrinityParser.VectorContext ctx) {
-        // TODO check range
-        List<TrinityParser.ExprContext> exprs = ctx.exprList().expr();
-        for (TrinityParser.ExprContext expr : exprs) {
-            expect(scalar, expr.accept(this));
+        if (ctx.range() != null) {
+            return ctx.range().accept(this);
+        } else {
+            List<TrinityParser.ExprContext> exprs = ctx.exprList().expr();
+            for (TrinityParser.ExprContext expr : exprs) {
+                expect(scalar, expr.accept(this));
+            }
+            return new VectorType(exprs.size());
         }
-        return new VectorType(exprs.size());
+    }
+
+    @Override
+    public Type visitRange(TrinityParser.RangeContext ctx) {
+        int from  = new Integer(ctx.NUMBER(0).getText());
+        int to  = new Integer(ctx.NUMBER(1).getText());
+        if (from > to) {
+            errorReporter.reportError("report in range, from is larger than to ");
+        }
+        return new VectorType(to - from + 1);
     }
 
     @Override
     public Type visitExprList(TrinityParser.ExprListContext ctx) {
-        errorReporter.reportError("what?");
+        errorReporter.reportError("internal error, visitExprList");
         return null;
     }
 
@@ -262,8 +251,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
-        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr(0).accept(this));
-        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr(1).accept(this));
+        expect(scalar, ctx.expr(0).accept(this));
+        expect(scalar, ctx.expr(1).accept(this));
         Type id = ctx.ID().accept(this);
         if (id instanceof MatrixType) {
             return new PrimitiveType(EnumType.SCALAR);
@@ -276,6 +265,11 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitParens(TrinityParser.ParensContext ctx) {
         return ctx.expr().accept(this);
+    }
+
+    @Override
+    public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
+        return ctx.vector().accept(this);
     }
 
     @Override
@@ -456,10 +450,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             errorReporter.reportError("what?");
         }
 
-
         return null;
-
-
     }
 
     @Override
@@ -484,47 +475,44 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return op;
     }
 
-
-
-
     @Override
-    public Type visitType(TrinityParser.TypeContext ctx) {
-
-        String prim = ctx.TYPE().getSymbol().getText(); // meh
-
-        // Check and return type of node
+    public Type visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
+        String prim = ctx.getChild(0).getText();
         if (prim.contentEquals("Boolean")) {
-            if (ctx.size() != null) {
-                errorReporter.reportError("size not allowed for Boolean");
-                return null;
-            }
-            return new PrimitiveType(EnumType.BOOLEAN);
+            return bool;
         } else if (prim.contentEquals("Scalar")) {
-            if (ctx.size() != null) {
-                errorReporter.reportError("size not allowed for Scalar");
-                return null;
-            }
-            return new PrimitiveType(EnumType.SCALAR);
-        } else if (prim.contentEquals("Vector")) {
-            TrinityParser.SizeContext size = ctx.size();
-            if (size == null) {
-                errorReporter.reportError("Vector must have size");
-                return null;
-
-            }
-            if (size.getRuleIndex() == 0) {
-                errorReporter.reportError("Vector needs size of one dim");
-                return null;
-            }
-            size.getChildCount();
-            return new VectorType(3);
-        } else if (prim.contentEquals("Matrix")) {
-            // TODO
-            return new MatrixType(3, 3);
+            return scalar;
         } else {
-            errorReporter.reportError("trinity.types.Type not know, must be one of Matrix, Scalar, Vector or Boolean");
+            errorReporter.reportError("hmm");
             return null;
         }
+    }
+
+    @Override
+    public Type visitVectorType(TrinityParser.VectorTypeContext ctx) {
+        Type out = null;
+        if (ctx.ID() != null) {
+            errorReporter.reportError("IDs not supported ... yet");
+        } else {
+            int size = new Integer(ctx.NUMBER().getText());
+            out = new VectorType(size);
+        }
+        return out;
+    }
+
+    @Override
+    public Type visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
+        Type out = null;
+        if (ctx.ID(1) != null || ctx.ID(0) != null) {
+            errorReporter.reportError("IDs not supported ... yet");
+        } else {
+            int rows = new Integer(ctx.NUMBER(0).getText());
+            int cols = new Integer(ctx.NUMBER(1).getText());
+
+            out = new MatrixType(rows, cols);
+        }
+
+        return out;
     }
 
     // TODO find ud af hvornår dette sker

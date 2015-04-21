@@ -2,6 +2,7 @@ package trinity;
 
 import trinity.CustomExceptions.SymbolAlreadyDefinedException;
 import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.types.FunctionType;
 import trinity.types.Type;
 
 import java.util.*;
@@ -99,4 +100,24 @@ public class HashSymbolTable implements SymbolTable {
     public boolean declaredLocally(String id) {
         return hashTable.containsKey(id) && hashTable.get(id).depth == getCurrentScopeDepth();
     }
+
+    // TODO can we do better?
+    public FunctionType getfunc() {
+        try {
+            return (FunctionType)retrieveSymbol("##func");
+        } catch (SymbolNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void setfunc(FunctionType inp) {
+        try {
+            enterSymbol("##func", inp);
+        } catch (SymbolAlreadyDefinedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

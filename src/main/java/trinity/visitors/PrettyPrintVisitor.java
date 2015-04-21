@@ -8,6 +8,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
+import trinity.types.MatrixType;
+import trinity.types.Type;
+import trinity.types.VectorType;
 
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
@@ -92,15 +95,6 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         ctx.type().accept(this);
         print(ctx.ID());
-        return null;
-    }
-
-    @Override
-    public Object visitType(TrinityParser.TypeContext ctx) {
-        print(ctx.TYPE());
-        if (ctx.size() != null)
-            ctx.size().accept(this);
-        print(" ");
         return null;
     }
 
@@ -353,20 +347,40 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitMatrixSize(TrinityParser.MatrixSizeContext ctx) {
-        print("[");
-        print(ctx.getChild(1).getText());
-        print(", ");
-        print(ctx.getChild(3).getText());
-        print("]");
+    public Type visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
+        print(ctx.getChild(0));
+        print(" ");
         return null;
     }
 
     @Override
-    public Object visitVectorSize(TrinityParser.VectorSizeContext ctx) {
-        print("[");
-        print(ctx.getChild(1).getText());
-        print("]");
+    public Type visitVectorType(TrinityParser.VectorTypeContext ctx) {
+        print("Vector[");
+        if (ctx.NUMBER() != null) {
+            print(ctx.NUMBER());
+        } else {
+            print(ctx.ID());
+        }
+        print("] ");
+        return null;
+    }
+
+    @Override
+    public Type visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
+        print("Matrix[");
+        if (ctx.NUMBER(0) != null) {
+            print(ctx.NUMBER(0));
+        } else {
+            print(ctx.ID(0));
+        }
+        print(",");
+        if (ctx.NUMBER(1) != null) {
+            print(ctx.NUMBER(1));
+        } else {
+            print(ctx.ID(1));
+        }
+
+        print("] ");
         return null;
     }
 

@@ -11,7 +11,10 @@ functionDecl: type ID '(' formalParameters? ')' 'do' block 'end' ;
 formalParameters: formalParameter (',' formalParameter)* ;
 formalParameter: type ID ;
 
-type: TYPE size? ;
+
+type: ('Boolean' | 'Scalar')                        # PrimitiveType
+    | 'Vector' '[' (NUMBER|ID) ']'                  # VectorType
+    | 'Matrix' '[' (NUMBER|ID) ',' (NUMBER|ID) ']'  # MatrixType ;
 
 // Statements
 
@@ -19,13 +22,13 @@ block: stmt* ('return' semiExpr)? ;
 
 semiExpr: expr LINETERMINATOR;
 
-stmt: constDecl                       # ConstDeclaration
-    | semiExpr                         # SingleExpression
-    | 'for' type ID 'in' expr 'do' block 'end'      # ForLoop
+stmt: constDecl                                 # ConstDeclaration
+    | semiExpr                                  # SingleExpression
+    | 'for' type ID 'in' expr 'do' block 'end'  # ForLoop
     | 'if' expr 'then' block
       ('elseif' expr 'then' block)*
-      ('else' block)? 'end'                         # IfStatement
-    | 'do' block 'end'                              # BlockStatement
+      ('else' block)? 'end'                     # IfStatement
+    | 'do' block 'end'                          # BlockStatement
     ;
 
 // Expressions
@@ -57,8 +60,3 @@ exprList: expr (',' expr)* ;
 vector: '[' (exprList | range) ']' ;
 matrix: vector vector+ ; // [][]...[]
 range:   NUMBER '..' NUMBER ;
-
-size: '[' (NUMBER|ID) ',' (NUMBER|ID) ']'     # MatrixSize
-    | '[' (NUMBER|ID) ']'                     # VectorSize
-    ;
-    

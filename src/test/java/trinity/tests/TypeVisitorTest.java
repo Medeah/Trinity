@@ -25,8 +25,6 @@ public class TypeVisitorTest {
 
         ParseTree tree = parser.prog();
 
-        int lol = parser.getNumberOfSyntaxErrors();
-
         if (parser.getNumberOfSyntaxErrors() != 0) {
             //TODO: custom excpe..
             throw new Exception("Parse error, invalid test.");
@@ -144,7 +142,7 @@ public class TypeVisitorTest {
     }
 
 
-    @Test
+    @Ignore
     public void testFunctionDeclaration() throws Exception {
         assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2,2);"));
         assertFalse(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2);"));
@@ -154,7 +152,7 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Vector[3] mat(Vector[3] a, Vector[3] b, Vector[3] c) do return [a[1], b[2], c[3]]; end Vector[3] v = mat([3,4,5], [5,6,7], [1,8,7]);"));
     }
 
-    @Ignore
+    @Test
     public void forLoopTest() throws Exception {
         assertTrue(typeCheck("Vector[3] v = [1,2,3]; for Scalar s in v do print(s); end"));
         assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do print(v[1]); end"));

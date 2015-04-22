@@ -154,6 +154,32 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     //TODO
     @Override
     public Type visitForLoop(TrinityParser.ForLoopContext ctx) {
+        Type type = ctx.expr().accept(this);
+        Type contextType = ctx.type().accept(this);
+
+        if (type instanceof MatrixType){
+            if(((MatrixType) type).getRows() == 1){
+                if(contextType.equals(scalar)) {
+                    try {
+                        symbolTable.enterSymbol(ctx.ID().getText(), contextType);
+                    } catch (SymbolAlreadyDefinedException e) {
+                        errorReporter.reportError("ID already exsists: " + ctx.ID().getText());
+                    }
+                    ctx.block().accept(this);
+                }else{
+                    errorReporter.reportError("Wrong type, expected Scalar.");
+                }
+            }else{
+                if(contextType.equals(new MatrixType(1, ((MatrixType) type).getCols()))) {
+
+                }else{
+                    errorReporter.reportError("Wrong type, expected Vector.");
+                }
+            }
+        }else{
+            errorReporter.reportError("Hmm, expected a Matrix.");
+        }
+
         return null;
     }
 

@@ -1,19 +1,15 @@
 package trinity.tests;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.junit.Ignore;
 import org.junit.Test;
 import trinity.*;
-import trinity.types.EnumType;
-import trinity.types.PrimitiveType;
-import trinity.types.Type;
 import trinity.visitors.TypeVisitor;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TypeVisitorTest {
 

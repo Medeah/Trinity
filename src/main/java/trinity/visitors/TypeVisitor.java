@@ -62,13 +62,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
 
-        symbolTable.openScope();
-
         Type funcType = ctx.type().accept(this);
 
         List<Type> formalParameterTypes = new ArrayList<Type>();
-        for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
-            formalParameterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
+
+        if(ctx.formalParameters() != null) {
+            for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
+                formalParameterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
+            }
         }
 
         FunctionType functionDecl = new FunctionType(funcType, formalParameterTypes);
@@ -77,7 +78,22 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } catch (SymbolAlreadyDefinedException e) {
             errorReporter.reportError("Symbol was already defined!");
         }
+
+        symbolTable.openScope();
         symbolTable.setfunc(functionDecl);
+
+        //TODO: can we merge this second iteration with the above one?
+        if(ctx.formalParameters() != null) {
+            for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
+                TrinityParser.FormalParameterContext formalParameter = ctx.formalParameters().formalParameter(i);
+
+                try {
+                    symbolTable.enterSymbol(formalParameter.ID().getText(), formalParameter.accept(this));
+                } catch (SymbolAlreadyDefinedException e) {
+                    errorReporter.reportError("Formal parameter Symbol was already defined!");
+                }
+            }
+        }
 
         ctx.block().accept(this);
 
@@ -88,18 +104,30 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
-        Type funT;
+        Type type;
         try {
-            funT = symbolTable.retrieveSymbol(ctx.ID().getText());
+            type = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
             errorReporter.reportError("Symbol not defined!");
             return null;
         }
-        if (funT instanceof FunctionType) {
-            // TODO mere fuction
+        if (type instanceof FunctionType) {
+            FunctionType funcType = (FunctionType) type;
 
-            return null;
+            if(ctx.exprList() != null) {
+                List<TrinityParser.ExprContext> actualParams = ctx.exprList().expr();
 
+                if (actualParams.size() != funcType.getParameterTypes().size()) {
+                    errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters");
+                    return null;
+                }
+
+                for (int i = 0; i < actualParams.size(); i++) {
+                    expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this));
+                }
+            }
+
+            return funcType.getType();
         } else {
             errorReporter.reportError(ctx.ID().getText() + " is not a function");
             return null;
@@ -118,11 +146,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         Type parameterType = ctx.type().accept(this);
 
-        try {
+        // TODO: see functionDecl
+        /*try {
             symbolTable.enterSymbol(ctx.ID().getText(), parameterType);
         } catch (SymbolAlreadyDefinedException e) {
             errorReporter.reportError("Symbol was already defined!");
-        }
+        }*/
 
         return parameterType;
     }
@@ -131,7 +160,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitBlock(TrinityParser.BlockContext ctx) {
         //TODO: is this (shit) the best way (no)
         Boolean openScope = true;
-        if(ctx.getParent() instanceof TrinityParser.FunctionDeclContext){
+        if (ctx.getParent() instanceof TrinityParser.FunctionDeclContext) {
             openScope = false;
         }
         if (openScope) symbolTable.openScope();
@@ -207,7 +236,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         for (TrinityParser.VectorContext vector : vectors) {
             Type type = vector.accept(this);
             if (type instanceof MatrixType) {
-                MatrixType vectorty = (MatrixType)type;
+                MatrixType vectorty = (MatrixType) type;
                 if (cols == -1) {
                     cols = vectorty.getCols();
                 } else if (cols != vectorty.getCols()) {
@@ -236,9 +265,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         /*if (symbol instanceof VectorType) {
             return new PrimitiveType(EnumType.SCALAR);
-        } else*/ if (symbol instanceof MatrixType) {
+        } else*/
+        if (symbol instanceof MatrixType) {
             MatrixType matrix = (MatrixType) symbol;
-            if(matrix.getRows() == 1) {
+            if (matrix.getRows() == 1) {
                 return new PrimitiveType(EnumType.SCALAR);
             } else {
                 //TODO row vector vs col vector
@@ -413,7 +443,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     MatrixType matrix2 = (MatrixType) op2;
 
                     // Vector dot product
-                    if(matrix1.getRows() == 1 && matrix2.getRows() == 1 && matrix1.getCols() == matrix2.getCols()) {
+                    if (matrix1.getRows() == 1 && matrix2.getRows() == 1 && matrix1.getCols() == matrix2.getCols()) {
                         return new PrimitiveType(EnumType.SCALAR);
                     }
 
@@ -446,6 +476,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitIdentifier(TrinityParser.IdentifierContext ctx) {
         try {
+            String spasserid = ctx.ID().getText();
             return symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
             errorReporter.reportError("Symbol not found");

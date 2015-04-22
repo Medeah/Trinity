@@ -46,6 +46,12 @@ public class ParserTest {
     }
 
 
+    @Test
+    public void wrongSyntax_Empty() throws Exception  {
+        assertTrue(canParse(""));
+        assertFalse(canParse(";"));
+    }
+
 
     @Test
     public void wrongSyntax_numbers() throws Exception  {

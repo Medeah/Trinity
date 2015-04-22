@@ -66,18 +66,19 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         Type funcType = ctx.type().accept(this);
 
-        List<Type> formalParamterTypes = new ArrayList<Type>();
+        List<Type> formalParameterTypes = new ArrayList<Type>();
         for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
-            formalParamterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
+            formalParameterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
         }
 
-        FunctionType functionDecl = new FunctionType(funcType, formalParamterTypes);
+        FunctionType functionDecl = new FunctionType(funcType, formalParameterTypes);
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
         } catch (SymbolAlreadyDefinedException e) {
             errorReporter.reportError("Symbol was already defined!");
         }
         symbolTable.setfunc(functionDecl);
+
         ctx.block().accept(this);
 
         symbolTable.closeScope();
@@ -128,7 +129,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
-        symbolTable.openScope();
+        //TODO: is this (shit) the best way (no)
+        Boolean openScope = true;
+        if(ctx.getParent() instanceof TrinityParser.FunctionDeclContext){
+            openScope = false;
+        }
+        if (openScope) symbolTable.openScope();
         for (int i = 0; i < ctx.stmt().size(); i++) {
             ctx.stmt(i).accept(this);
         }
@@ -136,7 +142,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.semiExpr() != null) {
             ctx.semiExpr().accept(this);
         }
-        symbolTable.closeScope();
+        if (openScope) symbolTable.closeScope();
         return null;
     }
 

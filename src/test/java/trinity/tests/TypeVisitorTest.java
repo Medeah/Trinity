@@ -3,10 +3,7 @@ package trinity.tests;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import org.antlr.v4.runtime.DiagnosticErrorListener;
-import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.Before;
 import org.junit.Test;
 import trinity.*;
 import trinity.types.EnumType;
@@ -19,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class TypeVisitorTest {
 
-    private boolean TypeCheck(String str) throws Exception {
+    private boolean typeCheck(String str) throws Exception {
         ErrorReporter er = new StandardErrorReporter(false);
         SymbolTable tab = new HashSymbolTable();
         TypeVisitor typeVisitor = new TypeVisitor(er, tab);
@@ -43,76 +40,133 @@ public class TypeVisitorTest {
         return er.getErrorAmount() == 0;
     }
 
-    private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
-    private final Type scal = new PrimitiveType(EnumType.SCALAR);
+    @Test
+    public void testConstDecl_Empty() throws Exception {
+        assertTrue(typeCheck(""));
+    }
 
     @Test
     public void testSimpleDcl1() throws Exception {
-        assertTrue(TypeCheck("Scalar q = 2;"));
+        assertTrue(typeCheck("Scalar q = 2;"));
     }
 
     @Test
     public void testSimpleDcl2() throws Exception {
-        assertFalse(TypeCheck("Vector[1] q = [3,3,4];"));
+        assertFalse(typeCheck("Vector[1] q = [3,3,4];"));
     }
 
     @Test
     public void testConstDecl_VectorDimensions() throws Exception {
-        assertTrue(TypeCheck("Vector[3] q = [3,3,4];"));
+        assertTrue(typeCheck("Vector[3] q = [3,3,4];"));
     }
 
     @Test
     public void testConstDecl_Boolean() throws Exception {
-        assertTrue(TypeCheck("Boolean b = true;"));
-        assertTrue(TypeCheck("Boolean b = true or false;"));
-        assertTrue(TypeCheck("Boolean b = 4 <= 4 + 1 and 3 != 2;"));
-        assertFalse(TypeCheck("Boolean b = 4 <= (8 and 4) == 7 or 3 != 2;"));
-        assertTrue(TypeCheck("Boolean b = [2,2] == [2,2] and [1,2][3,4] == [3,4][5,5];"));
+        assertTrue(typeCheck("Boolean b = true;"));
+        assertTrue(typeCheck("Boolean b = true or false;"));
+        assertTrue(typeCheck("Boolean b = 4 <= 4 + 1 and 3 != 2;"));
+        assertFalse(typeCheck("Boolean b = 4 <= (8 and 4) == 7 or 3 != 2;"));
+        assertTrue(typeCheck("Boolean b = [2,2] == [2,2] and [1,2][3,4] == [3,4][5,5];"));
     }
 
     @Test
     public void testConstDecl_MatrixDimensions() throws Exception {
-        assertTrue(TypeCheck("Matrix[2,2] m = [1,2][3,4];"));
-        assertTrue(TypeCheck("Matrix[2,3] m = [1,2,5][3,4,6];"));
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4];"));
+        assertTrue(typeCheck("Matrix[2,3] m = [1,2,5][3,4,6];"));
+    }
+
+    @Test
+    public void testConstDecl_MatrixDimensions2() throws Exception {
+        assertFalse(typeCheck("[1,2][3];"));
+        assertFalse(typeCheck("[1,2,5][3,4];"));
     }
 
     @Test
     public void testConstDecl_MatrixVectorDeclaration() throws Exception {
-        assertFalse(TypeCheck("Matrix[2,2] m = [1,2];"));
+        assertFalse(typeCheck("Matrix[2,2] m = [1,2];"));
     }
 
     @Test
     public void testConstDecl_ArithmeticExpresssions() throws Exception {
-        assertTrue(TypeCheck("Scalar q = 2 * 2;"));
-        assertTrue(TypeCheck("Scalar s = 1 + 2 * (5 + 2) / 4;"));
-        assertTrue(TypeCheck("Vector[2] v = [1,2] + [2,3] - ([5,4] + [2,1]);"));
-        assertTrue(TypeCheck("Matrix[2,2] m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);"));
+        assertTrue(typeCheck("Scalar q = 2 * 2;"));
+        assertTrue(typeCheck("Scalar s = 1 + 2 * (5 + 2) / 4;"));
+        assertTrue(typeCheck("Vector[2] v = [1,2] + [2,3] - ([5,4] + [2,1]);"));
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);"));
     }
 
     @Test
     public void testVectorMatrixMultiplication() throws Exception {
-        assertFalse(TypeCheck("Scalar s = [2,3] * [2,3,4];"));
-        assertTrue(TypeCheck("Scalar s = [2,3,4] * [2,3,4];"));
-        assertTrue(TypeCheck("Matrix[3,3] m = [2,3][4,5][5,6] * [2,3,4][6,7,8];"));
-        assertFalse(TypeCheck("[2,3][4,5][5,6] * [2,3,4][6,7,8][1,2,3];"));
+        assertFalse(typeCheck("Scalar s = [2,3] * [2,3,4];"));
+        assertTrue(typeCheck("Scalar s = [2,3,4] * [2,3,4];"));
+        assertTrue(typeCheck("Matrix[3,3] m = [2,3][4,5][5,6] * [2,3,4][6,7,8];"));
+        assertFalse(typeCheck("[2,3][4,5][5,6] * [2,3,4][6,7,8][1,2,3];"));
     }
 
     @Test
     public void testIndexing() throws Exception {
-        assertTrue(TypeCheck("Vector[3] v = [1,2,3]; Scalar s = v[2];"));
-        assertFalse(TypeCheck("Matrix[2,3] v = [1,2,3][3,3,3]; Scalar s = v[2];"));
-        assertTrue(TypeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Scalar s = m[1,2];"));
-        assertTrue(TypeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Vector[3] v = m[2];"));
-        assertTrue(TypeCheck("Vector[3] v = [1,2,3]; Scalar s = v[1,2];"));
-
+        assertTrue(typeCheck("Vector[3] v = [1,2,3]; Scalar s = v[2];"));
+        assertFalse(typeCheck("Matrix[2,3] v = [1,2,3][3,3,3]; Scalar s = v[2];"));
+        assertTrue(typeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Scalar s = m[1,2];"));
+        assertTrue(typeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Vector[3] v = m[2];"));
+        assertTrue(typeCheck("Vector[3] v = [1,2,3]; Scalar s = v[1,2];"));
     }
 
     @Test
-    public void matrixArithmetic() throws Exception {
-        assertTrue(TypeCheck("Matrix[2,2] m = [1,2][3,4] * 3;"));
-        assertTrue(TypeCheck("Matrix[2,2] m = 68717418 * [1,2][3,4];"));
-        assertTrue(TypeCheck("Matrix[2,3] m = [1,2][3,4] * [3,4,4][1,2,3];"));
+    public void matrixMultiplication() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] * 3;"));
+        assertTrue(typeCheck("Matrix[2,2] m = 68717418 * [1,2][3,4];"));
+        assertTrue(typeCheck("Matrix[2,3] m = [1,2][3,4] * [3,4,4][1,2,3];"));
     }
+
+    @Test
+    public void matrixAddition() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2][3,4];"));
+        assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2];"));
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] - [1,2][3,4];"));
+        assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] - [1,2];"));
+    }
+
+    @Test
+    public void testRange() throws Exception {
+        assertTrue(typeCheck("Vector[5] m = [1..5];"));
+        assertTrue(typeCheck("Matrix[2,3] m = [3..5][2..4];"));
+        assertFalse(typeCheck("Vector[3] m = [1..2];"));
+        assertFalse(typeCheck("Matrix[2,4] m = [1..3][3..5];"));
+    }
+
+    @Test
+    public void testTranspose() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4]';"));
+        assertTrue(typeCheck("Matrix[2,3] m = [1,2,5][3,4,6]; Matrix[3,2] n = m';"));
+        assertTrue(typeCheck("Vector[3] v = [1,2,3]; Matrix[3,1] m = v';"));
+        assertTrue(typeCheck("Matrix[3,1] m = [1][2][3]; Vector[3] v = m'; Matrix[1,3] x = m';"));
+        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]'';"));
+        assertTrue(typeCheck("Matrix[1,1] m = [5]';"));
+        assertFalse(typeCheck("Scalar s = 5';"));
+        assertFalse(typeCheck("Matrix[3,2] m = ([1,2][3,4][5,6])';"));
+    }
+
+
+    @Test
+    public void testFunctionDeclaration() throws Exception {
+        assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2,2);"));
+        assertFalse(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2);"));
+        assertFalse(typeCheck("Scalar s (Scalar s) do return s; end Scalar t = s(1);"));
+        assertFalse(typeCheck("Scalar x (Scalar s) do Scalar s = 3; return s; end"));
+        assertTrue(typeCheck("Scalar s() do return 3; end Scalar t = s();"));
+        assertTrue(typeCheck("Vector[3] mat(Vector[3] a, Vector[3] b, Vector[3] c) do return [a[1], b[2], c[3]]; end Vector[3] v = mat([3,4,5], [5,6,7], [1,8,7]);"));
+    }
+
+
+
+    /*@Test
+    public void testTypeInference() throws Exception {
+        // if you want it, then you should have put a ring on it?
+        assertTrue(typeCheck("Matrix m = [1,2][3,4][5,6]; Matrix[3,2] n = m;"));
+        assertFalse(typeCheck("Matrix m = [1,2][3,4]; Matrix[3,2] n = m;"));
+        assertTrue(typeCheck("Vector v = [1,2,3,4]; Vector[4] w = v;"));
+        assertFalse(typeCheck("Vector v = [1,2,3,4]; Vector[3] w = v;"));
+    }*/
 
 
 

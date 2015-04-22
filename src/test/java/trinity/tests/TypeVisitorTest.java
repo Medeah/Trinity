@@ -1,5 +1,6 @@
 package trinity.tests;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -157,6 +158,18 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Vector[3] mat(Vector[3] a, Vector[3] b, Vector[3] c) do return [a[1], b[2], c[3]]; end Vector[3] v = mat([3,4,5], [5,6,7], [1,8,7]);"));
     }
 
+    @Ignore
+    public void forLoopTest() throws Exception {
+        assertTrue(typeCheck("Vector[3] v = [1,2,3]; for Scalar s in v do print(s); end"));
+        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do print(v[1]); end"));
+        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do for Scalar s in v do print(s); end end"));
+        assertTrue(typeCheck("for Scalar s in [1,2,3,4,5,6,7,8,9] do print(s); end"));
+
+        assertFalse(typeCheck("for Scalar s in 3 > 4 do print(s); end"));
+        assertFalse(typeCheck("for Scalar s in 3 and true do print(s); end"));
+        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do print(v[1]); end")); // Rows not cols
+        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do for Scalar s in v do print(s); end end")); // Rows not cols
+    }
 
 
     /*@Test

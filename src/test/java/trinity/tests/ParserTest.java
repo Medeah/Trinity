@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 
 public class ParserTest {
 
+    //TODO: spørg mathias haha
     @Test
     public void correctSyntax_parseFile() throws Exception  {
         InputStream is = this.getClass().getResourceAsStream("/trinity/tests/parsing-tests.tri");
@@ -38,12 +39,25 @@ public class ParserTest {
         assertTrue(canParse("-1e9;"));
     }
 
+    @Test
+    public void correctSyntax_Dimensions() throws Exception  {
+        assertTrue(canParse("Vector[1] v = [1,2,3];"));
+        assertTrue(canParse("Matrix[2,3] m = [1,2,3][1,2,4];"));
+    }
+
+
 
     @Test
     public void wrongSyntax_numbers() throws Exception  {
         assertFalse(canParse("00;"));
         assertFalse(canParse("01;"));
         assertFalse(canParse("01.2;"));
+    }
+
+    @Test
+    public void wrongSyntax_NoDimensions() throws Exception  {
+        assertFalse(canParse("Vector v = [1,2,3];"));
+        assertFalse(canParse("Matrix m = [1,2,3][1,2,4];"));
     }
 
     @Test
@@ -93,6 +107,7 @@ public class ParserTest {
     public Boolean canParse(String syntax) throws IOException {
         TrinityParser parser = createParser(syntax);
         parser.prog();
+        int lol = parser.getNumberOfSyntaxErrors();
         return 0 == parser.getNumberOfSyntaxErrors();
     }
 
@@ -100,8 +115,9 @@ public class ParserTest {
         TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
-        // do not output (most) errors
         parser.removeErrorListeners();
+        parser.addErrorListener(new DiagnosticErrorListener());
+        parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
         return parser;
     }
 

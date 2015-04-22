@@ -36,11 +36,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitProg(TrinityParser.ProgContext ctx) {
-        return null;
-    }
-
-    @Override
     public Type visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         // Declared (expected) type:
         Type LHS = ctx.type().accept(this);
@@ -225,20 +220,19 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
         expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this));
 
-        Type idtype;
+        Type symbol;
 
         try {
-            idtype = symbolTable.retrieveSymbol(ctx.ID().getText());
+            symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
             errorReporter.reportError("Symbol not defined!");
             return null;
         }
 
-        // hack??
-        if (idtype instanceof VectorType) {
+        if (symbol instanceof VectorType) {
             return new PrimitiveType(EnumType.SCALAR);
-        } else if (idtype instanceof MatrixType) {
-            MatrixType cast = (MatrixType) idtype;
+        } else if (symbol instanceof MatrixType) {
+            MatrixType cast = (MatrixType) symbol;
 
             //TODO row vector vs col vector
             return new VectorType(cast.getCols());
@@ -253,8 +247,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
         expect(scalar, ctx.expr(0).accept(this));
         expect(scalar, ctx.expr(1).accept(this));
-        Type id = ctx.ID().accept(this);
-        if (id instanceof MatrixType) {
+
+        Type symbol = null;
+        try {
+           symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
+        } catch (SymbolNotFoundException e) {
+            errorReporter.reportError("Symbol not found");
+            return null;
+        }
+
+        if (symbol instanceof MatrixType) {
             return new PrimitiveType(EnumType.SCALAR);
         } else {
             errorReporter.reportError("hmm error");
@@ -383,7 +385,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitMultDivMod(TrinityParser.MultDivModContext ctx) {
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
-        String operator = ctx.getChild(1).getText(); // TODO måske ikke det rigte måde at få operator ud
+        String operator = ctx.op.getText(); // TODO måske ikke det rigte måde at få operator ud
 
         if (operator.equals("*")) {
             if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op2.equals(new PrimitiveType(EnumType.BOOLEAN))) {

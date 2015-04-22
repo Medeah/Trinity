@@ -289,7 +289,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             MatrixType matrixT = (MatrixType) exprT;
             return new MatrixType(matrixT.getCols(), matrixT.getRows());
         } else {
-            errorReporter.reportError("hmm error");
+            errorReporter.reportError("can only transpose matrix and vectors");
             return null;
         }
     }

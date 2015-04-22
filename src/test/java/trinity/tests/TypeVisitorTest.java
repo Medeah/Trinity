@@ -160,9 +160,11 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do print(v[1]); end"));
         assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do for Scalar s in v do print(s); end end"));
         assertTrue(typeCheck("for Scalar s in [1,2,3,4,5,6,7,8,9] do print(s); end"));
-
+        assertTrue(typeCheck("for Scalar s in [6] do print(s); end"));
+        
         assertFalse(typeCheck("for Scalar s in 3 > 4 do print(s); end"));
-        assertFalse(typeCheck("for Scalar s in 3 and true do print(s); end"));
+        assertFalse(typeCheck("for Scalar s in 6 do print(s); end"));
+        assertFalse(typeCheck("for Scalar s in false do print(s); end"));
         assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do print(v[1]); end")); // Rows not cols
         assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do for Scalar s in v do print(s); end end")); // Rows not cols
     }

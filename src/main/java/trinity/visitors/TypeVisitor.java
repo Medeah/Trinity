@@ -25,7 +25,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private Type scalar = new PrimitiveType(EnumType.SCALAR);
     private Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
-
     private boolean expect(Type expected, Type actual) {
         if (expected.equals(actual)) {
             return true;
@@ -167,18 +166,18 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             for (TrinityParser.ExprContext expr : exprs) {
                 expect(scalar, expr.accept(this));
             }
-            return new VectorType(exprs.size());
+            return new MatrixType(1, exprs.size()); // Vector
         }
     }
 
     @Override
     public Type visitRange(TrinityParser.RangeContext ctx) {
-        int from  = new Integer(ctx.NUMBER(0).getText());
-        int to  = new Integer(ctx.NUMBER(1).getText());
+        int from = new Integer(ctx.NUMBER(0).getText());
+        int to = new Integer(ctx.NUMBER(1).getText());
         if (from > to) {
             errorReporter.reportError("report in range, from is larger than to ");
         }
-        return new VectorType(to - from + 1);
+        return new MatrixType(1, to - from + 1); // vector
     }
 
     @Override
@@ -200,12 +199,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         int cols = -1;
 
         for (TrinityParser.VectorContext vector : vectors) {
-            Type ty = vector.accept(this);
-            if (ty instanceof VectorType) {
-                VectorType vectorty = (VectorType) ty;
+            Type type = vector.accept(this);
+            if (type instanceof MatrixType) {
+                MatrixType vectorty = (MatrixType)type;
                 if (cols == -1) {
-                    cols = vectorty.getNumElems();
-                } else if (cols != vectorty.getNumElems()) {
+                    cols = vectorty.getCols();
+                } else if (cols != vectorty.getCols()) {
                     errorReporter.reportError("all rows in matrix lit must be of same size");
                 }
             } else {
@@ -229,13 +228,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             return null;
         }
 
-        if (symbol instanceof VectorType) {
+        /*if (symbol instanceof VectorType) {
             return new PrimitiveType(EnumType.SCALAR);
-        } else if (symbol instanceof MatrixType) {
-            MatrixType cast = (MatrixType) symbol;
-
-            //TODO row vector vs col vector
-            return new VectorType(cast.getCols());
+        } else*/ if (symbol instanceof MatrixType) {
+            MatrixType matrix = (MatrixType) symbol;
+            if(matrix.getRows() == 1) {
+                return new PrimitiveType(EnumType.SCALAR);
+            } else {
+                //TODO row vector vs col vector
+                return new MatrixType(1, matrix.getCols()); // vector
+            }
         } else {
 
             errorReporter.reportError("hmm error");
@@ -250,7 +252,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         Type symbol = null;
         try {
-           symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
+            symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
             errorReporter.reportError("Symbol not found");
             return null;
@@ -397,41 +399,21 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 return op2;
             }
             // Nx1
-            if (op1 instanceof VectorType) {
-                int size = ((VectorType)op1).getNumElems();
-                if (op2.equals(scalar)) {
-                    return new VectorType(size);
-                } else if (op2.equals(op1) ) {
-                    return scalar;
-                } else if (op2 instanceof MatrixType) {
-                    MatrixType mt = (MatrixType)op2;
-                    if (mt.getRows() == 1) {
-                        return new MatrixType(size, mt.getCols());
-                    } else {
-                        errorReporter.reportError("size mismatch");
-                        return null;
-                    }
-                } else {
-                    errorReporter.reportError("cannot multiply vector with " + op2);
-                    return null;
-                }
-            } else if (op1 instanceof MatrixType) {
+            else if (op1 instanceof MatrixType) {
                 if (op2.equals(scalar)) {
                     return op1;
-                } else if (op2 instanceof VectorType ) {
-                    // NxM * Lx1 = Nx1
-                    int N = ((MatrixType) op1).getRows();
-                    int M = ((MatrixType) op1).getCols();
-                    int L = ((VectorType) op2).getNumElems();
-                    if (M == L) {
-                        return new VectorType(N);
-                    } else {
-                        errorReporter.reportError("size mismatch");
-                        return null;
-                    }
                 } else if (op2 instanceof MatrixType) {
-                    if (((MatrixType) op1).getCols() == ((MatrixType) op2).getRows()) {
-                        return new MatrixType(((MatrixType) op1).getRows(), ((MatrixType) op2).getCols());
+                    MatrixType matrix1 = (MatrixType) op1;
+                    MatrixType matrix2 = (MatrixType) op2;
+
+                    // Vector dot product
+                    if(matrix1.getRows() == 1 && matrix2.getRows() == 1 && matrix1.getCols() == matrix2.getCols()) {
+                        return new PrimitiveType(EnumType.SCALAR);
+                    }
+
+                    // Matrix multiplication
+                    if (matrix1.getCols() == matrix2.getRows()) {
+                        return new MatrixType(matrix1.getRows(), matrix2.getCols());
                     } else {
                         errorReporter.reportError("size mismatch");
                         return null;
@@ -497,7 +479,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             errorReporter.reportError("IDs not supported ... yet");
         } else {
             int size = new Integer(ctx.NUMBER().getText());
-            out = new VectorType(size);
+            out = new MatrixType(1, size);
         }
         return out;
     }

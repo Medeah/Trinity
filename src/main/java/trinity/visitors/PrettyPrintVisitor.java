@@ -8,9 +8,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
-import trinity.types.MatrixType;
 import trinity.types.Type;
-import trinity.types.VectorType;
 
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 

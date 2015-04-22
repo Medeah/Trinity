@@ -28,8 +28,8 @@ public class HashSymbolTableTest {
     public void initialize() {
         tab = new HashSymbolTable();
         scalar = new PrimitiveType(EnumType.SCALAR);
-        vector = new VectorType(2);
-        matrix = new MatrixType(2,2);
+        vector = new MatrixType(1, 2);
+        matrix = new MatrixType(2, 2);
         bool = new PrimitiveType(EnumType.BOOLEAN);
     }
 

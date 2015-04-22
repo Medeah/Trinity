@@ -103,7 +103,7 @@ public class TypeVisitorTest {
         assertFalse(TypeCheck("Matrix[2,3] v = [1,2,3][3,3,3]; Scalar s = v[2];"));
         assertTrue(TypeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Scalar s = m[1,2];"));
         assertTrue(TypeCheck("Matrix[2,3] m = [1,2,3][3,3,3]; Vector[3] v = m[2];"));
-        assertFalse(TypeCheck("Vector[3] v = [1,2,3]; Scalar s = v[2,1];"));
+        assertTrue(TypeCheck("Vector[3] v = [1,2,3]; Scalar s = v[1,2];"));
 
     }
 
@@ -111,7 +111,7 @@ public class TypeVisitorTest {
     public void matrixArithmetic() throws Exception {
         assertTrue(TypeCheck("Matrix[2,2] m = [1,2][3,4] * 3;"));
         assertTrue(TypeCheck("Matrix[2,2] m = 68717418 * [1,2][3,4];"));
-       // assertTrue(TypeCheck("Matrix[1,2] m = [1,2][3,4] * [3,4];"));
+        assertTrue(TypeCheck("Matrix[2,3] m = [1,2][3,4] * [3,4,4][1,2,3];"));
     }
 
 

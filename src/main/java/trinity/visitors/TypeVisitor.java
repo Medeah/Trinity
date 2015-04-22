@@ -217,7 +217,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
 
     @Override
-    public Type visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
+    public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this));
 
         Type symbol;
@@ -244,7 +244,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
+    public Type visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
         expect(scalar, ctx.expr(0).accept(this));
         expect(scalar, ctx.expr(1).accept(this));
 

@@ -35,8 +35,8 @@ stmt: constDecl                                 # ConstDeclaration
 
 // TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
 expr: ID '(' exprList? ')'              # FunctionCall
-    | ID '[' expr ']'                   # VectorIndexing
-    | ID '[' expr ',' expr ']'          # MatrixIndexing
+    | ID '[' expr ']'                   # SingleIndexing
+    | ID '[' expr ',' expr ']'          # DoubleIndexing
     | '-' expr                          # Negate
     | '!' expr                          # Not
     | expr '\''                         # Transpose

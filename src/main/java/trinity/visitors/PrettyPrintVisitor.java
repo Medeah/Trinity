@@ -144,7 +144,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitMatrixIndexing(TrinityParser.MatrixIndexingContext ctx) {
+    public Object visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
         print(ctx.ID());
         print("[");
         ctx.expr(0).accept(this);
@@ -292,7 +292,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitVectorIndexing(TrinityParser.VectorIndexingContext ctx) {
+    public Object visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         print(ctx.ID());
         print("[");
         ctx.expr().accept(this);

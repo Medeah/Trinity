@@ -156,6 +156,18 @@ public class TypeVisitorTest {
     }
 
     @Test
+    public void testReturnTypes() throws Exception {
+        assertTrue(typeCheck("Boolean x() do return true; end"));
+        assertTrue(typeCheck("Scalar x () do return 2; end"));
+        assertTrue(typeCheck("Vector[2] x () do return [2,3]; end"));
+        assertTrue(typeCheck("Matrix[2,2] x () do return [1,2][3,4]; end"));
+        assertFalse(typeCheck("Boolean x() do return 1; end"));
+        assertFalse(typeCheck("Scalar x () do return false; end"));
+        assertFalse(typeCheck("Vector[1] x () do return false; end"));
+        assertFalse(typeCheck("Matrix[2,2] x () do return false; end"));
+    }
+
+    @Test
     public void forLoopTest() throws Exception {
         assertTrue(typeCheck("Vector[3] v = [1,2,3]; for Scalar s in v do 1+1; end"));
         assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do 1+1; end"));
@@ -204,7 +216,6 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Vector v = [1,2,3,4]; Vector[4] w = v;"));
         assertFalse(typeCheck("Vector v = [1,2,3,4]; Vector[3] w = v;"));
     }*/
-
 
 
 }

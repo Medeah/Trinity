@@ -66,7 +66,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         List<Type> formalParameterTypes = new ArrayList<Type>();
 
-        if(ctx.formalParameters() != null) {
+        if (ctx.formalParameters() != null) {
             for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
                 formalParameterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
             }
@@ -83,7 +83,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         symbolTable.setfunc(functionDecl);
 
         //TODO: can we merge this second iteration with the above one?
-        if(ctx.formalParameters() != null) {
+        if (ctx.formalParameters() != null) {
             for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
                 TrinityParser.FormalParameterContext formalParameter = ctx.formalParameters().formalParameter(i);
 
@@ -114,7 +114,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (type instanceof FunctionType) {
             FunctionType funcType = (FunctionType) type;
 
-            if(ctx.exprList() != null) {
+            if (ctx.exprList() != null) {
                 List<TrinityParser.ExprContext> actualParams = ctx.exprList().expr();
 
                 if (actualParams.size() != funcType.getParameterTypes().size()) {
@@ -163,7 +163,11 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         if (ctx.semiExpr() != null) {
-            ctx.semiExpr().accept(this);
+            Type returnType = ctx.semiExpr().accept(this);
+            if (!returnType.equals(symbolTable.getfunc().getType())) {
+                errorReporter.reportError("Incorrect return type for function");
+            }
+            return returnType;
         }
 
         return null;
@@ -181,13 +185,13 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         symbolTable.openScope();
 
-        if (type instanceof MatrixType){
-            if(((MatrixType) type).getRows() == 1){
+        if (type instanceof MatrixType) {
+            if (((MatrixType) type).getRows() == 1) {
                 expect(scalar, contextType);
-            }else{
+            } else {
                 expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType);
             }
-        }else{
+        } else {
             errorReporter.reportError("Hmm, expected a Matrix.");
         }
 

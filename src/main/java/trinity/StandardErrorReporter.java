@@ -60,20 +60,21 @@ public class StandardErrorReporter implements ErrorReporter {
     private void underlineError(Token startToken, Token endToken, int line, int charPositionInLine) {
         String[] lines = input.split("\n");
         String errorLine = lines[line - 1];
+        String pointToError = "";
         int start = startToken.getStartIndex();
         int stop = endToken.getStopIndex();
 
         System.err.println(errorLine);
         for (int i = 0; i < charPositionInLine; i++){
-            System.err.print(" ");
+            pointToError += (String.valueOf(" "));
         }
 
         if (start >= 0 && stop >= 0) {
             for (int i = start; i <= stop; i++) {
-                System.err.print("^");
+                pointToError += (String.valueOf("^"));
             }
         }
 
-        System.err.println();
+        System.err.println(pointToError);
     }
 }

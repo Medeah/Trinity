@@ -64,7 +64,7 @@ public class Trinity {
     private static void compile(String is) throws Exception {
         ParseTree tree = parse(is);
 
-        ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError);
+        ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError, is);
         SymbolTable table = new HashSymbolTable();
 
         TypeVisitor typeChecker = new TypeVisitor(reporter, table);

@@ -15,10 +15,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         this.symbolTable = symbolTable;
     }
 
-    public TypeVisitor() {
-        errorReporter = new StandardErrorReporter(true);
-    }
-
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
@@ -48,7 +44,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             try {
                 symbolTable.enterSymbol(ctx.ID().getText(), LHS);
             } catch (SymbolAlreadyDefinedException e) {
-                errorReporter.reportError("Symbol was already defined!");
+                errorReporter.reportError("Symbol was already defined!", ctx.ID().getSymbol());
             }
 
             return LHS;
@@ -366,7 +362,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         expect(op1, op2);
 
         if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("cannot compare booleans");
+            errorReporter.reportError("cannot compare booleans", ctx);
         }
 
         return new PrimitiveType(EnumType.BOOLEAN);

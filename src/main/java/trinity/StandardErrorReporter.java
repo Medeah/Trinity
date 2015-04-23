@@ -1,6 +1,5 @@
 package trinity;
 
-import trinity.types.Type;
 import org.antlr.v4.runtime.*;
 
 public class StandardErrorReporter implements ErrorReporter {
@@ -22,20 +21,6 @@ public class StandardErrorReporter implements ErrorReporter {
         printError(line, schar, message);
 
         errorAmount++;
-    }
-
-    @Override
-    public void reportError(String message) {
-        errorHandling(-1, -1, message);
-
-        testFailOnError();
-    }
-
-    @Override
-    public void reportTypeError(Type expectedType, Type receivedType) {
-        errorHandling(-1, -1, "Expected type " + expectedType + " but got " + receivedType);
-
-        testFailOnError();
     }
 
     @Override

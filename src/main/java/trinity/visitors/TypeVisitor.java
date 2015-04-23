@@ -1,6 +1,7 @@
 package trinity.visitors;
 
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.*;
 import trinity.*;
 import trinity.CustomExceptions.SymbolAlreadyDefinedException;
 import trinity.CustomExceptions.SymbolNotFoundException;
@@ -21,11 +22,11 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private Type scalar = new PrimitiveType(EnumType.SCALAR);
     private Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
-    private boolean expect(Type expected, Type actual) {
+    private boolean expect(Type expected, Type actual, ParserRuleContext ctx) {
         if (expected.equals(actual)) {
             return true;
         } else {
-            errorReporter.reportTypeError(expected, actual);
+            errorReporter.reportError("Expected type " + expected + " but got " + actual, ctx);
             return false;
         }
     }
@@ -49,7 +50,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
             return LHS;
         } else {
-            errorReporter.reportTypeError(LHS, RHS);
+            errorReporter.reportError("Expected type " + RHS + " but got " + LHS, ctx);
         }
 
         return null;
@@ -74,7 +75,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
         } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("Symbol was already defined!");
+            errorReporter.reportError("Symbol was already defined!", ctx.ID().getSymbol());
         }
 
         symbolTable.openScope();
@@ -86,7 +87,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             try {
                 symbolTable.enterSymbol(formalParameterIds.get(i), formalParameterTypes.get(i));
             } catch (SymbolAlreadyDefinedException e) {
-                errorReporter.reportError("Formal parameter Symbol was already defined!");
+                errorReporter.reportError("Formal parameter Symbol was already defined!", ctx);
             }
         }
 
@@ -103,7 +104,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             type = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
-            errorReporter.reportError("Symbol not defined!");
+            errorReporter.reportError("Symbol not defined!", ctx);
             return null;
         }
         if (type instanceof FunctionType) {
@@ -113,18 +114,20 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 List<TrinityParser.ExprContext> actualParams = ctx.exprList().expr();
 
                 if (actualParams.size() != funcType.getParameterTypes().size()) {
-                    errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters");
+                    errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters", ctx);
                     return null;
                 }
 
                 for (int i = 0; i < actualParams.size(); i++) {
-                    expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this));
+                    //TODO: find noget bedre end .getStart() xD
+                    //expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i).getStart());
+                    expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), ctx);
                 }
             }
 
             return funcType.getType();
         } else {
-            errorReporter.reportError(ctx.ID().getText() + " is not a function");
+            errorReporter.reportError(ctx.ID().getText() + " is not a function", ctx.getStart());
             return null;
         }
 
@@ -132,7 +135,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
-        errorReporter.reportError("internal compiler error. visitFormalParameters should never be called");
+        errorReporter.reportError("internal compiler error. visitFormalParameters should never be called", ctx);
 
         return null;
     }
@@ -160,7 +163,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.semiExpr() != null) {
             Type returnType = ctx.semiExpr().accept(this);
             if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
-                errorReporter.reportError("Incorrect return type for function");
+                errorReporter.reportError("Incorrect return type for function", ctx.semiExpr().getStart()   );
             }
             return returnType;
         }
@@ -182,18 +185,18 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (type instanceof MatrixType) {
             if (((MatrixType) type).getRows() == 1) {
-                expect(scalar, contextType);
+                expect(scalar, contextType, ctx);
             } else {
-                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType);
+                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType, ctx);
             }
         } else {
-            errorReporter.reportError("Hmm, expected a Matrix.");
+            errorReporter.reportError("Hmm, expected a Matrix or Vector.", ctx.expr().getStart());
         }
 
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), contextType);
         } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("ID already exsists: " + ctx.ID().getText());
+            errorReporter.reportError("ID already exsists: " + ctx.ID().getText(), ctx.ID().getSymbol());
         }
         ctx.block().accept(this);
 
@@ -206,7 +209,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitIfStatement(TrinityParser.IfStatementContext ctx) {
 
         for (TrinityParser.ExprContext expCtx : ctx.expr()){
-            expect(bool, expCtx.accept(this));
+            expect(bool, expCtx.accept(this), ctx);
         }
 
         for (TrinityParser.BlockContext blockCtx : ctx.block()){
@@ -223,7 +226,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } else {
             List<TrinityParser.ExprContext> exprs = ctx.exprList().expr();
             for (TrinityParser.ExprContext expr : exprs) {
-                expect(scalar, expr.accept(this));
+                expect(scalar, expr.accept(this), ctx);
             }
             return new MatrixType(1, exprs.size()); // Vector
         }
@@ -234,14 +237,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         int from = new Integer(ctx.NUMBER(0).getText());
         int to = new Integer(ctx.NUMBER(1).getText());
         if (from > to) {
-            errorReporter.reportError("report in range, from is larger than to ");
+            errorReporter.reportError("Range error, " + from + " is larger than " + to + ".", ctx.NUMBER(0).getSymbol());
         }
         return new MatrixType(1, to - from + 1); // vector
     }
 
     @Override
     public Type visitExprList(TrinityParser.ExprListContext ctx) {
-        errorReporter.reportError("internal error, visitExprList");
+        errorReporter.reportError("internal error, visitExprList", ctx);
         return null;
     }
 
@@ -257,17 +260,17 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         int rows = vectors.size();
         int cols = -1;
 
-        for (TrinityParser.VectorContext vector : vectors) {
-            Type type = vector.accept(this);
+        for (int i = 0; i < rows; i++){
+            Type type = vectors.get(i).accept(this);
             if (type instanceof MatrixType) {
-                MatrixType vectorty = (MatrixType) type;
+                MatrixType vectortyY= (MatrixType) type;
                 if (cols == -1) {
-                    cols = vectorty.getCols();
-                } else if (cols != vectorty.getCols()) {
-                    errorReporter.reportError("all rows in matrix lit must be of same size");
+                    cols = vectortyY.getCols();
+                } else if (cols != vectortyY.getCols()) {
+                    errorReporter.reportError("All rows in a Matrix must be of same size.", vectors.get(i));
                 }
             } else {
-                errorReporter.reportError("hmm error");
+                errorReporter.reportError("hmm error", ctx);
             }
         }
         return new MatrixType(rows, cols);
@@ -276,14 +279,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
-        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this));
+        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this), ctx);
 
         Type symbol;
 
         try {
             symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
-            errorReporter.reportError("Symbol not defined!");
+            errorReporter.reportError("Symbol not defined!", ctx.ID().getSymbol() );
             return null;
         }
 
@@ -300,28 +303,28 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
         } else {
 
-            errorReporter.reportError("hmm error");
+            errorReporter.reportError("hmm error", ctx);
             return null;
         }
     }
 
     @Override
     public Type visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        expect(scalar, ctx.expr(0).accept(this));
-        expect(scalar, ctx.expr(1).accept(this));
+        expect(scalar, ctx.expr(0).accept(this), ctx);
+        expect(scalar, ctx.expr(1).accept(this), ctx);
 
         Type symbol = null;
         try {
             symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
-            errorReporter.reportError("Symbol not found");
+            errorReporter.reportError("Symbol not found", ctx.ID().getSymbol());
             return null;
         }
 
         if (symbol instanceof MatrixType) {
             return new PrimitiveType(EnumType.SCALAR);
         } else {
-            errorReporter.reportError("hmm error");
+            errorReporter.reportError("hmm error", ctx);
             return null;
         }
     }
@@ -349,7 +352,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             MatrixType matrixT = (MatrixType) exprT;
             return new MatrixType(matrixT.getCols(), matrixT.getRows());
         } else {
-            errorReporter.reportError("can only transpose matrix and vectors");
+            errorReporter.reportError("Only Matrix and Vectors can be transposed.", ctx);
             return null;
         }
     }
@@ -359,7 +362,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(op1, op2);
+        expect(op1, op2, ctx);
 
         if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
             errorReporter.reportError("cannot compare booleans", ctx);
@@ -373,10 +376,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(op1, op2);
+        expect(op1, op2, ctx);
 
         if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("cannot compare booleans");
+            errorReporter.reportError("Cannot compare booleans", ctx);
         }
 
         return new PrimitiveType(EnumType.BOOLEAN);
@@ -390,7 +393,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitNot(TrinityParser.NotContext ctx) {
         Type exprT = ctx.expr().accept(this);
-        expect(new PrimitiveType(EnumType.BOOLEAN), exprT);
+        expect(new PrimitiveType(EnumType.BOOLEAN), exprT, ctx);
         return exprT;
     }
 
@@ -399,8 +402,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.BOOLEAN), op1);
-        expect(new PrimitiveType(EnumType.BOOLEAN), op2);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx);
 
         return op1;
     }
@@ -410,8 +413,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.BOOLEAN), op1);
-        expect(new PrimitiveType(EnumType.BOOLEAN), op2);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx);
 
         return op1;
     }
@@ -421,8 +424,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.SCALAR), op1);
-        expect(new PrimitiveType(EnumType.SCALAR), op2);
+        expect(new PrimitiveType(EnumType.SCALAR), op1, ctx);
+        expect(new PrimitiveType(EnumType.SCALAR), op2, ctx);
 
         return op1;
     }
@@ -432,10 +435,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(op1, op2);
+        expect(op1, op2, ctx);
 
         if (op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("cannot use operator +/- on boolean values");
+            errorReporter.reportError("Cannot use operator +/- on boolean values.", ctx);
         } else {
             return op1;
         }
@@ -451,7 +454,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (operator.equals("*")) {
             if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op2.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-                errorReporter.reportError("cannot mult or div boolean");
+                errorReporter.reportError("Cannot mult or div boolean", ctx);
                 return null;
             }
 
@@ -475,23 +478,23 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     if (matrix1.getCols() == matrix2.getRows()) {
                         return new MatrixType(matrix1.getRows(), matrix2.getCols());
                     } else {
-                        errorReporter.reportError("size mismatch");
+                        errorReporter.reportError("Size mismatch", ctx);
                         return null;
                     }
                 } else {
-                    errorReporter.reportError("cannot multiply matrix with " + op2);
+                    errorReporter.reportError("cannot multiply matrix with " + op2, ctx);
                     return null;
                 }
             }
         } else if (operator.equals("/")) {
-            expect(scalar, op1);
-            expect(scalar, op2);
+            expect(scalar, op1, ctx);
+            expect(scalar, op2, ctx);
             return scalar;
 
         } else if (operator.equals("%")) {
             // TODO
         } else {
-            errorReporter.reportError("what?");
+            errorReporter.reportError("what?", ctx);
         }
 
         return null;
@@ -503,7 +506,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             String spasserid = ctx.ID().getText();
             return symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
-            errorReporter.reportError("Symbol not found");
+            errorReporter.reportError("Symbol not found", ctx.ID().getSymbol());
             return null;
         }
     }
@@ -513,7 +516,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitNegate(TrinityParser.NegateContext ctx) {
         Type op = ctx.expr().accept(this);
         if (op.equals(bool)) {
-            errorReporter.reportError("cannot negate bool");
+            errorReporter.reportError("cannot negate bool", ctx);
             return bool;
         }
 
@@ -528,7 +531,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } else if (prim.contentEquals("Scalar")) {
             return scalar;
         } else {
-            errorReporter.reportError("hmm");
+            errorReporter.reportError("hmm", ctx);
             return null;
         }
     }
@@ -537,7 +540,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitVectorType(TrinityParser.VectorTypeContext ctx) {
         Type out = null;
         if (ctx.ID() != null) {
-            errorReporter.reportError("IDs not supported ... yet");
+            errorReporter.reportError("IDs not supported ... yet", ctx.ID().getSymbol());
         } else {
             int size = new Integer(ctx.NUMBER().getText());
             out = new MatrixType(1, size);
@@ -549,7 +552,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
         Type out = null;
         if (ctx.ID(1) != null || ctx.ID(0) != null) {
-            errorReporter.reportError("IDs not supported ... yet");
+            errorReporter.reportError("IDs not supported ... yet", ctx.ID(0).getSymbol());
         } else {
             int rows = new Integer(ctx.NUMBER(0).getText());
             int cols = new Integer(ctx.NUMBER(1).getText());

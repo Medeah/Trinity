@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Trinity {
+    static CommandLineOptions options = new CommandLineOptions();
 
     private static class CommandLineOptions {
         @Parameter(description = "filename")
@@ -23,10 +24,12 @@ public class Trinity {
 
         @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
         private boolean prettyPrint;
+
+        @Parameter(names = {"-g", "--go"}, description = "Keep-on-trucking on error")
+        private boolean notFailOnError;
     }
 
     public static void main(String[] args) throws Exception {
-        CommandLineOptions options = new CommandLineOptions();
         JCommander jc = new JCommander(options, args);
 
         if (options.files.size() == 0) {
@@ -61,7 +64,7 @@ public class Trinity {
     private static void compile(String is) throws Exception {
         ParseTree tree = parse(is);
 
-        ErrorReporter reporter = new StandardErrorReporter();
+        ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError);
         SymbolTable table = new HashSymbolTable();
 
         TypeVisitor typeChecker = new TypeVisitor(reporter, table);

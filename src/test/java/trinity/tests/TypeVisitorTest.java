@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public class TypeVisitorTest {
 
     private boolean typeCheck(String str) throws Exception {
-        ErrorReporter er = new StandardErrorReporter(false);
+        ErrorReporter er = new StandardErrorReporter(false, str);
         SymbolTable tab = new HashSymbolTable();
         TypeVisitor typeVisitor = new TypeVisitor(er, tab);
 

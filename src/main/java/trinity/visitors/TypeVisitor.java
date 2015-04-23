@@ -64,11 +64,13 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         Type funcType = ctx.type().accept(this);
 
+        List<String> formalParameterIds = new ArrayList<String>();
         List<Type> formalParameterTypes = new ArrayList<Type>();
 
         if (ctx.formalParameters() != null) {
-            for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
-                formalParameterTypes.add(ctx.formalParameters().formalParameter(i).accept(this));
+            for (TrinityParser.FormalParameterContext formalParameter : ctx.formalParameters().formalParameter()) {
+                formalParameterTypes.add(formalParameter.accept(this));
+                formalParameterIds.add(formalParameter.ID().getText());
             }
         }
 
@@ -80,18 +82,15 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         symbolTable.openScope();
-        symbolTable.setfunc(functionDecl);
+        symbolTable.setCurrentFunction(functionDecl);
 
-        //TODO: can we merge this second iteration with the above one?
-        if (ctx.formalParameters() != null) {
-            for (int i = 0; i < ctx.formalParameters().formalParameter().size(); i++) {
-                TrinityParser.FormalParameterContext formalParameter = ctx.formalParameters().formalParameter(i);
+        assert formalParameterIds.size() == formalParameterTypes.size();
 
-                try {
-                    symbolTable.enterSymbol(formalParameter.ID().getText(), formalParameter.accept(this));
-                } catch (SymbolAlreadyDefinedException e) {
-                    errorReporter.reportError("Formal parameter Symbol was already defined!");
-                }
+        for (int i = 0; i < formalParameterTypes.size(); i++) {
+            try {
+                symbolTable.enterSymbol(formalParameterIds.get(i), formalParameterTypes.get(i));
+            } catch (SymbolAlreadyDefinedException e) {
+                errorReporter.reportError("Formal parameter Symbol was already defined!");
             }
         }
 
@@ -164,7 +163,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (ctx.semiExpr() != null) {
             Type returnType = ctx.semiExpr().accept(this);
-            if (!returnType.equals(symbolTable.getfunc().getType())) {
+            if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
                 errorReporter.reportError("Incorrect return type for function");
             }
             return returnType;

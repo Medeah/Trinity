@@ -14,15 +14,10 @@ import static org.junit.Assert.*;
 
 public class ParserTest {
 
-    //TODO: spørg mathias haha
     @Test
     public void correctSyntax_parseFile() throws Exception  {
         InputStream is = this.getClass().getResourceAsStream("/trinity/tests/parsing-tests.tri");
         TrinityParser parser = createParser(is);
-
-        parser.removeErrorListeners();
-        parser.addErrorListener(new DiagnosticErrorListener());
-        parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
         parser.prog();
         assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
@@ -108,16 +103,15 @@ public class ParserTest {
         assertFalse(canParse("Matrix m(var) do end"));
     }
 
-
     // Utility functions
-    public Boolean canParse(String syntax) throws IOException {
+    private static Boolean canParse(String syntax) throws IOException {
         TrinityParser parser = createParser(syntax);
         parser.prog();
         int lol = parser.getNumberOfSyntaxErrors();
         return 0 == parser.getNumberOfSyntaxErrors();
     }
 
-    public TrinityParser createParser(ANTLRInputStream input) throws IOException {
+    private static TrinityParser createParser(ANTLRInputStream input) throws IOException {
         TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
@@ -127,12 +121,12 @@ public class ParserTest {
         return parser;
     }
 
-    public TrinityParser createParser(String string) throws IOException {
+    private static TrinityParser createParser(String string) throws IOException {
         ANTLRInputStream input = new ANTLRInputStream(string);
         return createParser(input);
     }
 
-    public TrinityParser createParser(InputStream is) throws IOException {
+    private static TrinityParser createParser(InputStream is) throws IOException {
         ANTLRInputStream input = new ANTLRInputStream(is);
         return createParser(input);
     }

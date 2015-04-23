@@ -102,7 +102,7 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     // TODO can we do better?
-    public FunctionType getfunc() {
+    public FunctionType getCurrentFunction() {
         try {
             return (FunctionType)retrieveSymbol("##func");
         } catch (SymbolNotFoundException e) {
@@ -112,7 +112,7 @@ public class HashSymbolTable implements SymbolTable {
         return null;
     }
 
-    public void setfunc(FunctionType inp) {
+    public void setCurrentFunction(FunctionType inp) {
         try {
             enterSymbol("##func", inp);
         } catch (SymbolAlreadyDefinedException e) {

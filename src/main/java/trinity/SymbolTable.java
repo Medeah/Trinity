@@ -18,7 +18,7 @@ public interface SymbolTable {
 
     boolean declaredLocally(String name);
 
-    FunctionType getfunc();
+    FunctionType getCurrentFunction();
 
-    void setfunc(FunctionType inp);
+    void setCurrentFunction(FunctionType inp);
 }

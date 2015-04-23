@@ -172,6 +172,29 @@ public class TypeVisitorTest {
         assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do for Scalar s in v do 1+1; end end")); // Rows not cols
     }
 
+    @Test
+    public void ifBirdsCouldFly() throws Exception {
+        assertTrue(typeCheck("if true then 1+2; end"));
+        assertTrue(typeCheck("if false then 1+3; elseif true then 1+2; end"));
+        assertTrue(typeCheck("if false then 1+2; elseif true then 1+2; else 1+2; end"));
+        assertTrue(typeCheck("if false then 1+2; else 1+2; end"));
+        assertTrue(typeCheck("if true or false then 123+345; end"));
+        assertTrue(typeCheck("if true and false then 123+345; end"));
+        assertTrue(typeCheck("if false then 1+2; elseif false then 3+3; elseif true then 1+1; end "));
+        assertTrue(typeCheck("Scalar s = 2; if s == 2 then 1+1; end"));
+        assertTrue(typeCheck("Scalar s = 3; if s != 2 then 1+1; end"));
+        assertTrue(typeCheck("Scalar s = 3; if s > 2 then 1+1; end"));
+        assertTrue(typeCheck("Scalar s = 25; if (s/5) == 5 then 1+1; end"));
+
+
+        assertFalse(typeCheck("if false then 1+2; elseif false then 3+3; elseif true then 1+true; end "));
+        assertFalse(typeCheck("if false then true+false; end"));
+        assertFalse(typeCheck("if true or false then [1,2,4][6,7,8][3,7,6]+345; end"));
+        assertFalse(typeCheck("if true and false then 1+1; else 123+[1234,56,78]+false; end"));
+        assertFalse(typeCheck("if 2 then 1+1; end"));
+        assertFalse(typeCheck("if 2+3 then 1+1; end"));
+
+    }
 
     /*@Test
     public void testTypeInference() throws Exception {

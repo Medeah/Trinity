@@ -174,7 +174,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return ctx.expr().accept(this);
     }
 
-    //TODO
     @Override
     public Type visitForLoop(TrinityParser.ForLoopContext ctx) {
         Type type = ctx.expr().accept(this);
@@ -204,9 +203,17 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return null;
     }
 
-    //TODO
     @Override
     public Type visitIfStatement(TrinityParser.IfStatementContext ctx) {
+
+        for (TrinityParser.ExprContext expCtx : ctx.expr()){
+            expect(bool, expCtx.accept(this));
+        }
+
+        for (TrinityParser.BlockContext blockCtx : ctx.block()){
+            blockCtx.accept(this);
+        }
+
         return null;
     }
 
@@ -482,7 +489,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             expect(scalar, op2);
             return scalar;
 
-        } else if (operator.equals("/")) {
+        } else if (operator.equals("%")) {
             // TODO
         } else {
             errorReporter.reportError("what?");

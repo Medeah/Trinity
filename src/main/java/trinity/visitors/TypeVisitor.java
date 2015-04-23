@@ -158,12 +158,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
-        //TODO: is this (shit) the best way (no)
-        Boolean openScope = true;
-        if (ctx.getParent() instanceof TrinityParser.FunctionDeclContext) {
-            openScope = false;
-        }
-        if (openScope) symbolTable.openScope();
         for (int i = 0; i < ctx.stmt().size(); i++) {
             ctx.stmt(i).accept(this);
         }
@@ -171,7 +165,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.semiExpr() != null) {
             ctx.semiExpr().accept(this);
         }
-        if (openScope) symbolTable.closeScope();
+
         return null;
     }
 
@@ -183,6 +177,30 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     //TODO
     @Override
     public Type visitForLoop(TrinityParser.ForLoopContext ctx) {
+        Type type = ctx.expr().accept(this);
+        Type contextType = ctx.type().accept(this);
+
+        symbolTable.openScope();
+
+        if (type instanceof MatrixType){
+            if(((MatrixType) type).getRows() == 1){
+                expect(scalar, contextType);
+            }else{
+                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType);
+            }
+        }else{
+            errorReporter.reportError("Hmm, expected a Matrix.");
+        }
+
+        try {
+            symbolTable.enterSymbol(ctx.ID().getText(), contextType);
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("ID already exsists: " + ctx.ID().getText());
+        }
+        ctx.block().accept(this);
+
+        symbolTable.closeScope();
+
         return null;
     }
 

@@ -129,12 +129,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitBlock(TrinityParser.BlockContext ctx) {
-        //TODO: is this (shit) the best way (no)
-        Boolean openScope = true;
-        if(ctx.getParent() instanceof TrinityParser.FunctionDeclContext){
-            openScope = false;
-        }
-        if (openScope) symbolTable.openScope();
+
         for (int i = 0; i < ctx.stmt().size(); i++) {
             ctx.stmt(i).accept(this);
         }
@@ -142,7 +137,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.semiExpr() != null) {
             ctx.semiExpr().accept(this);
         }
-        if (openScope) symbolTable.closeScope();
+
         return null;
     }
 
@@ -171,7 +166,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 }
             }else{
                 if(contextType.equals(new MatrixType(1, ((MatrixType) type).getCols()))) {
-
+                    //Matrix
                 }else{
                     errorReporter.reportError("Wrong type, expected Vector.");
                 }

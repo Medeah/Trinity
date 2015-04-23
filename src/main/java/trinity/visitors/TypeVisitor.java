@@ -180,28 +180,26 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type type = ctx.expr().accept(this);
         Type contextType = ctx.type().accept(this);
 
+        symbolTable.openScope();
+
         if (type instanceof MatrixType){
             if(((MatrixType) type).getRows() == 1){
-                if(contextType.equals(scalar)) {
-                    try {
-                        symbolTable.enterSymbol(ctx.ID().getText(), contextType);
-                    } catch (SymbolAlreadyDefinedException e) {
-                        errorReporter.reportError("ID already exsists: " + ctx.ID().getText());
-                    }
-                    ctx.block().accept(this);
-                }else{
-                    errorReporter.reportError("Wrong type, expected Scalar.");
-                }
+                expect(scalar, contextType);
             }else{
-                if(contextType.equals(new MatrixType(1, ((MatrixType) type).getCols()))) {
-                    //Matrix
-                }else{
-                    errorReporter.reportError("Wrong type, expected Vector.");
-                }
+                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType);
             }
         }else{
             errorReporter.reportError("Hmm, expected a Matrix.");
         }
+
+        try {
+            symbolTable.enterSymbol(ctx.ID().getText(), contextType);
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("ID already exsists: " + ctx.ID().getText());
+        }
+        ctx.block().accept(this);
+
+        symbolTable.closeScope();
 
         return null;
     }

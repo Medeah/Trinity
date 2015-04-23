@@ -142,7 +142,7 @@ public class TypeVisitorTest {
     }
 
 
-    @Ignore
+    @Test
     public void testFunctionDeclaration() throws Exception {
         assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end"));
         assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2,2);"));
@@ -157,17 +157,19 @@ public class TypeVisitorTest {
 
     @Test
     public void forLoopTest() throws Exception {
-        assertTrue(typeCheck("Vector[3] v = [1,2,3]; for Scalar s in v do print(s); end"));
-        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do print(v[1]); end"));
-        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do for Scalar s in v do print(s); end end"));
-        assertTrue(typeCheck("for Scalar s in [1,2,3,4,5,6,7,8,9] do print(s); end"));
-        assertTrue(typeCheck("for Scalar s in [6] do print(s); end"));
-        
-        assertFalse(typeCheck("for Scalar s in 3 > 4 do print(s); end"));
-        assertFalse(typeCheck("for Scalar s in 6 do print(s); end"));
-        assertFalse(typeCheck("for Scalar s in false do print(s); end"));
-        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do print(v[1]); end")); // Rows not cols
-        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do for Scalar s in v do print(s); end end")); // Rows not cols
+        assertTrue(typeCheck("Vector[3] v = [1,2,3]; for Scalar s in v do 1+1; end"));
+        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do 1+1; end"));
+        assertTrue(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[2] v in m do for Scalar s in v do 1+1; end end"));
+        assertTrue(typeCheck("for Scalar s in [1,2,3,4,5,6,7,8,9] do 1+1; end"));
+        assertTrue(typeCheck("for Scalar s in [6] do 1+1; end"));
+
+        assertFalse(typeCheck("for Scalar s in [6] do 1+false; end"));
+
+        assertFalse(typeCheck("for Scalar s in 3 > 4 do 1+1; end"));
+        assertFalse(typeCheck("for Scalar s in 6 do 1+1; end"));
+        assertFalse(typeCheck("for Scalar s in false do 1+1; end"));
+        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do 1+1; end")); // Rows not cols
+        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][5,6]; for Vector[3] v in m do for Scalar s in v do 1+1; end end")); // Rows not cols
     }
 
 

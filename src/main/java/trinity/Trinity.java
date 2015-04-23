@@ -4,6 +4,8 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import trinity.CustomExceptions.ParseException;
+import trinity.CustomExceptions.TypeCheckException;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
 
@@ -71,8 +73,7 @@ public class Trinity {
 
         typeChecker.visit(tree);
         if (reporter.getErrorAmount() > 0) {
-            // TODO: custom ex ?
-            throw new Exception("To many type errors aborting");
+            throw new TypeCheckException("To many type errors aborting");
         }
 
         //return tree.toStringTree(parser);
@@ -87,8 +88,7 @@ public class Trinity {
         ParseTree tree = parser.prog();
 
         if (parser.getNumberOfSyntaxErrors() != 0) {
-            // TODO: custom ex ?
-            throw new Exception("wtf");
+            throw new ParseException("Input contains syntax errors.");
         }
 
         return tree;

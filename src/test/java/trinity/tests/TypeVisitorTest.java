@@ -3,9 +3,9 @@ package trinity.tests;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.Ignore;
 import org.junit.Test;
 import trinity.*;
+import trinity.CustomExceptions.ParseException;
 import trinity.visitors.TypeVisitor;
 
 import static org.junit.Assert.assertFalse;
@@ -26,8 +26,7 @@ public class TypeVisitorTest {
         ParseTree tree = parser.prog();
 
         if (parser.getNumberOfSyntaxErrors() != 0) {
-            //TODO: custom excpe..
-            throw new Exception("Parse error, invalid test.");
+            throw new ParseException("Invalid test.");
         }
 
         tree.accept(typeVisitor);

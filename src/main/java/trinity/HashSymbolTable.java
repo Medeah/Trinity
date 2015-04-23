@@ -112,9 +112,9 @@ public class HashSymbolTable implements SymbolTable {
         return null;
     }
 
-    public void setCurrentFunction(FunctionType inp) {
+    public void setCurrentFunction(FunctionType type) {
         try {
-            enterSymbol("##func", inp);
+            enterSymbol("##func", type);
         } catch (SymbolAlreadyDefinedException e) {
             e.printStackTrace();
         }

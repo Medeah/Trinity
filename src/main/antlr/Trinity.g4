@@ -20,7 +20,7 @@ type: ('Boolean' | 'Scalar')                        # PrimitiveType
 
 block: stmt* ('return' semiExpr)? ;
 
-semiExpr: expr LINETERMINATOR;
+semiExpr: expr ';';
 
 stmt: constDecl                                 # ConstDeclaration
     | semiExpr                                  # SingleExpression
@@ -40,8 +40,8 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | '!' expr                          # Not
     | expr '\''                         # Transpose
     | <assoc=right> expr op='^' expr    # Exponent
-    | expr op=('*'|'/'|'%') expr        # MultDivMod
-    | expr op=('+'|'-') expr            # AddSub
+    | expr op=('*'|'/') expr            # MultiplyDivide
+    | expr op=('+'|'-') expr            # AddSubtract
     | expr op=('<'|'>'|'<='|'>=') expr  # Relation
     | expr op=('=='|'!=') expr          # Equality
     | expr op='and' expr                # And
@@ -49,8 +49,8 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | ID                                # Identifier
     | NUMBER                            # Number
     | BOOL                              # Boolean
-    | matrix                            # MatrixLit
-    | vector                            # VectorLit
+    | matrix                            # MatrixLiteral
+    | vector                            # VectorLiteral
     | '(' expr ')'                      # Parens
     ;
 

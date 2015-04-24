@@ -258,11 +258,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitMatrixLit(TrinityParser.MatrixLitContext ctx) {
-        return ctx.matrix().accept(this);
-    }
-
-    @Override
     public Type visitMatrix(TrinityParser.MatrixContext ctx) {
         List<TrinityParser.VectorContext> vectors = ctx.vector();
 
@@ -344,7 +339,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitVectorLit(TrinityParser.VectorLitContext ctx) {
+    public Type visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+        return ctx.matrix().accept(this);
+    }
+
+    @Override
+    public Type visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         return ctx.vector().accept(this);
     }
 
@@ -444,7 +444,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitAddSub(TrinityParser.AddSubContext ctx) {
+    public Type visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
@@ -460,7 +460,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     }
 
     @Override
-    public Type visitMultDivMod(TrinityParser.MultDivModContext ctx) {
+    public Type visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
         String operator = ctx.op.getText(); // TODO måske ikke det rigte måde at få operator ud
@@ -504,8 +504,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             expect(scalar, op2, ctx);
             return scalar;
 
-        } else if (operator.equals("%")) {
-            // TODO
         } else {
             errorReporter.reportError("what?", ctx);
         }

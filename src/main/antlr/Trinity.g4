@@ -33,7 +33,6 @@ stmt: constDecl                                 # ConstDeclaration
 
 // Expressions
 
-// TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
 expr: ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing
@@ -51,12 +50,12 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | NUMBER                            # Number
     | BOOL                              # Boolean
     | matrix                            # MatrixLit
-    | vector                            # VectorLit // TODO: naming
+    | vector                            # VectorLit
     | '(' expr ')'                      # Parens
     ;
 
 exprList: expr (',' expr)* ;
 
 vector: '[' (exprList | range) ']' ;
-matrix: vector vector+ ; // [][]...[]
+matrix: vector vector+ ;
 range:   NUMBER '..' NUMBER ;

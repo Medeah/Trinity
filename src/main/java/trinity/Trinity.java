@@ -95,12 +95,11 @@ public class Trinity {
         }
 
         return tree;
-
     }
 
     private static void prettyPrint(String is, int indentation) throws Exception {
         ParseTree tree = parse(is);
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
-        prettyPrinter.visit(tree);
+        System.out.print(prettyPrinter.prettyfy(tree));
     }
 }

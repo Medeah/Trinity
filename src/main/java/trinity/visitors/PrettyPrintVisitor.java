@@ -17,21 +17,20 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     //TODO: fix output method
     private String outputString = "";
 
-    private void print(String string) {
-        //System.out.print(string);
+    private void emit(String string) {
         outputString += string;
     }
 
-    private void print(ParseTree node) {
-        print(node.getText());
+    private void emit(ParseTree node) {
+        emit(node.getText());
     }
 
-    private void print(Token token) {
-        print(token.getText());
+    private void emit(Token token) {
+        emit(token.getText());
     }
 
     private void indent() {
-        print(Strings.repeat(" ", indentLevel * spaces));
+        emit(Strings.repeat(" ", indentLevel * spaces));
     }
 
     public PrettyPrintVisitor() {
@@ -51,7 +50,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitProg(TrinityParser.ProgContext ctx) {
         for (ParseTree child : ctx.children) {
             child.accept(this);
-            print(System.lineSeparator());
+            emit(System.lineSeparator());
         }
         return null;
     }
@@ -59,8 +58,8 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         ctx.type().accept(this);
-        print(ctx.ID());
-        print(" = ");
+        emit(ctx.ID());
+        emit(" = ");
         ctx.semiExpr().accept(this);
         return null;
     }
@@ -68,14 +67,14 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
         ctx.type().accept(this);
-        print(ctx.ID());
-        print(" (");
+        emit(ctx.ID());
+        emit(" (");
         if (ctx.formalParameters() != null) {
             ctx.formalParameters().accept(this);
         }
-        print(") do");
+        emit(") do");
         ctx.block().accept(this);
-        print("end");
+        emit("end");
         return null;
     }
 
@@ -83,7 +82,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
         ctx.formalParameter(0).accept(this);
         for (int i = 1; i < ctx.formalParameter().size(); i++) {
-            print(", ");
+            emit(", ");
             ctx.formalParameter(i).accept(this);
         }
         return null;
@@ -92,24 +91,24 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         ctx.type().accept(this);
-        print(ctx.ID());
+        emit(ctx.ID());
         return null;
     }
 
     @Override
     public Object visitBlock(TrinityParser.BlockContext ctx) {
-        print(System.lineSeparator());
+        emit(System.lineSeparator());
         this.indentLevel++;
         for (int i = 0; i < ctx.stmt().size(); i++) {
             indent();
             ctx.stmt(i).accept(this);
-            print(System.lineSeparator());
+            emit(System.lineSeparator());
         }
         if(ctx.semiExpr() != null) {
             indent();
-            print("return ");
+            emit("return ");
             ctx.semiExpr().accept(this);
-            print(System.lineSeparator());
+            emit(System.lineSeparator());
         }
         this.indentLevel--;
         indent();
@@ -119,16 +118,16 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitSemiExpr(TrinityParser.SemiExprContext ctx) {
         ctx.expr().accept(this);
-        print(";");
+        emit(";");
         return null;
     }
 
     @Override
     public Object visitOr(TrinityParser.OrContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
@@ -136,95 +135,95 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitExponent(TrinityParser.ExponentContext ctx) {
         ctx.expr(0).accept(this);
-        print(ctx.op);
+        emit(ctx.op);
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Object visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        print(ctx.ID());
-        print("[");
+        emit(ctx.ID());
+        emit("[");
         ctx.expr(0).accept(this);
-        print(", ");
+        emit(", ");
         ctx.expr(1).accept(this);
-        print("]");
+        emit("]");
         return null;
     }
 
     @Override
     public Object visitForLoop(TrinityParser.ForLoopContext ctx) {
-        print("for ");
+        emit("for ");
         ctx.type().accept(this);
-        print(ctx.ID());
-        print(" in ");
+        emit(ctx.ID());
+        emit(" in ");
         ctx.expr().accept(this);
-        print(" do");
+        emit(" do");
         ctx.block().accept(this);
-        print("end");
+        emit("end");
         return null;
     }
 
     @Override
     public Object visitIfStatement(TrinityParser.IfStatementContext ctx) {
-        print("if ");
+        emit("if ");
         ctx.expr(0).accept(this);
-        print(" then");
+        emit(" then");
         ctx.block(0).accept(this);
 
         int i;
         for(i = 1; i < ctx.expr().size(); i++) {
-            print("elseif ");
+            emit("elseif ");
             ctx.expr(i).accept(this);
-            print(" then");
+            emit(" then");
             ctx.block(i).accept(this);
         }
 
         if(ctx.block(i) != null) {
-            print("else");
+            emit("else");
             ctx.block(i).accept(this);
         }
 
-        print("end");
+        emit("end");
         return null;
     }
 
     @Override
     public Object visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
-        print("do");
+        emit("do");
         ctx.block().accept(this);
-        print("end");
+        emit("end");
         return null;
     }
 
     @Override
     public Object visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Object visitParens(TrinityParser.ParensContext ctx) {
-        print("(");
+        emit("(");
         ctx.expr().accept(this);
-        print(")");
+        emit(")");
         return null;
     }
 
     @Override
     public Object visitTranspose(TrinityParser.TransposeContext ctx) {
         ctx.expr().accept(this);
-        print("'");
+        emit("'");
         return null;
     }
 
     @Override
     public Object visitNot(TrinityParser.NotContext ctx) {
-        print("!");
+        emit("!");
         ctx.expr().accept(this);
         return null;
     }
@@ -232,31 +231,31 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitRelation(TrinityParser.RelationContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Object visitIdentifier(TrinityParser.IdentifierContext ctx) {
-        print(ctx.ID());
+        emit(ctx.ID());
         return null;
     }
 
     @Override
     public Object visitNumber(TrinityParser.NumberContext ctx) {
-        print(ctx.NUMBER());
+        emit(ctx.NUMBER());
         return null;
     }
 
     @Override
     public Object visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
@@ -264,53 +263,53 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitAnd(TrinityParser.AndContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Object visitNegate(TrinityParser.NegateContext ctx) {
-        print("-");
+        emit("-");
         ctx.expr().accept(this);
         return null;
     }
 
     @Override
     public Object visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
-        print(ctx.ID().getText());
-        print("(");
+        emit(ctx.ID().getText());
+        emit("(");
         if (ctx.exprList() != null) {
             ctx.exprList().accept(this);
         }
-        print(")");
+        emit(")");
         return null;
     }
 
     @Override
     public Object visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
-        print(ctx.ID());
-        print("[");
+        emit(ctx.ID());
+        emit("[");
         ctx.expr().accept(this);
-        print("]");
+        emit("]");
         return null;
     }
 
     @Override
     public Object visitEquality(TrinityParser.EqualityContext ctx) {
         ctx.expr(0).accept(this);
-        print(" ");
-        print(ctx.op);
-        print(" ");
+        emit(" ");
+        emit(ctx.op);
+        emit(" ");
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Object visitBoolean(TrinityParser.BooleanContext ctx) {
-        print(ctx.BOOL());
+        emit(ctx.BOOL());
         return null;
     }
 
@@ -318,7 +317,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitExprList(TrinityParser.ExprListContext ctx) {
         ctx.expr(0).accept(this);
         for(int i = 1; i < ctx.expr().size(); i++) {
-            print(", ");
+            emit(", ");
             ctx.expr(i).accept(this);
         }
         return null;
@@ -326,59 +325,59 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 
     @Override
     public Object visitVector(TrinityParser.VectorContext ctx) {
-        print("[");
+        emit("[");
         if(ctx.exprList() != null) {
             ctx.exprList().accept(this);
         } else {
             ctx.range().accept(this);
         }
-        print("]");
+        emit("]");
         return null;
     }
 
     @Override
     public Object visitRange (TrinityParser.RangeContext ctx) {
-        print(ctx.NUMBER(0));
-        print("..");
-        print(ctx.NUMBER(1));
+        emit(ctx.NUMBER(0));
+        emit("..");
+        emit(ctx.NUMBER(1));
         return null;
     }
 
     @Override
     public Type visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
-        print(ctx.getChild(0));
-        print(" ");
+        emit(ctx.getChild(0));
+        emit(" ");
         return null;
     }
 
     @Override
     public Type visitVectorType(TrinityParser.VectorTypeContext ctx) {
-        print("Vector[");
+        emit("Vector[");
         if (ctx.NUMBER() != null) {
-            print(ctx.NUMBER());
+            emit(ctx.NUMBER());
         } else {
-            print(ctx.ID());
+            emit(ctx.ID());
         }
-        print("] ");
+        emit("] ");
         return null;
     }
 
     @Override
     public Type visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
-        print("Matrix[");
+        emit("Matrix[");
         if (ctx.NUMBER(0) != null) {
-            print(ctx.NUMBER(0));
+            emit(ctx.NUMBER(0));
         } else {
-            print(ctx.ID(0));
+            emit(ctx.ID(0));
         }
-        print(",");
+        emit(",");
         if (ctx.NUMBER(1) != null) {
-            print(ctx.NUMBER(1));
+            emit(ctx.NUMBER(1));
         } else {
-            print(ctx.ID(1));
+            emit(ctx.ID(1));
         }
 
-        print("] ");
+        emit("] ");
         return null;
     }
 

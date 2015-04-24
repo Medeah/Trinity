@@ -163,7 +163,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.semiExpr() != null) {
             Type returnType = ctx.semiExpr().accept(this);
             if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
-                errorReporter.reportError("Incorrect return type for function", ctx.semiExpr().getStart()   );
+                errorReporter.reportError("Incorrect return type for function", ctx.semiExpr().getStart());
             }
             return returnType;
         }
@@ -207,15 +207,24 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitIfStatement(TrinityParser.IfStatementContext ctx) {
-
-        for (TrinityParser.ExprContext expCtx : ctx.expr()){
+        for (TrinityParser.ExprContext expCtx : ctx.expr()) {
             expect(bool, expCtx.accept(this), ctx);
         }
 
-        for (TrinityParser.BlockContext blockCtx : ctx.block()){
+        for (TrinityParser.BlockContext blockCtx : ctx.block()) {
+            symbolTable.openScope();
             blockCtx.accept(this);
+            symbolTable.closeScope();
         }
 
+        return null;
+    }
+
+    @Override
+    public Type visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
+        symbolTable.openScope();
+        ctx.block().accept(this);
+        symbolTable.closeScope();
         return null;
     }
 
@@ -260,10 +269,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         int rows = vectors.size();
         int cols = -1;
 
-        for (int i = 0; i < rows; i++){
+        for (int i = 0; i < rows; i++) {
             Type type = vectors.get(i).accept(this);
             if (type instanceof MatrixType) {
-                MatrixType vectortyY= (MatrixType) type;
+                MatrixType vectortyY = (MatrixType) type;
                 if (cols == -1) {
                     cols = vectortyY.getCols();
                 } else if (cols != vectortyY.getCols()) {
@@ -286,7 +295,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
-            errorReporter.reportError("Symbol not defined!", ctx.ID().getSymbol() );
+            errorReporter.reportError("Symbol not defined!", ctx.ID().getSymbol());
             return null;
         }
 
@@ -364,8 +373,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         expect(op1, op2, ctx);
 
-        if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("cannot compare booleans", ctx);
+        if (op1.equals(bool) && op2.equals(bool)) {
+            errorReporter.reportError("Cannot compare booleans", ctx);
         }
 
         return new PrimitiveType(EnumType.BOOLEAN);
@@ -377,10 +386,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op2 = ctx.expr(1).accept(this);
 
         expect(op1, op2, ctx);
-
-        if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
-            errorReporter.reportError("Cannot compare booleans", ctx);
-        }
 
         return new PrimitiveType(EnumType.BOOLEAN);
     }
@@ -424,8 +429,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.SCALAR), op1, ctx);
-        expect(new PrimitiveType(EnumType.SCALAR), op2, ctx);
+        if (op1.equals(bool)) {
+            errorReporter.reportError("Can only use exponent operator scalars and square matrices.", ctx);
+        } else if (op1 instanceof MatrixType) {
+            MatrixType matrix = (MatrixType) op1;
+            if (matrix.getRows() != matrix.getCols()) {
+                errorReporter.reportError("Can only use exponent operator scalars and square matrices.", ctx);
+            }
+        }
+
+        expect(scalar, op2, ctx);
 
         return op1;
     }
@@ -482,7 +495,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                         return null;
                     }
                 } else {
-                    errorReporter.reportError("cannot multiply matrix with " + op2, ctx);
+                    errorReporter.reportError("Cannot multiply matrix with " + op2, ctx);
                     return null;
                 }
             }
@@ -503,7 +516,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitIdentifier(TrinityParser.IdentifierContext ctx) {
         try {
-            String spasserid = ctx.ID().getText();
             return symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
             errorReporter.reportError("Symbol not found", ctx.ID().getSymbol());
@@ -516,7 +528,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitNegate(TrinityParser.NegateContext ctx) {
         Type op = ctx.expr().accept(this);
         if (op.equals(bool)) {
-            errorReporter.reportError("cannot negate bool", ctx);
+            errorReporter.reportError("Cannot negate bool", ctx);
             return bool;
         }
 

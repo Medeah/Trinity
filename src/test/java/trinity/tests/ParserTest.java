@@ -84,6 +84,13 @@ public class ParserTest {
     }
 
     @Test
+    public void parseReturn() throws Exception  {
+        assertFalse(canParse("return 1;"));
+        assertFalse(canParse("Scalar x() do return 1; return 1; end"));
+        assertTrue(canParse("Scalar x() do return 1; end"));
+    }
+
+    @Test
     public void badSyntax_wrongVectorMatrix() throws Exception  {
         assertFalse(canParse("[1,2,3;"));
         assertFalse(canParse("1,3];"));

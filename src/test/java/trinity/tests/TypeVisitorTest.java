@@ -55,12 +55,19 @@ public class TypeVisitorTest {
     }
 
     @Test
-    public void testConstDecl_Boolean() throws Exception {
+    public void testBooleanAndLogicalExpressions() throws Exception {
         assertTrue(typeCheck("Boolean b = true;"));
         assertTrue(typeCheck("Boolean b = true or false;"));
         assertTrue(typeCheck("Boolean b = 4 <= 4 + 1 and 3 != 2;"));
         assertFalse(typeCheck("Boolean b = 4 <= (8 and 4) == 7 or 3 != 2;"));
         assertTrue(typeCheck("Boolean b = [2,2] == [2,2] and [1,2][3,4] == [3,4][5,5];"));
+
+        assertTrue(typeCheck("Boolean b = 1 == 2 and 1 < 2 and 1 > 2;"));
+        assertTrue(typeCheck("Boolean b = 1 != 2 or true != false;"));
+        assertTrue(typeCheck("Boolean b = 1 <= 2 and 1 >= 2;"));
+        assertTrue(typeCheck("Boolean b = !true and !(1==2);"));
+        assertFalse(typeCheck("Boolean b = !2;"));
+        assertFalse(typeCheck("Boolean b = ![2];"));
     }
 
     @Test
@@ -83,9 +90,11 @@ public class TypeVisitorTest {
     @Test
     public void testConstDecl_ArithmeticExpresssions() throws Exception {
         assertTrue(typeCheck("Scalar q = 2 * 2;"));
-        assertTrue(typeCheck("Scalar s = 1 + 2 * (5 + 2) / 4;"));
+        assertTrue(typeCheck("Scalar s = 1 + 2 * (5 + 2) / -4;"));
         assertTrue(typeCheck("Vector[2] v = [1,2] + [2,3] - ([5,4] + [2,1]);"));
-        assertTrue(typeCheck("Matrix[2,2] m = [1,2][2,1] + [2,3][4,5] * ([5,4][2,6] + [2,1][7,2]);"));
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][2,1] + [2,3][4,-5] * ([5,4][2,6] + [2,1][7,2]);"));
+        assertTrue(typeCheck("Matrix[2,2] m = -[1,2][2,1];"));
+        assertFalse(typeCheck("-true;"));
     }
 
     @Test
@@ -140,9 +149,17 @@ public class TypeVisitorTest {
         assertFalse(typeCheck("Matrix[3,2] m = ([1,2][3,4][5,6])';"));
     }
 
+    @Test
+    public void testExponent() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4]^2;"));
+        assertFalse(typeCheck("Matrix[3,2] m = [1,2][3,4][3,4]^2;"));
+        assertFalse(typeCheck("Matrix[2,3] m = [1,2,4][3,4,6]^2;"));
+        assertTrue(typeCheck("Scalar s = 3^4;"));
+    }
 
     @Test
     public void testFunctionDeclaration() throws Exception {
+        assertTrue(typeCheck("Boolean x() do end"));
         assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end"));
         assertTrue(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2,2);"));
         assertFalse(typeCheck("Scalar add (Scalar a, Scalar b) do return a + b; end Scalar s = add(2);"));
@@ -164,6 +181,9 @@ public class TypeVisitorTest {
         assertFalse(typeCheck("Scalar x () do return false; end"));
         assertFalse(typeCheck("Vector[1] x () do return false; end"));
         assertFalse(typeCheck("Matrix[2,2] x () do return false; end"));
+        assertTrue(typeCheck("Boolean x() do if true then return true; elseif 1==1 then return true; else return false; end end"));
+        assertFalse(typeCheck("Boolean x() do if true then return true; else return 1; end end"));
+        assertTrue(typeCheck("Boolean x() do for Scalar s in [1..3] do return true; end end"));
     }
 
     @Test

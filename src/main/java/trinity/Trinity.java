@@ -27,6 +27,9 @@ public class Trinity {
         @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
         private boolean prettyPrint;
 
+        @Parameter(names = {"-i", "--indent"}, description = "Indentation width")
+        private int indentation = 4;
+
         @Parameter(names = {"-g", "--go"}, description = "Keep-on-trucking on error")
         private boolean notFailOnError;
     }
@@ -45,8 +48,8 @@ public class Trinity {
 
             String is = new String(encoded, Charset.defaultCharset());
 
-            if(options.prettyPrint) {
-                prettyPrint(is);
+            if (options.prettyPrint) {
+                prettyPrint(is, options.indentation);
             } else {
                 compile(is);
                 //System.out.println(out);
@@ -95,9 +98,9 @@ public class Trinity {
 
     }
 
-    private static void prettyPrint(String is) throws Exception {
+    private static void prettyPrint(String is, int indentation) throws Exception {
         ParseTree tree = parse(is);
-        PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor();
+        PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
     }
 }

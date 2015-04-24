@@ -198,7 +198,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitAddSub(TrinityParser.AddSubContext ctx) {
+    public Object visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
         ctx.expr(0).accept(this);
         print(" ");
         print(ctx.op);
@@ -252,7 +252,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitMultDivMod(TrinityParser.MultDivModContext ctx) {
+    public Object visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
         ctx.expr(0).accept(this);
         print(" ");
         print(ctx.op);

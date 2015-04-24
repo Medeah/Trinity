@@ -21,7 +21,7 @@ type: ('Boolean' | 'Scalar')                        # PrimitiveType
 
 block: stmt* ('return' semiExpr)? ;
 
-semiExpr: expr LINETERMINATOR;
+semiExpr: expr ';';
 
 stmt: constDecl                                 # ConstDeclaration
     | semiExpr                                  # SingleExpression
@@ -34,7 +34,6 @@ stmt: constDecl                                 # ConstDeclaration
 
 // Expressions
 
-// TODO: no sub-matrix sub-vector indexing (range) for now (maybe we don't need it)
 expr: ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing
@@ -42,8 +41,8 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | '!' expr                          # Not
     | expr '\''                         # Transpose
     | <assoc=right> expr op='^' expr    # Exponent
-    | expr op=('*'|'/'|'%') expr        # MultDivMod
-    | expr op=('+'|'-') expr            # AddSub
+    | expr op=('*'|'/') expr            # MultiplyDivide
+    | expr op=('+'|'-') expr            # AddSubtract
     | expr op=('<'|'>'|'<='|'>=') expr  # Relation
     | expr op=('=='|'!=') expr          # Equality
     | expr op='and' expr                # And
@@ -51,13 +50,13 @@ expr: ID '(' exprList? ')'              # FunctionCall
     | ID                                # Identifier
     | NUMBER                            # Number
     | BOOL                              # Boolean
-    | matrix                            # MatrixLit
-    | vector                            # VectorLit // TODO: naming
+    | matrix                            # MatrixLiteral
+    | vector                            # VectorLiteral
     | '(' expr ')'                      # Parens
     ;
 
 exprList: expr (',' expr)* ;
 
 vector: '[' (exprList | range) ']' ;
-matrix: vector vector+ ; // [][]...[]
+matrix: vector vector+ ;
 range:   NUMBER '..' NUMBER ;

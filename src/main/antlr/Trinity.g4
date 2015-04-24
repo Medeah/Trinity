@@ -14,7 +14,8 @@ formalParameter: type ID ;
 
 type: ('Boolean' | 'Scalar')                        # PrimitiveType
     | 'Vector' '[' (NUMBER|ID) ']'                  # VectorType
-    | 'Matrix' '[' (NUMBER|ID) ',' (NUMBER|ID) ']'  # MatrixType ;
+    | 'Matrix' '[' (NUMBER|ID) ',' (NUMBER|ID) ']'  # MatrixType
+    ;
 
 // Statements
 

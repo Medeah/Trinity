@@ -11,16 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
+
+    private ErrorReporter errorReporter;
+    private SymbolTable symbolTable;
+    private Type scalar = new PrimitiveType(EnumType.SCALAR);
+    private Type bool = new PrimitiveType(EnumType.BOOLEAN);
+
     public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
         this.errorReporter = errorReporter;
         this.symbolTable = symbolTable;
     }
-
-    private ErrorReporter errorReporter;
-    private SymbolTable symbolTable;
-
-    private Type scalar = new PrimitiveType(EnumType.SCALAR);
-    private Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
     private boolean expect(Type expected, Type actual, ParserRuleContext ctx) {
         if (expected.equals(actual)) {

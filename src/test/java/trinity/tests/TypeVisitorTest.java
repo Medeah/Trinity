@@ -172,6 +172,12 @@ public class TypeVisitorTest {
     }
 
     @Test
+    public void testFunctionCall() throws Exception {
+        assertTrue(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(1, [1,2]);"));
+        assertFalse(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(true, 1);"));
+    }
+
+    @Test
     public void testReturnTypes() throws Exception {
         assertTrue(typeCheck("Boolean x() do return true; end"));
         assertTrue(typeCheck("Scalar x () do return 2; end"));

@@ -113,9 +113,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 }
 
                 for (int i = 0; i < actualParams.size(); i++) {
-                    //TODO: find noget bedre end .getStart() xD
-                    //expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i).getStart());
-                    expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), ctx);
+                    expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
             }
 
@@ -288,9 +286,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             return null;
         }
 
-        /*if (symbol instanceof VectorType) {
-            return new PrimitiveType(EnumType.SCALAR);
-        } else*/
         if (symbol instanceof MatrixType) {
             MatrixType matrix = (MatrixType) symbol;
             if (matrix.getRows() == 1) {

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class ReachabilityVisitorTest {
+public class    ReachabilityVisitorTest {
 
     private boolean reachabilityTest(String str) throws Exception{
         ErrorReporter er = new StandardErrorReporter(false, str);

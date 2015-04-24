@@ -17,17 +17,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Object> implements T
 
     @Override
     public Object visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-        boolean returnNotFound = true;
-
-        //for loop that treverse through all the children of the block.
-        for (ParseTree child : ctx.block().children){
-
-            if(child.getText().equalsIgnoreCase("return")){
-                returnNotFound = false;
-            }
-        }
-
-        if(returnNotFound){
+        if(ctx.block().getChildCount() == 1 || !ctx.block().getChild(ctx.block().getChildCount()-2).getText().equalsIgnoreCase("return")){
             errorReporter.reportError("ARGH!", ctx);
         }
 

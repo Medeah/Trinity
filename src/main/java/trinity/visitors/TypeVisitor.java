@@ -19,8 +19,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
-    private Type scalar = new PrimitiveType(EnumType.SCALAR);
-    private Type bool = new PrimitiveType(EnumType.BOOLEAN);
+    private final Type scalar = new PrimitiveType(EnumType.SCALAR);
+    private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
     private boolean expect(Type expected, Type actual, ParserRuleContext ctx) {
         if (expected.equals(actual)) {
@@ -450,7 +450,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         expect(op1, op2, ctx);
 
-        if (op1.equals(new PrimitiveType(EnumType.BOOLEAN))) {
+        if (op1.equals(bool)) {
             errorReporter.reportError("Cannot use operator +/- on boolean values.", ctx);
         } else {
             return op1;

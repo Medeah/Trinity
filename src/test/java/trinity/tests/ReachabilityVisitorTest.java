@@ -37,12 +37,8 @@ public class ReachabilityVisitorTest {
 
     @Test
     public void testSimpleFunction() throws Exception{
-        assertTrue(reachabilityTest("Boolean b () do\n" +
-                                    "    return false;\n" +
-                                    "end"));
-        assertFalse(reachabilityTest("Boolean b () do\n" +
-                                    "    Scalar s = 1+1;\n" +
-                                    "end"));
+        assertTrue(reachabilityTest("Boolean b () do return false; end"));
+        assertFalse(reachabilityTest("Boolean b () do Scalar s = 1+1; end"));
     }
 
     @Test

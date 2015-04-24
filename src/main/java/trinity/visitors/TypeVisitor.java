@@ -134,16 +134,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
-        Type parameterType = ctx.type().accept(this);
-
-        // TODO: see functionDecl
-        /*try {
-            symbolTable.enterSymbol(ctx.ID().getText(), parameterType);
-        } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("Symbol was already defined!");
-        }*/
-
-        return parameterType;
+        return ctx.type().accept(this);
     }
 
     @Override
@@ -291,7 +282,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             if (matrix.getRows() == 1) {
                 return new PrimitiveType(EnumType.SCALAR);
             } else {
-                //TODO row vector vs col vector
                 return new MatrixType(1, matrix.getCols()); // vector
             }
         } else {
@@ -452,7 +442,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
-        String operator = ctx.op.getText(); // TODO måske ikke det rigte måde at få operator ud
+        String operator = ctx.op.getText();
 
         if (operator.equals("*")) {
             if (op1.equals(new PrimitiveType(EnumType.BOOLEAN)) || op2.equals(new PrimitiveType(EnumType.BOOLEAN))) {
@@ -562,9 +552,4 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return out;
     }
 
-    // TODO find ud af hvornår dette sker
-    @Override
-    public Type visitErrorNode(ErrorNode node) {
-        return null;
-    }
 }

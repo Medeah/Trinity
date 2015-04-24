@@ -36,23 +36,17 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         // Declared (expected) type:
         Type LHS = ctx.type().accept(this);
 
-        // trinity.types.Type found in expr (RHS of declaration)
+        // Type found in expr (RHS of declaration)
         Type RHS = ctx.semiExpr().accept(this);
 
         // Check if the two achieved types matches each other and react accordingly:
-        if (LHS.equals(RHS)) {
-
+        if (expect(LHS, RHS, ctx.semiExpr())) {
             try {
                 symbolTable.enterSymbol(ctx.ID().getText(), LHS);
             } catch (SymbolAlreadyDefinedException e) {
                 errorReporter.reportError("Symbol was already defined!", ctx.ID().getSymbol());
             }
-
-            return LHS;
-        } else {
-            errorReporter.reportError("Expected type " + RHS + " but got " + LHS, ctx);
         }
-
         return null;
     }
 
@@ -185,9 +179,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (type instanceof MatrixType) {
             if (((MatrixType) type).getRows() == 1) {
-                expect(scalar, contextType, ctx);
+                expect(scalar, contextType, ctx.type());
             } else {
-                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType, ctx);
+                expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType, ctx.type());
             }
         } else {
             errorReporter.reportError("Hmm, expected a Matrix or Vector.", ctx.expr().getStart());
@@ -208,7 +202,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitIfStatement(TrinityParser.IfStatementContext ctx) {
         for (TrinityParser.ExprContext expCtx : ctx.expr()) {
-            expect(bool, expCtx.accept(this), ctx);
+            expect(bool, expCtx.accept(this), expCtx);
         }
 
         for (TrinityParser.BlockContext blockCtx : ctx.block()) {
@@ -235,7 +229,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } else {
             List<TrinityParser.ExprContext> exprs = ctx.exprList().expr();
             for (TrinityParser.ExprContext expr : exprs) {
-                expect(scalar, expr.accept(this), ctx);
+                expect(scalar, expr.accept(this), expr);
             }
             return new MatrixType(1, exprs.size()); // Vector
         }
@@ -283,7 +277,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
-        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this), ctx);
+        expect(new PrimitiveType(EnumType.SCALAR), ctx.expr().accept(this), ctx.expr());
 
         Type symbol;
 
@@ -314,8 +308,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        expect(scalar, ctx.expr(0).accept(this), ctx);
-        expect(scalar, ctx.expr(1).accept(this), ctx);
+        expect(scalar, ctx.expr(0).accept(this), ctx.expr(0));
+        expect(scalar, ctx.expr(1).accept(this), ctx.expr(1));
 
         Type symbol = null;
         try {
@@ -398,7 +392,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitNot(TrinityParser.NotContext ctx) {
         Type exprT = ctx.expr().accept(this);
-        expect(new PrimitiveType(EnumType.BOOLEAN), exprT, ctx);
+        expect(new PrimitiveType(EnumType.BOOLEAN), exprT, ctx.expr());
         return exprT;
     }
 
@@ -407,8 +401,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx);
-        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx.expr(0));
+        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx.expr(1));
 
         return op1;
     }
@@ -418,8 +412,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx);
-        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx);
+        expect(new PrimitiveType(EnumType.BOOLEAN), op1, ctx.expr(0));
+        expect(new PrimitiveType(EnumType.BOOLEAN), op2, ctx.expr(1));
 
         return op1;
     }
@@ -438,7 +432,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
         }
 
-        expect(scalar, op2, ctx);
+        expect(scalar, op2, ctx.expr(1));
 
         return op1;
     }
@@ -500,8 +494,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 }
             }
         } else if (operator.equals("/")) {
-            expect(scalar, op1, ctx);
-            expect(scalar, op2, ctx);
+            expect(scalar, op1, ctx.expr(0));
+            expect(scalar, op2, ctx.expr(1));
             return scalar;
 
         } else {

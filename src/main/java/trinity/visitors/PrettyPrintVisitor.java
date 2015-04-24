@@ -18,7 +18,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     private String outputString = "";
 
     private void print(String string) {
-        System.out.print(string);
+        //System.out.print(string);
         outputString += string;
     }
 

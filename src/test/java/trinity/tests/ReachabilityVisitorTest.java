@@ -38,7 +38,10 @@ public class    ReachabilityVisitorTest {
     @Test
     public void testSimpleFunction() throws Exception{
         assertTrue(reachabilityTest("Boolean b () do return false; end"));
+        assertTrue(reachabilityTest("Scalar b () do return 1+1; end"));
+
         assertFalse(reachabilityTest("Boolean b () do Scalar s = 1+1; end"));
+        assertFalse(reachabilityTest("Boolean b (Scalar s) do return s; end"));
     }
 
     @Test
@@ -46,4 +49,13 @@ public class    ReachabilityVisitorTest {
 
     }
 
+    @Test
+    public void moreFunctionTestst() throws Exception{
+        assertTrue(reachabilityTest("Scalar b() do if (1+1)==2 then return false; elseif test() then return true; else return false; end end Boolean test() do  return true; end"));
+        assertTrue(reachabilityTest("Boolean b () do return 2==2; end"));
+        assertTrue(reachabilityTest("Boolean b () do return !(2==2); end"));
+
+        assertFalse(reachabilityTest("Boolean b () do return; end"));
+        assertFalse(reachabilityTest("Scalar b() do if false then return false; end end"));
+    }
 }

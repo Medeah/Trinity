@@ -45,32 +45,58 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
-        return super.visitConstDecl(ctx);
+        ctx.type().accept(this);
+        emit(ctx.ID().getText());
+        emit("=");
+        ctx.semiExpr().accept(this);
+        return null;
     }
 
     @Override
     public Void visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-        return super.visitFunctionDecl(ctx);
+        ctx.type().accept(this);
+        emit(ctx.ID().getText());
+        emit("(");
+        if(ctx.formalParameters() != null) {
+            ctx.formalParameters().accept(this);
+        }
+        emit(")");
+        return null;
     }
 
     @Override
     public Void visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
-        return super.visitFormalParameters(ctx);
+        ctx.formalParameter(0).accept(this);
+        for(int i = 1; i < ctx.formalParameter().size(); i++) {
+            emit(",");
+            ctx.formalParameter(i).accept(this);
+        }
+        return null;
     }
 
     @Override
     public Void visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
-        return super.visitFormalParameter(ctx);
+        ctx.type().accept(this);
+        emit(ctx.ID().getText());
+        return null;
     }
 
     @Override
     public Void visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
+        if (ctx.getText().equals("Boolean")) {
+            emit("bool ");
+        } else /* Scalar */ {
+            emit("float ");
+        }
         return super.visitPrimitiveType(ctx);
     }
 
     @Override
     public Void visitVectorType(TrinityParser.VectorTypeContext ctx) {
-        return super.visitVectorType(ctx);
+        emit("float[");
+        emit(ctx.NUMBER().getText());
+        emit("]");
+        return null;
     }
 
     @Override

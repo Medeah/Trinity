@@ -95,34 +95,51 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitVectorType(TrinityParser.VectorTypeContext ctx) {
         emit("float[");
         emit(ctx.NUMBER().getText());
-        emit("]");
+        emit("] ");
         return null;
     }
 
     @Override
     public Void visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
-        return super.visitMatrixType(ctx);
+        emit("float[");
+        emit(ctx.NUMBER(0).getText());
+        emit("][");
+        emit(ctx.NUMBER(1).getText());
+        emit("] ");
+        return null;
     }
 
     @Override
     public Void visitBlock(TrinityParser.BlockContext ctx) {
+        for(TrinityParser.StmtContext stmt : ctx.stmt()) {
+            stmt.accept(this);
+        }
+
+        if(ctx.semiExpr() != null) {
+            emit("return ");
+            ctx.semiExpr().accept(this);
+        }
+
         return super.visitBlock(ctx);
     }
 
     @Override
     public Void visitSemiExpr(TrinityParser.SemiExprContext ctx) {
+        visitChildren(ctx);
+        emit(";\n"); // TODO: don't print newline?
         return super.visitSemiExpr(ctx);
     }
 
-    @Override
+    /*@Override
     public Void visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
+
         return super.visitConstDeclaration(ctx);
     }
 
     @Override
     public Void visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
         return super.visitSingleExpression(ctx);
-    }
+    }*/
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {

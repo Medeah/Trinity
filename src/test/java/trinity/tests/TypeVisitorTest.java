@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
+import org.junit.Ignore;
 import trinity.*;
 import trinity.CustomExceptions.ParseException;
 import trinity.visitors.TypeVisitor;
@@ -232,6 +233,18 @@ public class TypeVisitorTest {
         assertFalse(typeCheck("if 2+3 then 1+1; end"));
 
     }
+
+    @Test
+    public void overflowStuff() throws Exception {
+        //TODO: fuck
+        //assertFalse(typeCheck("Scalar a = " + Float.MAX_VALUE + 1 + ";"));
+        assertFalse(typeCheck("Vector[" + Integer.MAX_VALUE + 1 + "] a() do end"));
+        assertFalse(typeCheck("Matrix[" + Integer.MAX_VALUE + 1 + ",2] a() do end"));
+        assertTrue(typeCheck("Vector[" + Integer.MAX_VALUE + "] a() do end"));
+        assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
+    }
+
+
 
     /*@Test
     public void testTypeInference() throws Exception {

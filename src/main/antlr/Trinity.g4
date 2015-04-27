@@ -1,6 +1,10 @@
 grammar Trinity;
 import LexerRules; // includes all rules from LexerRules.g4
 
+@header {
+import trinity.types.*;
+}
+
 prog: (functionDecl | stmt)* ;
 
 // Declarations
@@ -12,7 +16,8 @@ formalParameters: formalParameter (',' formalParameter)* ;
 formalParameter: type ID ;
 
 
-type: ('Boolean' | 'Scalar')                        # PrimitiveType
+type
+    : ('Boolean' | 'Scalar')                        # PrimitiveType
     | 'Vector' '[' (NUMBER|ID) ']'                  # VectorType
     | 'Matrix' '[' (NUMBER|ID) ',' (NUMBER|ID) ']'  # MatrixType
     ;
@@ -23,7 +28,8 @@ block: stmt* ('return' semiExpr)? ;
 
 semiExpr: expr ';';
 
-stmt: constDecl                                 # ConstDeclaration
+stmt
+    : constDecl                                 # ConstDeclaration
     | semiExpr                                  # SingleExpression
     | 'for' type ID 'in' expr 'do' block 'end'  # ForLoop
     | 'if' expr 'then' block
@@ -34,7 +40,9 @@ stmt: constDecl                                 # ConstDeclaration
 
 // Expressions
 
-expr: ID '(' exprList? ')'              # FunctionCall
+expr
+locals [Type t]
+    : ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing
     | '-' expr                          # Negate

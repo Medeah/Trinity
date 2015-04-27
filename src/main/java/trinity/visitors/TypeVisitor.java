@@ -531,8 +531,12 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.ID() != null) {
             errorReporter.reportError("IDs not supported ... yet", ctx.ID().getSymbol());
         } else {
-            int size = new Integer(ctx.NUMBER().getText());
-            out = new MatrixType(1, size);
+            try {
+                int size = new Integer(ctx.NUMBER().getText());
+                out = new MatrixType(1, size);
+            } catch (NumberFormatException ex) {
+                errorReporter.reportError("Unsupported dimension", ctx.NUMBER().getSymbol());
+            }
         }
         return out;
     }
@@ -543,10 +547,22 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (ctx.ID(1) != null || ctx.ID(0) != null) {
             errorReporter.reportError("IDs not supported ... yet", ctx.ID(0).getSymbol());
         } else {
-            int rows = new Integer(ctx.NUMBER(0).getText());
-            int cols = new Integer(ctx.NUMBER(1).getText());
+            int rows = 0;
+            int cols = 0;
+            try {
+                rows = new Integer(ctx.NUMBER(0).getText());
+            } catch (NumberFormatException ex) {
+                errorReporter.reportError("Unsupported dimension", ctx.NUMBER(0).getSymbol());
+            }
+
+            try {
+                cols = new Integer(ctx.NUMBER(1).getText());
+            } catch (NumberFormatException ex) {
+                errorReporter.reportError("Unsupported dimension", ctx.NUMBER(0).getSymbol());
+            }
 
             out = new MatrixType(rows, cols);
+
         }
 
         return out;

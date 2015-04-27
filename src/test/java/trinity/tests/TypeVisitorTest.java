@@ -234,6 +234,18 @@ public class TypeVisitorTest {
 
     }
 
+    @Test
+    public void overflowStuff() throws Exception {
+        //TODO: fuck
+        //assertFalse(typeCheck("Scalar a = " + Float.MAX_VALUE + 1 + ";"));
+        assertFalse(typeCheck("Vector[" + Integer.MAX_VALUE + 1 + "] a() do end"));
+        assertFalse(typeCheck("Matrix[" + Integer.MAX_VALUE + 1 + ",2] a() do end"));
+        assertTrue(typeCheck("Vector[" + Integer.MAX_VALUE + "] a() do end"));
+        assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
+    }
+
+
+
     /*@Test
     public void testTypeInference() throws Exception {
         // if you want it, then you should have put a ring on it?

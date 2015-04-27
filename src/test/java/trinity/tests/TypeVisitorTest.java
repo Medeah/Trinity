@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeVisitorTest {
 
+    //TODO: check the test file (parsing-tests or a new one for type-checking.)
+
     private boolean typeCheck(String str) throws Exception {
         ErrorReporter er = new StandardErrorReporter(false, str);
         SymbolTable tab = new HashSymbolTable();

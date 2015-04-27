@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import trinity.CustomExceptions.ParseException;
 import trinity.CustomExceptions.TypeCheckException;
+import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
 
@@ -37,6 +38,9 @@ public class Trinity {
     public static void main(String[] args) throws Exception {
         JCommander jc = new JCommander(options, args);
 
+        //TODO: remove me son
+        options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
+
         if (options.files.size() == 0) {
             jc.usage();
             System.exit(1);
@@ -52,6 +56,7 @@ public class Trinity {
                 prettyPrint(is, options.indentation);
             } else {
                 compile(is);
+                generatec(is);
                 //System.out.println(out);
             }
 
@@ -102,5 +107,11 @@ public class Trinity {
         ParseTree tree = parse(is);
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
+    }
+
+    private static void generatec(String is) throws Exception {
+        ParseTree tree = parse(is);
+        CodeGenerationVisitor generator = new CodeGenerationVisitor();
+        generator.visit(tree);
     }
 }

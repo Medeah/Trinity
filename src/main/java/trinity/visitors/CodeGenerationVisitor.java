@@ -1,6 +1,5 @@
 package trinity.visitors;
 
-import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
-
 
     private static void emit(String string) {
         // TODO: replace this function with the good stuff
@@ -31,13 +29,13 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     private static void generateIncludes() {
         for(String path : includes) {
-            emit("#include <" + path + ">");
+            emit("#include <" + path + ">\n");
         }
     }
 
     @Override
     public Void visitProg(TrinityParser.ProgContext ctx) {
-        generateIncludes();
+        //generateIncludes();
 
         visitChildren(ctx);
         return null;
@@ -60,7 +58,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if(ctx.formalParameters() != null) {
             ctx.formalParameters().accept(this);
         }
-        emit(")");
+        emit("){");
+        ctx.block().accept(this);
+        emit("}");
         return null;
     }
 
@@ -88,7 +88,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         } else /* Scalar */ {
             emit("float ");
         }
-        return super.visitPrimitiveType(ctx);
+        return null;
     }
 
     @Override
@@ -120,14 +120,14 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             ctx.semiExpr().accept(this);
         }
 
-        return super.visitBlock(ctx);
+        return null;
     }
 
     @Override
     public Void visitSemiExpr(TrinityParser.SemiExprContext ctx) {
         visitChildren(ctx);
         emit(";\n"); // TODO: don't print newline?
-        return super.visitSemiExpr(ctx);
+        return null;
     }
 
     /*@Override
@@ -143,131 +143,232 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
-        return super.visitForLoop(ctx);
+        //TODO: make
+        emit("int forloop;");
+        return null;
     }
 
     @Override
     public Void visitIfStatement(TrinityParser.IfStatementContext ctx) {
-        return super.visitIfStatement(ctx);
+        emit("if(");
+        ctx.expr(0).accept(this);
+        emit("){");
+        ctx.block(0).accept(this);
+
+        int i;
+        for(i = 1; i < ctx.expr().size(); i++) {
+            emit("}else if(");
+            ctx.expr(i).accept(this);
+            emit("){");
+            ctx.block(i).accept(this);
+        }
+
+        if(ctx.block(i) != null) {
+            emit("}else{");
+            ctx.block(i).accept(this);
+        }
+
+        emit("}");
+        return null;
     }
 
     @Override
     public Void visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
-        return super.visitBlockStatement(ctx);
+        emit("{");
+        ctx.block().accept(this);
+        emit("}");
+        return null;
     }
 
     @Override
     public Void visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        return super.visitDoubleIndexing(ctx);
+        // TODO: zero indexing
+        emit(ctx.ID().getText());
+        emit("[");
+        ctx.expr(0).accept(this);
+        emit("][");
+        ctx.expr(1).accept(this);
+        emit("]");
+        return null;
     }
 
     @Override
     public Void visitOr(TrinityParser.OrContext ctx) {
-        return super.visitOr(ctx);
+        ctx.expr(0).accept(this);
+        emit("||");
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitExponent(TrinityParser.ExponentContext ctx) {
-        return super.visitExponent(ctx);
+        // TODO: exponent on types???
+        ctx.expr(0).accept(this);
+
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitParens(TrinityParser.ParensContext ctx) {
-        return super.visitParens(ctx);
+        emit("(");
+        ctx.expr().accept(this);
+        emit(")");
+        return null;
     }
 
-    @Override
+    /*@Override
     public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+
         return super.visitMatrixLiteral(ctx);
-    }
+    }*/
 
     @Override
     public Void visitTranspose(TrinityParser.TransposeContext ctx) {
-        return super.visitTranspose(ctx);
+        // TODO: transpose function (unique name...)
+        emit("traspose(");
+        ctx.expr().accept(this);
+        emit(")");
+        return null;
     }
 
     @Override
     public Void visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
-        return super.visitMultiplyDivide(ctx);
+        // TODO: types and shit.
+        return null;
     }
 
     @Override
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
-        return super.visitSingleIndexing(ctx);
+        emit(ctx.ID().getText());
+        emit("[");
+        ctx.expr().accept(this);
+        emit("]");
+        return null;
     }
 
-    @Override
+    /*@Override
     public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         return super.visitVectorLiteral(ctx);
-    }
+    }*/
 
     @Override
     public Void visitNot(TrinityParser.NotContext ctx) {
-        return super.visitNot(ctx);
+        emit("!");
+        ctx.expr().accept(this);
+        return null;
     }
 
     @Override
     public Void visitRelation(TrinityParser.RelationContext ctx) {
-        return super.visitRelation(ctx);
+        ctx.expr(0).accept(this);
+        emit(ctx.op.getText());
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitIdentifier(TrinityParser.IdentifierContext ctx) {
-        return super.visitIdentifier(ctx);
+        emit(ctx.ID().getText());
+        return null;
     }
 
     @Override
     public Void visitNumber(TrinityParser.NumberContext ctx) {
-        return super.visitNumber(ctx);
+        emit(ctx.NUMBER().getText());
+        return null;
     }
 
     @Override
     public Void visitAnd(TrinityParser.AndContext ctx) {
-        return super.visitAnd(ctx);
+        ctx.expr(0).accept(this);
+        emit("&&");
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitNegate(TrinityParser.NegateContext ctx) {
-        return super.visitNegate(ctx);
+        emit("-");
+        ctx.expr().accept(this);
+        return null;
     }
 
     @Override
     public Void visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
-        return super.visitFunctionCall(ctx);
+        emit(ctx.ID().getText());
+        emit("(");
+        if (ctx.exprList() != null) {
+            ctx.exprList().accept(this);
+        }
+        emit(")");
+        return null;
     }
 
     @Override
     public Void visitEquality(TrinityParser.EqualityContext ctx) {
-        return super.visitEquality(ctx);
+        ctx.expr(0).accept(this);
+        emit(ctx.op.getText());
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitBoolean(TrinityParser.BooleanContext ctx) {
-        return super.visitBoolean(ctx);
+        emit(ctx.BOOL().getText());
+        return null;
     }
 
     @Override
     public Void visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
-        return super.visitAddSubtract(ctx);
+        ctx.expr(0).accept(this);
+        emit(ctx.op.getText());
+        ctx.expr(1).accept(this);
+        return null;
     }
 
     @Override
     public Void visitExprList(TrinityParser.ExprListContext ctx) {
-        return super.visitExprList(ctx);
+        ctx.expr(0).accept(this);
+        for(int i = 1; i < ctx.expr().size(); i++) {
+            emit(",");
+            ctx.expr(i).accept(this);
+        }
+        return null;
     }
 
     @Override
     public Void visitVector(TrinityParser.VectorContext ctx) {
-        return super.visitVector(ctx);
+        // TODO: implement properly
+        emit("[");
+        if(ctx.exprList() != null) {
+            emit("{");
+            ctx.exprList().accept(this);
+            emit("}");
+        } else {
+            emit("{");
+            ctx.range().accept(this);
+            emit("}");
+        }
+        emit("]");
+        return null;
     }
 
-    @Override
+    /*@Override
     public Void visitMatrix(TrinityParser.MatrixContext ctx) {
         return super.visitMatrix(ctx);
-    }
+    }*/
 
     @Override
     public Void visitRange(TrinityParser.RangeContext ctx) {
-        return super.visitRange(ctx);
+        int start = new Integer(ctx.NUMBER(0).getText());
+        int end = new Integer(ctx.NUMBER(1).getText());
+        int step = start > end ? -1 : 1;
+
+        emit(start + ""); //TODO: string syntaxify this
+        for(int i = start + 1; i < end; i += step) {
+            emit("," + i);
+        }
+        return null;
     }
 }

@@ -2,50 +2,66 @@ Boolean t = true;
 Scalar s = 1;
 Vector[3] v = [1, 5, 6];
 Vector[10] w = [1..10];
-Matrix[1,2] m = [1, 2][4, 5];
-Scalar s = 1 + 2 * (3 + 4) / 1.5 - s;
-Scalar t = v[2];
+Matrix[2,2] m = [1, 2][4, 5];
+Scalar s2 = 1 + 2 * (3 + 4) / 1.5 - s;
+Scalar t2 = v[2];
 Scalar u = m[2, 3];
 m^2;
 m';
+
 for Scalar s in v do
-    print(s);
+    Scalar lort = 1;
 end
 for Scalar v in [1, 2, 3] do
-    print(0);
+    Scalar lort2 = 12;
 end
 for Scalar v in [1..5] do
     for Scalar x in [1, 2] do
-        print(0);
+        Scalar lort3 = 12;
     end
 end
+
+Boolean frederik = true;
 Scalar mathias () do
     if frederik then
         for Scalar s in [1..10] do
-            print(10);
+            #print(10);
+            Scalar lort4 = 12;
         end
     else
-        for Scalar v in [1, 2][1, 2] do
+        for Matrix[1,2] v in [1, 2][1, 2] do
             1 + 1;
         end
     end
 end
-if m == v * v then
+if 12 == v * v then
     Matrix[2,1] x = [1][0];
 elseif 1 + 2 != 4 or 5 == 2 + 2 then
-    print(m);
+    Scalar printdims = 123;
 elseif true and false then
-    print(m);
+    Scalar printdims1 = 123;
 else
     Scalar leet = 1337;
 end
+
+Boolean something = true;
+Boolean somethingElse = true;
+
+Scalar this() do
+    return 1;
+end
+
+Scalar that(Scalar wer) do
+    return wer+1000;
+end
+
 if !something then
     if somethingElse then
         this();
     elseif true then
         that(1 + 2);
-    elseif [1, 2] == 3 then
-        hello;
+    elseif [1, 2] == [1,2] then
+        Scalar s = 4+4;
     else
         1 + 1;
     end
@@ -53,10 +69,10 @@ else
     Scalar a = 1 + 2 * 2^1 - 1;
 end
 do
-    call();
+    Scalar a = this();
 end
 do
-    stuff();
+    that(2);
     do
         1 + 2;
     end
@@ -65,17 +81,15 @@ Matrix[2,1] f (Scalar s1, Scalar s2) do
     Matrix[2,1] m = [s1][s2];
     m;
 end
-Matrix[N,N] matrixMul (Matrix[N,N] A, Matrix[N,N] B) do
-    A * B;
-end
+
 Scalar sf () do
     2 + 2;
 end
-Boolean v (Scalar a) do
-    1 + 1;
-    return true;
+
+Matrix[3,3] matrixMul(Matrix[3,3] a, Matrix[3,3] b) do
+    return a * b;
 end
+
 Matrix[2,1] n = f(5, 20 + 3);
-fire(parma, skinke, gideon, 2 + 2e3, xz / lol - (os), arnejohn);
 Matrix[3,3] mat = [1, 2, 3][4, 5, 6][7, 8, 9];
 matrixMul(mat, mat');

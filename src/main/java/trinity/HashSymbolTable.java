@@ -47,7 +47,7 @@ public class HashSymbolTable implements SymbolTable {
      */
     public void closeScope() {
         List<tableEntry> entries = scopeDisplay.pop();
-        for(tableEntry sym : entries) {
+        for (tableEntry sym : entries) {
             hashTable.remove(sym.name);
 
             // Restore outer scope
@@ -86,7 +86,7 @@ public class HashSymbolTable implements SymbolTable {
      * return null. Do NOT throw any exceptions from this method.
      */
     public Type retrieveSymbol(String id) throws SymbolNotFoundException {
-        if ( hashTable.containsKey(id))  {
+        if (hashTable.containsKey(id)) {
             return hashTable.get(id).type;
         }
         throw new SymbolNotFoundException();
@@ -102,8 +102,8 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     // TODO can we do better?
-    public FunctionType getCurrentFunction() throws SymbolNotFoundException{
-        return (FunctionType)retrieveSymbol("##func");
+    public FunctionType getCurrentFunction() throws SymbolNotFoundException {
+        return (FunctionType) retrieveSymbol("##func");
     }
 
     public void setCurrentFunction(FunctionType type) {

@@ -1,6 +1,7 @@
 package trinity;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 public class StandardErrorReporter implements ErrorReporter {
     private int errorAmount = 0;
@@ -47,11 +48,11 @@ public class StandardErrorReporter implements ErrorReporter {
         testFailOnError();
     }
 
-    private void printError(int line, int schar, String message){
-        System.err.println(line + ":" + schar + " -> " + message );
+    private void printError(int line, int schar, String message) {
+        System.err.println(line + ":" + schar + " -> " + message);
     }
 
-    private void testFailOnError(){
+    private void testFailOnError() {
         if (failOnError) {
             System.exit(1);
         }
@@ -65,7 +66,7 @@ public class StandardErrorReporter implements ErrorReporter {
         int stop = endToken.getStopIndex();
 
         System.err.println(errorLine);
-        for (int i = 0; i < charPositionInLine; i++){
+        for (int i = 0; i < charPositionInLine; i++) {
             pointToError += (String.valueOf(" "));
         }
 

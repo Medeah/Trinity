@@ -1,10 +1,9 @@
 package trinity.visitors;
 
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.*;
-import trinity.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 import trinity.CustomExceptions.SymbolAlreadyDefinedException;
 import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.*;
 import trinity.types.*;
 
 import java.util.ArrayList;
@@ -289,7 +288,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 out = scalar;
             } else {
                 out = new MatrixType(1, matrix.getCols()); // vector
-           }
+            }
         } else {
 
             errorReporter.reportError("hmm error", ctx);
@@ -434,7 +433,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         expect(scalar, op2, ctx.expr(1));
 
-        return ctx.t= op1;
+        return ctx.t = op1;
     }
 
     @Override
@@ -481,13 +480,13 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                         out = scalar;
                     } else
 
-                    // Matrix multiplication
-                    if (matrix1.getCols() == matrix2.getRows()) {
-                        out = new MatrixType(matrix1.getRows(), matrix2.getCols());
-                    } else {
-                        errorReporter.reportError("Size mismatch", ctx);
-                        out = null;
-                    }
+                        // Matrix multiplication
+                        if (matrix1.getCols() == matrix2.getRows()) {
+                            out = new MatrixType(matrix1.getRows(), matrix2.getCols());
+                        } else {
+                            errorReporter.reportError("Size mismatch", ctx);
+                            out = null;
+                        }
                 } else {
                     errorReporter.reportError("Cannot multiply matrix with " + op2, ctx);
                     out = null;
@@ -496,7 +495,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } else if (operator.equals("/")) {
             expect(scalar, op1, ctx.expr(0));
             expect(scalar, op2, ctx.expr(1));
-            out =  scalar;
+            out = scalar;
 
         } else {
             errorReporter.reportError("what?", ctx);

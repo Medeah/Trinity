@@ -3,18 +3,21 @@ package trinity.tests;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import trinity.*;
 import org.junit.Test;
 import trinity.CustomExceptions.ParseException;
+import trinity.ErrorReporter;
+import trinity.StandardErrorReporter;
+import trinity.TrinityLexer;
+import trinity.TrinityParser;
 import trinity.visitors.ReachabilityVisitor;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class    ReachabilityVisitorTest {
+public class ReachabilityVisitorTest {
 
-    private boolean reachabilityTest(String str) throws Exception{
+    private boolean reachabilityTest(String str) throws Exception {
         ErrorReporter er = new StandardErrorReporter(false, str);
         ReachabilityVisitor ReachabilityVisitor = new ReachabilityVisitor(er);
 
@@ -35,13 +38,13 @@ public class    ReachabilityVisitorTest {
     }
 
     @Test
-    public void testFunctionWithoutAnyStmts() throws Exception{
+    public void testFunctionWithoutAnyStmts() throws Exception {
         /*assertFalse(reachabilityTest("Scalar s () do\n" +
                 "end"));*/
     }
 
     @Test
-    public void testBlockHell() throws Exception{
+    public void testBlockHell() throws Exception {
         assertFalse(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
                 "    end\n" +
@@ -69,7 +72,7 @@ public class    ReachabilityVisitorTest {
     }
 
     @Test
-    public void testBadFunctionsWithOneStmt() throws Exception{
+    public void testBadFunctionsWithOneStmt() throws Exception {
         /*assertFalse(reachabilityTest("Scalar k () do\n" +
                 "    1 + 1;\n" +
                 "end"));

@@ -2,8 +2,9 @@ package trinity;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.CustomExceptions.ParseException;
 import trinity.CustomExceptions.TypeCheckException;
 import trinity.visitors.PrettyPrintVisitor;

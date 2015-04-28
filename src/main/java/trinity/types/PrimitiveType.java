@@ -14,7 +14,6 @@ public class PrimitiveType extends Type {
     @Override public boolean equals(Object other) {
         boolean result = false;
         if (other instanceof PrimitiveType) {
-            PrimitiveType that = (PrimitiveType) other;
             result = this.ptype == ((PrimitiveType) other).ptype;
         }
         return result;

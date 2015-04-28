@@ -35,13 +35,17 @@ public class    ReachabilityVisitorTest {
         return er.getErrorAmount() == 0;
     }
 
-    @Ignore
+    @Test
     public void testSimpleFunctionFalseOnly() throws Exception{
         assertFalse(reachabilityTest("Scalar s () do\n" +
                 "end"));
         assertFalse(reachabilityTest("Scalar k () do\n" +
                 "    1 + 1;\n" +
                 "end"));
+    }
+
+    @Ignore
+    public void testSimpleFunctionTrueOnly() throws Exception{
         assertTrue(reachabilityTest("Scalar s () do\n" +
                 "    return 1;\n" +
                 "end"));

@@ -36,8 +36,8 @@ public class    ReachabilityVisitorTest {
 
     @Test
     public void testFunctionWithoutAnyStmts() throws Exception{
-        /*assertFalse(reachabilityTest("Scalar s () do\n" +
-                "end"));*/
+        assertFalse(reachabilityTest("Scalar s () do\n" +
+                "end"));
     }
 
     @Test
@@ -58,13 +58,13 @@ public class    ReachabilityVisitorTest {
                 "           return 1;" +
                 "        end\n" +
                 "    end\n" +
-                "end"));/*
+                "end"));
         assertFalse(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
                 "    end\n" +
                 "    do\n" +
                 "    end\n" +
-                "end"));*/
+                "end"));
 
     }
 

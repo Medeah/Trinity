@@ -244,6 +244,17 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
     }
 
+    @Test
+    public void WeirdStuff() throws Exception {
+        assertFalse(typeCheck("Boolean b = true;\n" +
+                "\n" +
+                "do\n" +
+                "    return 1;\n" +
+                "end\n" +
+                "\n" +
+                "Scalar s = 1;"));
+    }
+
 
 
     /*@Test

@@ -10,6 +10,7 @@ import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
 
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -39,7 +40,8 @@ public class Trinity {
         JCommander jc = new JCommander(options, args);
 
         //TODO: remove me son
-        options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
+        //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
+        options.files.add("src/test/resources/trinity/tests/simple.tri");
 
         if (options.files.size() == 0) {
             jc.usage();
@@ -55,9 +57,12 @@ public class Trinity {
             if (options.prettyPrint) {
                 prettyPrint(is, options.indentation);
             } else {
-                compile(is);
-                generatec(is);
-                //System.out.println(out);
+                String out = compile(is);
+                System.out.println(out);
+                PrintWriter pw = new PrintWriter("cout.c");
+                pw.println(out);
+                pw.flush();
+                Runtime.getRuntime().exec("indent cout.c");
             }
 
         } catch (NoSuchFileException ex) {
@@ -71,7 +76,7 @@ public class Trinity {
 
     }
 
-    private static void compile(String is) throws Exception {
+    private static String compile(String is) throws Exception {
         ParseTree tree = parse(is);
 
         ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError, is);
@@ -84,6 +89,10 @@ public class Trinity {
             throw new TypeCheckException("To many type errors aborting");
         }
 
+        CodeGenerationVisitor generator = new CodeGenerationVisitor();
+        String out = generator.generate(tree);
+
+        return out;
         //return tree.toStringTree(parser);
     }
 
@@ -109,9 +118,4 @@ public class Trinity {
         prettyPrinter.visit(tree);
     }
 
-    private static void generatec(String is) throws Exception {
-        ParseTree tree = parse(is);
-        CodeGenerationVisitor generator = new CodeGenerationVisitor();
-        generator.visit(tree);
-    }
 }

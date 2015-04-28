@@ -1,43 +1,89 @@
 package trinity.visitors;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
+import trinity.types.EnumType;
+import trinity.types.MatrixType;
+import trinity.types.PrimitiveType;
+import trinity.types.Type;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
+    //TODO: everything
+    private static String output = "";
+    private static String body = "";
+    public String generate(ParseTree tree)  {
+        this.visit(tree);
+
+        output += includes();
+        output += "typedef struct Matrix{float *data; int rows; int cols;} Matrix;";
+
+        output += generateStatic();
+
+        //TODO: fix
+        output += ("int main(void) {");
+        output += body;
+        output += ("return 0;};");
+
+        return output;
+    }
+
     private static void emit(String string) {
         // TODO: replace this function with the good stuff
-        System.out.print(string);
+        //System.out.print(string);
+        body += string;
     }
 
     // TODO: find out what is always needed and what is not? (windows)
     private static List<String> includes = new ArrayList<String>() {{
-        add("cuda_runtime.h");
-        add("curand.h");
-        add("cublas_v2.h");
-        add("time.h");
-        add("windows.h");
+        //add("cuda_runtime.h");
+        //add("curand.h");
+        //add("cublas_v2.h");
+        //add("time.h");
+       // add("windows.h");
         add("stdio.h");
-        add("stdlib.h");
+        //add("stdlib.h");
     }};
 
     private static List<String> prototypes = new ArrayList<String>();
 
-    private static void generateIncludes() {
+    //private Map<String, MatrixType> staticInit = new HashMap<String, MatrixType>();
+    private List<String> staticInit = new ArrayList<String>();
+
+    private int idc = 0;
+    private String getUniqueId() {
+        return "_u" + idc;
+    }
+
+    private static String includes() {
+        String out = "";
         for(String path : includes) {
-            emit("#include <" + path + ">\n");
+            out += "#include <" + path + ">\n";
         }
+        return out;
+    }
+
+    private String generateStatic() {
+        String out = "";
+      for(String str :  staticInit){
+          out += str;
+      }
+        return out;
     }
 
     @Override
     public Void visitProg(TrinityParser.ProgContext ctx) {
-        //generateIncludes();
 
         visitChildren(ctx);
+
+
         return null;
     }
 
@@ -93,19 +139,17 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitVectorType(TrinityParser.VectorTypeContext ctx) {
-        emit("float[");
-        emit(ctx.NUMBER().getText());
-        emit("] ");
+        emit("Matrix ");
         return null;
     }
 
     @Override
     public Void visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
-        emit("float[");
-        emit(ctx.NUMBER(0).getText());
-        emit("][");
-        emit(ctx.NUMBER(1).getText());
-        emit("] ");
+        emit("Matrix");
+        //emit(ctx.NUMBER(0).getText());
+        //emit("][");
+        //emit(ctx.NUMBER(1).getText());
+        //emit("] ");
         return null;
     }
 
@@ -130,21 +174,41 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return null;
     }
 
-    /*@Override
-    public Void visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
 
-        return super.visitConstDeclaration(ctx);
-    }
-
-    @Override
-    public Void visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
-        return super.visitSingleExpression(ctx);
-    }*/
+    //TODO: move or something..
+    private final Type scalar = new PrimitiveType(EnumType.SCALAR);
+    private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
         //TODO: make
-        emit("int forloop;");
+
+        if(ctx.expr().t instanceof MatrixType) {
+            MatrixType matrix = (MatrixType)ctx.expr().t;
+
+            if(matrix.getRows() != 1) {
+                //TODO!
+                emit("matrix-forloop-error;");
+                return null;
+            }
+
+            //TODO: unique id + type
+            emit("float[" + matrix.getCols() + "] _sa = ");
+            ctx.expr().accept(this);
+            emit(";");
+            emit("int i;");
+            emit("for(i=;i<" + matrix.getCols() + "; i++){");
+            emit("float ");
+            emit(ctx.ID().getText());
+            emit("=_sa[i];");
+            ctx.block().accept(this);
+            emit("}");
+
+        } else {
+            emit("forloop-unimpl;");
+
+        }
+
         return null;
     }
 
@@ -217,12 +281,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return null;
     }
 
-    /*@Override
-    public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-
-        return super.visitMatrixLiteral(ctx);
-    }*/
-
     @Override
     public Void visitTranspose(TrinityParser.TransposeContext ctx) {
         // TODO: transpose function (unique name...)
@@ -246,11 +304,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         emit("]");
         return null;
     }
-
-    /*@Override
-    public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-        return super.visitVectorLiteral(ctx);
-    }*/
 
     @Override
     public Void visitNot(TrinityParser.NotContext ctx) {
@@ -340,24 +393,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitVector(TrinityParser.VectorContext ctx) {
         // TODO: implement properly
-        emit("[");
-        if(ctx.exprList() != null) {
-            emit("{");
-            ctx.exprList().accept(this);
-            emit("}");
-        } else {
-            emit("{");
-            ctx.range().accept(this);
-            emit("}");
-        }
-        emit("]");
+
         return null;
     }
-
-    /*@Override
-    public Void visitMatrix(TrinityParser.MatrixContext ctx) {
-        return super.visitMatrix(ctx);
-    }*/
 
     @Override
     public Void visitRange(TrinityParser.RangeContext ctx) {
@@ -371,4 +409,46 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         }
         return null;
     }
+
+    // TODO: these will be visited by default implementation (TrinityBaseVisitor)
+    /*@Override
+    public Void visitMatrix(TrinityParser.MatrixContext ctx) {
+        return super.visitMatrix(ctx);
+    }*/
+
+    /*@Override
+    public Void visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
+
+        return super.visitConstDeclaration(ctx);
+    }
+
+    @Override
+    public Void visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
+        return super.visitSingleExpression(ctx);
+    }*/
+
+    /*@Override
+    public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+
+        return super.visitMatrixLiteral(ctx);
+    }*/
+
+    @Override
+    public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+        MatrixType vector = (MatrixType)ctx.t;
+        if(ctx.vector().exprList() != null) {
+            String id = getUniqueId();
+            //TODO: change this (remove getText())
+            staticInit.add("static float " + id + "[" + vector.getCols() + "]={" +
+            ctx.vector().exprList().getText() + "};");
+            emit("(Matrix){.data=" + id + ",.rows=" + vector.getRows() + ",.cols=" + vector.getCols() + "}");
+        } else {
+            //TODO:
+            emit("{nope");
+            //ctx.vector().range().accept(this);
+            emit("}");
+        }
+        return null;
+    }
+
 }

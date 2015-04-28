@@ -191,6 +191,13 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Boolean x() do if true then return true; elseif 1==1 then return true; else return false; end end"));
         assertFalse(typeCheck("Boolean x() do if true then return true; else return 1; end end"));
         assertTrue(typeCheck("Boolean x() do for Scalar s in [1..3] do return true; end end"));
+        assertFalse(typeCheck("Boolean b = true;\n" +
+                "\n" +
+                "do\n" +
+                "    return 1;\n" +
+                "end\n" +
+                "\n" +
+                "Scalar s = 1;"));
     }
 
     @Test
@@ -244,19 +251,6 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
     }
 
-    @Test
-    public void WeirdStuff() throws Exception {
-        assertFalse(typeCheck("Boolean b = true;\n" +
-                "\n" +
-                "do\n" +
-                "    return 1;\n" +
-                "end\n" +
-                "\n" +
-                "Scalar s = 1;"));
-    }
-
-
-
     /*@Test
     public void testTypeInference() throws Exception {
         // if you want it, then you should have put a ring on it?
@@ -265,6 +259,4 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Vector v = [1,2,3,4]; Vector[4] w = v;"));
         assertFalse(typeCheck("Vector v = [1,2,3,4]; Vector[3] w = v;"));
     }*/
-
-
 }

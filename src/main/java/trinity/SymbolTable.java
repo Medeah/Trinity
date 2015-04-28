@@ -18,7 +18,7 @@ public interface SymbolTable {
 
     boolean declaredLocally(String name);
 
-    FunctionType getCurrentFunction();
+    FunctionType getCurrentFunction() throws SymbolNotFoundException;
 
     void setCurrentFunction(FunctionType inp);
 }

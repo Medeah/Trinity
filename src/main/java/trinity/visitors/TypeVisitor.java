@@ -145,8 +145,13 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (ctx.semiExpr() != null) {
             Type returnType = ctx.semiExpr().accept(this);
-            if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
-                errorReporter.reportError("Incorrect return type for function", ctx.semiExpr().getStart());
+            try {
+                if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
+                    errorReporter.reportError("Incorrect return type for function", ctx.semiExpr());
+                }
+            } catch (SymbolNotFoundException e) {
+                errorReporter.reportError("No fuction to return from", ctx.semiExpr());
+
             }
             return returnType;
         }

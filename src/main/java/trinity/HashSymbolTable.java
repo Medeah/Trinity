@@ -102,14 +102,8 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     // TODO can we do better?
-    public FunctionType getCurrentFunction() {
-        try {
-            return (FunctionType)retrieveSymbol("##func");
-        } catch (SymbolNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public FunctionType getCurrentFunction() throws SymbolNotFoundException{
+        return (FunctionType)retrieveSymbol("##func");
     }
 
     public void setCurrentFunction(FunctionType type) {

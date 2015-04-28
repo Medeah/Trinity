@@ -12,7 +12,6 @@ import trinity.visitors.ReachabilityVisitor;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 public class    ReachabilityVisitorTest {
 
     private boolean reachabilityTest(String str) throws Exception{
@@ -33,6 +32,13 @@ public class    ReachabilityVisitorTest {
         tree.accept(ReachabilityVisitor);
 
         return er.getErrorAmount() == 0;
+    }
+
+    @Ignore
+    public void testSimpleIfFunctionFalseOnly() throws Exception{
+        assertFalse(reachabilityTest("if false then\n" +
+                "    1+1;\n" +
+                "end"));
     }
 
     @Test
@@ -197,4 +203,5 @@ public class    ReachabilityVisitorTest {
                 "    end\n" +
                 "end"));
     }
+
 }

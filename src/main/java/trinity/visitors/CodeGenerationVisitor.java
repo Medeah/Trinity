@@ -1,5 +1,6 @@
 package trinity.visitors;
 
+import com.sun.tracing.dtrace.DependencyClass;
 import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
@@ -10,9 +11,8 @@ import trinity.types.PrimitiveType;
 import trinity.types.Type;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
@@ -89,6 +89,11 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
+        DependencyVisitor dep = new DependencyVisitor();
+        ctx.semiExpr().accept(dep);
+        ctx.semiExpr().
+
+
         ctx.type().accept(this);
         emit(ctx.ID().getText());
         emit("=");
@@ -214,6 +219,26 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitIfStatement(TrinityParser.IfStatementContext ctx) {
+        //TODO: initialize dependencies
+
+        /*DependencyVisitor dep = new DependencyVisitor();
+
+
+        Iterable<TrinityParser.ExprContext> s = ctx.accept(dep);
+
+        emit("float uniq[" + "s.size()" + "];\n");
+        int lol = 0;
+        for(TrinityParser.ExprContext expr : s) {
+           // System.out.println( expr.getText());
+
+            emit("float uniq[" + lol++ + "] = ");
+            expr.accept(this);
+            emit(";\n");
+        }
+
+        System.out.println("      .");*/
+
+
         emit("if(");
         ctx.expr(0).accept(this);
         emit("){");

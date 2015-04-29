@@ -1,2 +1,7 @@
-Scalar a = 2 + 3;
-Scalar b = 2;
+Boolean a = [1,2] == [1,2];
+#Scalar a = 2 + 3;
+#Scalar b = 2;
+#Vector[3] v = [1+2,3,4];
+#if([1,2] == [2,3+3]) then
+
+#end

@@ -9,6 +9,7 @@ import trinity.CustomExceptions.TypeCheckException;
 import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
+import static com.google.common.io.Files.getNameWithoutExtension;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
@@ -34,6 +35,12 @@ public class Trinity {
 
         @Parameter(names = {"-g", "--go"}, description = "Keep-on-trucking on error")
         private boolean notFailOnError;
+
+        @Parameter(names = {"-f", "--format"}, description = "Format the generated c code using indent")
+        private boolean formatc;
+
+        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command")
+        private String ccompiler = "cc";
     }
 
     public static void main(String[] args) throws Exception {
@@ -43,11 +50,13 @@ public class Trinity {
         //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
         options.files.add("src/test/resources/trinity/tests/simple.tri");
 
-        if (options.files.size() == 0) {
+        if (options.files.size() != 1) {
             jc.usage();
             System.exit(1);
         }
-        Path filePath = Paths.get(options.files.get(0));
+        String file = options.files.get(0);
+        String filename = getNameWithoutExtension(file);
+        Path filePath = Paths.get(file);
 
         try {
             byte[] encoded = Files.readAllBytes(filePath);
@@ -59,10 +68,20 @@ public class Trinity {
             } else {
                 String out = compile(is);
                 System.out.println(out);
-                PrintWriter pw = new PrintWriter("cout.c");
+                PrintWriter pw = new PrintWriter(filename + ".c");
                 pw.println(out);
                 pw.flush();
-                Runtime.getRuntime().exec("indent cout.c");
+                if(options.formatc) {
+                    Process process = new ProcessBuilder("indent",filename+".c").start();
+                    if(process.waitFor() != 0) {
+                        System.err.println("error running indent, do you have it installed?");
+                    }
+                }
+
+                Process process = new ProcessBuilder(options.ccompiler,filename + ".c").start();
+                if(process.waitFor() != 0) {
+                    System.err.println("Error compiling c code");
+                }
             }
 
         } catch (NoSuchFileException ex) {
@@ -93,9 +112,7 @@ public class Trinity {
         String out = generator.generate(tree);
 
         return out;
-        //return tree.toStringTree(parser);
     }
-
 
     private static ParseTree parse(String is) throws Exception {
         ANTLRInputStream input = new ANTLRInputStream(is);
@@ -117,5 +134,4 @@ public class Trinity {
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
     }
-
 }

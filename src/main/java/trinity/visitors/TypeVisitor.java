@@ -1,8 +1,8 @@
 package trinity.visitors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import trinity.CustomExceptions.SymbolAlreadyDefinedException;
-import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.customExceptions.SymbolAlreadyDefinedException;
+import trinity.customExceptions.SymbolNotFoundException;
 import trinity.*;
 import trinity.types.*;
 

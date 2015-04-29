@@ -5,8 +5,8 @@ import com.beust.jcommander.Parameter;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import trinity.CustomExceptions.ParseException;
-import trinity.CustomExceptions.TypeCheckException;
+import trinity.customExceptions.ParseException;
+import trinity.customExceptions.TypeCheckException;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
 

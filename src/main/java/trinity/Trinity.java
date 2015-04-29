@@ -2,8 +2,10 @@ package trinity;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.CustomExceptions.ParseException;
 import trinity.CustomExceptions.TypeCheckException;
@@ -11,12 +13,8 @@ import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
 
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,17 +64,11 @@ public class Trinity {
         }
         String file = options.files.get(0);
         String filename = getNameWithoutExtension(file);
-        Path filePath = Paths.get(file);
-
         try {
-            byte[] encoded = Files.readAllBytes(filePath);
-
-            String is = new String(encoded, Charset.defaultCharset());
-
             if (options.prettyPrint) {
-                prettyPrint(is, options.indentation);
+                prettyPrint(file, options.indentation);
             } else {
-                String out = compile(is);
+                String out = compile(file);
                 System.out.println(out);
                 PrintWriter pw = new PrintWriter(filename + ".c");
                 pw.println(out);
@@ -94,7 +86,7 @@ public class Trinity {
                 }
             }
 
-        } catch (NoSuchFileException ex) {
+        } catch (IOException ex) {
             System.out.println("File not found: " + ex.getMessage());
             System.exit(1);
             //jc.usage();
@@ -105,10 +97,12 @@ public class Trinity {
 
     }
 
-    private static String compile(String is) throws Exception {
-        ParseTree tree = parse(is);
+    private static String compile(String filename) throws Exception {
+        Pair<ParseTree, TrinityParser> r = parse(filename);
+        ParseTree tree = r.a;
+        TrinityParser parser = r.b;
 
-        ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError, is);
+        ErrorReporter reporter = new StandardErrorReporter(!options.notFailOnError, parser.getInputStream().getTokenSource().getInputStream().toString());
         SymbolTable table = new HashSymbolTable();
 
         TypeVisitor typeChecker = new TypeVisitor(reporter, table);
@@ -124,8 +118,8 @@ public class Trinity {
         return out;
     }
 
-    private static ParseTree parse(String is) throws Exception {
-        ANTLRInputStream input = new ANTLRInputStream(is);
+    private static Pair<ParseTree, TrinityParser> parse(String filename) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filename);
         trinity.TrinityLexer lexer = new TrinityLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
@@ -135,12 +129,11 @@ public class Trinity {
             throw new ParseException("Input contains syntax errors.");
         }
 
-        return tree;
-
+        return new Pair<ParseTree, TrinityParser>(tree, parser);
     }
 
-    private static void prettyPrint(String is, int indentation) throws Exception {
-        ParseTree tree = parse(is);
+    private static void prettyPrint(String filename, int indentation) throws Exception {
+        ParseTree tree = parse(filename).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
     }

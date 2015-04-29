@@ -2,60 +2,113 @@ package trinity.visitors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import trinity.NeedInit;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
+import trinity.types.MatrixType;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public class DependencyVisitor extends TrinityBaseVisitor<Iterable<TrinityParser.ExprContext>> implements TrinityVisitor<Iterable<TrinityParser.ExprContext>> {
+public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> implements TrinityVisitor<Iterable<NeedInit>> {
 
-
-    @Override
-    public Iterable<TrinityParser.ExprContext> visitIfStatement(TrinityParser.IfStatementContext ctx) {
-
-
-       // Iterable<TrinityParser.ExprContext> test =  visitChildren(ctx);
-
-
-        return super.visitIfStatement(ctx);
+    //TODO: this is not good.
+    private static int idc = 0;
+    private static String getUniqueId() {
+        return "_up" + idc++;
     }
 
+    //TODO: accept vectors instead
     @Override
-    public Iterable<TrinityParser.ExprContext> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+    public Iterable<NeedInit> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+        ((MatrixType)ctx.t).cgid = getUniqueId();
+
+        NeedInit ni = new NeedInit();
+        ni.type = ((MatrixType)ctx.t);
+
+        ni.items = new ArrayList<TrinityParser.ExprContext>();
+
+        //TODO: fix this
+        if(ctx.matrix() != null){
+            for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
+                if (vector.exprList() != null) {
+                    ni.items.addAll(vector.exprList().expr());
+
+                    //ni.id = ((MatrixType) ctx.t).cgid;
+                } else if (vector.range() != null) {
+                    //ni.items = ctx.vector().range();
+                    //TODO: range
+                    System.out.println("dv: no range yet!");
+                }
+            }
+        } else {
+            //TODO: remove the risk.
+            //throw new Exception
+            System.out.println("Congratz! This should not happen :D");
+        }
+        //visitChildren(ctx);
+
+
+        assert ni.items.size() == ni.type.getCols() * ni.type.getRows();
+
+        //TODO: rewrite this context to id...
+
         //TODO: null
-        //Iterable<TrinityParser.ExprContext> exprs = ctx.vector().exprList().accept(this);
-        return ImmutableList.copyOf(ctx.vector().exprList().expr());
+        //Iterable<NeedInit> exprs = ctx.vector().exprList().accept(this);
+        //return ImmutableList.copyOf(ctx.vector().exprList().expr());
+        //return ImmutableList.of(ni);
 
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
+    }
+
+    @Override
+    public Iterable<NeedInit> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+        ((MatrixType)ctx.t).cgid = getUniqueId();
+
+        NeedInit ni = new NeedInit();
+        ni.type = ((MatrixType)ctx.t);
+
+        ni.items = new ArrayList<TrinityParser.ExprContext>();
+
+        //TODO: fix this
+        if(ctx.vector() != null){
+            //for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
+            TrinityParser.VectorContext vector = ctx.vector();
+                if (vector.exprList() != null) {
+                    ni.items.addAll(vector.exprList().expr());
+
+                    //ni.id = ((MatrixType) ctx.t).cgid;
+                } else if (vector.range() != null) {
+                    //ni.items = ctx.vector().range();
+                    //TODO: range
+                    System.out.println("dv: no range yet!");
+                }
+            //}
+        } else {
+            //TODO: remove the risk.
+            //throw new Exception
+            System.out.println("Congratz! This should not happen :D");
+        }
+        //visitChildren(ctx);
+
+
+        assert ni.items.size() == ni.type.getCols() * ni.type.getRows();
+
+        //TODO: rewrite this context to id...
+
+        //TODO: null
+        //Iterable<NeedInit> exprs = ctx.vector().exprList().accept(this);
+        //return ImmutableList.copyOf(ctx.vector().exprList().expr());
+        //return ImmutableList.of(ni);
+
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
 
     }
 
-   /* @Override
-    public Iterable<ExprContext> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-
-        Iterable<ExprContext> test = ImmutableList.of("lol);
-
-        return test;
-    }*/
-
-    @Override
-    public Iterable<TrinityParser.ExprContext> visitExprList(TrinityParser.ExprListContext ctx) {
-       // Iterable<ExprContext> lol =  new
-     /*   ctx.expr(0).accept(this);
-        for(int i = 1; i < ctx.expr().size(); i++) {
-
-            ctx.expr(i).accept(this);
-        }*/
-
-       // return ImmutableList.copyOf(ctx.expr());
-        //return ImmutableList.of(ctx.expr());
-        
-        
-    }
 
 
     @Override
-    protected Iterable<TrinityParser.ExprContext> aggregateResult(Iterable<TrinityParser.ExprContext> aggregate, Iterable<TrinityParser.ExprContext> nextResult) {
+    protected Iterable<NeedInit> aggregateResult(Iterable<NeedInit> aggregate, Iterable<NeedInit> nextResult) {
         if(aggregate == null)
             return nextResult;
         else if(nextResult == null)

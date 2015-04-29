@@ -4,6 +4,9 @@ public class MatrixType extends Type {
     final private int rows;
     final private int cols;
 
+    //TODO: find a better way or whateva..
+    public String cgid = "";
+
     public MatrixType(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;

@@ -1,7 +1,14 @@
-Boolean a = [1,2] == [1,2];
-#Scalar a = 2 + 3;
-#Scalar b = 2;
-#Vector[3] v = [1+2,3,4];
-#if([1,2] == [2,3+3]) then
+#Boolean a = [1,2] != [4,3];
 
-#end
+#Boolean b = [1,2] == [[5,6]*[7,8],3];
+
+Vector[3] z = [7,8,9];
+
+Matrix[2,3] a = [1,2,3][4,5,6];
+
+Scalar gideon = 2 * 3;
+Scalar b = 2;
+Vector[3] v = [1+2,3,4];
+if [1,gideon] == [2,3+3] then
+    Scalar christoffer = 4+gideon;
+end

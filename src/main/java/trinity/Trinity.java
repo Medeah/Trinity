@@ -2,14 +2,14 @@ package trinity;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.CustomExceptions.ParseException;
 import trinity.CustomExceptions.TypeCheckException;
 import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
 import trinity.visitors.TypeVisitor;
-import static com.google.common.io.Files.getNameWithoutExtension;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class Trinity {
     static CommandLineOptions options = new CommandLineOptions();
@@ -41,6 +43,9 @@ public class Trinity {
 
         @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command")
         private String ccompiler = "cc";
+
+        @Parameter(names = {"-v", "--version"}, description = "Display the version number")
+        private boolean version;
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,6 +54,11 @@ public class Trinity {
         //TODO: remove me son
         //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
         options.files.add("src/test/resources/trinity/tests/simple.tri");
+
+        if (options.version) {
+            System.out.println("Trinity 0.1");
+            System.exit(0);
+        }
 
         if (options.files.size() != 1) {
             jc.usage();
@@ -71,15 +81,15 @@ public class Trinity {
                 PrintWriter pw = new PrintWriter(filename + ".c");
                 pw.println(out);
                 pw.flush();
-                if(options.formatc) {
-                    Process process = new ProcessBuilder("indent",filename+".c").start();
-                    if(process.waitFor() != 0) {
+                if (options.formatc) {
+                    Process process = new ProcessBuilder("indent", filename + ".c").start();
+                    if (process.waitFor() != 0) {
                         System.err.println("error running indent, do you have it installed?");
                     }
                 }
 
-                Process process = new ProcessBuilder(options.ccompiler,filename + ".c").start();
-                if(process.waitFor() != 0) {
+                Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
+                if (process.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
             }

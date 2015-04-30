@@ -16,6 +16,11 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     //TODO: everything
     private static String output = "";
     private static String body = "";
+    //TODO: this is not good
+    private static String funcbody = "";
+    private static Boolean funclevel = false;
+
+    private List<String> funcs = new ArrayList<String>();
 
     public String generate(ParseTree tree) {
         this.visit(tree);
@@ -23,7 +28,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         output += includes();
         //output += "typedef struct Matrix{float *data; int rows; int cols;} Matrix;";
 
-        output += generateStatic();
+        //TODO: don't?
+        //output += generateStatic();
+
+        output += generateFunctions();
 
         //TODO: fix
         output += ("int main(void){");
@@ -36,7 +44,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     private static void emit(String string) {
         // TODO: replace this function with the good stuff
         //System.out.print(string);
-        body += string;
+        if(!funclevel)
+            body += string;
+        else
+            funcbody += string;
     }
 
     // TODO: find out what is always needed and what is not? (windows)
@@ -71,6 +82,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     private String generateStatic() {
         String out = "";
         for (String str : staticInit) {
+            out += str;
+        }
+        return out;
+    }
+
+
+    private String generateFunctions() {
+        String out = "";
+        for (String str : funcs) {
             out += str;
         }
         return out;
@@ -133,6 +153,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
+        funcbody = "";
+        funclevel = true;
         ctx.type().accept(this);
         emit(ctx.ID().getText());
         emit("(");
@@ -142,6 +164,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         emit("){");
         ctx.block().accept(this);
         emit("}");
+        funcs.add(funcbody);
+        funclevel = false;
         return null;
     }
 

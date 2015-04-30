@@ -22,7 +22,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class Trinity {
 
-    private Trinity {}
+    private Trinity () {}
     static CommandLineOptions options = new CommandLineOptions();
 
     private static class CommandLineOptions {

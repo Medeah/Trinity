@@ -183,7 +183,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), contextType);
         } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("ID already exsists: " + ctx.ID().getText(), ctx.ID().getSymbol());
+            errorReporter.reportError("ID already exists: " + ctx.ID().getText(), ctx.ID().getSymbol());
         }
         ctx.block().accept(this);
 

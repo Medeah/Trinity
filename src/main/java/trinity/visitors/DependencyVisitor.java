@@ -2,26 +2,17 @@ package trinity.visitors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import trinity.NeedInit;
-import trinity.TrinityBaseVisitor;
-import trinity.TrinityParser;
-import trinity.TrinityVisitor;
+import trinity.*;
 import trinity.types.MatrixType;
 
 import java.util.ArrayList;
 
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> implements TrinityVisitor<Iterable<NeedInit>> {
 
-    //TODO: this is not good.
-    private static int idc = 0;
-    private static String getUniqueId() {
-        return "_up" + idc++;
-    }
-
     //TODO: accept vectors instead
     @Override
     public Iterable<NeedInit> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-        ((MatrixType)ctx.t).cgid = getUniqueId();
+        ((MatrixType)ctx.t).cgid = UniqueId.next();
 
         NeedInit ni = new NeedInit();
         ni.type = ((MatrixType)ctx.t);
@@ -63,7 +54,7 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
 
     @Override
     public Iterable<NeedInit> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-        ((MatrixType)ctx.t).cgid = getUniqueId();
+        ((MatrixType)ctx.t).cgid = UniqueId.next();
 
         NeedInit ni = new NeedInit();
         ni.type = ((MatrixType)ctx.t);

@@ -2,10 +2,7 @@ package trinity.visitors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import trinity.NeedInit;
-import trinity.TrinityBaseVisitor;
-import trinity.TrinityParser;
-import trinity.TrinityVisitor;
+import trinity.*;
 import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
@@ -110,7 +107,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 emit("float " + ni.type.cgid + "[" + ni.items.size() + "];");
 
                 for (int i = 0; i < ni.items.size(); i++) {
-                    emit("a[" + i + "]=");
+                    emit(ni.type.cgid + "[" + i + "]=");
                     ni.items.get(i).accept(this);
                     emit(";");
                 }
@@ -214,37 +211,54 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
 
     //TODO: move or something..
-    private final Type scalar = new PrimitiveType(EnumType.SCALAR);
-    private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
+    ///private final Type scalar = new PrimitiveType(EnumType.SCALAR);
+    //private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
-        //TODO: make
+        // TODO: row-major / column-major
+        emitDependencies(ctx.expr());
 
         if (ctx.expr().t instanceof MatrixType) {
             MatrixType matrix = (MatrixType) ctx.expr().t;
 
+            //TODO: refactor much.
+            // vector in matrix
+            Boolean vinm = false;
             if (matrix.getRows() != 1) {
-                //TODO!
-                emit("matrix-forloop-error;");
-                return null;
+                vinm = true;
             }
 
-            //TODO: unique id + type
-            emit("float[" + matrix.getCols() + "] _sa=");
-            ctx.expr().accept(this);
-            emit(";");
-            emit("int i;");
-            emit("for(i=;i<" + matrix.getCols() + "; i++){");
-            emit("float ");
+            String incId = UniqueId.next();
+            int size  = vinm ? matrix.getRows() : matrix.getCols();
+
+            emit("int " + incId + ";");
+            emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
+
+            // current scalar/vector being iterated
+            emit(vinm ? "float* " : "float ");
             emit(ctx.ID().getText());
-            emit("=_sa[i];");
+            emit("=");
+            ctx.expr().accept(this); //TODO: this should always emit the pre-initialized vector id;
+
+            if (vinm) {
+                // Get pointer to vector in matrix
+                emit("+" + incId + "*");
+                emit(matrix.getCols() + "");
+                emit(";");
+            } else {
+                // Get scalar element
+                emit("[" + incId + "];");
+            }
+
             ctx.block().accept(this);
+
+            if (!vinm) emit(" printf(\"%f\\n\", res);"); //TODO: remove me
+
             emit("}");
-
         } else {
-            emit("forloop-unimpl;");
-
+            // TODO: is this safe to remove.
+            emit("INTERNAL-ERROR;");
         }
 
         return null;
@@ -422,7 +436,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             // Use same operator as trinity (== or !=)
             emit(ctx.op.getText());
             ctx.expr(1).accept(this);
-        } else if(ctx.expr(0).t instanceof MatrixType) {
+        } else if (ctx.expr(0).t instanceof MatrixType) {
             if (ctx.op.getText().equals("!=")) {
                 emit("!");
             }
@@ -461,31 +475,48 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     @Override
-    public Void visitVector(TrinityParser.VectorContext ctx) {
-        // TODO: implement properly
-
-        return null;
-    }
-
-    @Override
     public Void visitRange(TrinityParser.RangeContext ctx) {
         int start = new Integer(ctx.NUMBER(0).getText());
         int end = new Integer(ctx.NUMBER(1).getText());
         int step = start > end ? -1 : 1;
 
-        emit(start + ""); //TODO: string syntaxify this
+        emit(Integer.toString(start));
         for (int i = start + 1; i < end; i += step) {
             emit("," + i);
         }
         return null;
     }
 
-    // TODO: these will be visited by default implementation (TrinityBaseVisitor)
-    /*@Override
-    public Void visitMatrix(TrinityParser.MatrixContext ctx) {
-        return super.visitMatrix(ctx);
-    }*/
+    @Override
+    public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+        // TODO: reconsider
+        emit(((MatrixType) ctx.t).cgid);
+        return null;
+    }
 
+
+    @Override
+    public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+        // TODO: reconsider
+        emit(((MatrixType) ctx.t).cgid);
+        return null;
+    }
+
+    @Override
+    public Void visitVector(TrinityParser.VectorContext ctx) {
+        // TODO: THIS SHOULD NEVER BE CALLED
+        System.out.println("ERROR: visitVector should not be called.");
+        return null;
+    }
+
+    @Override
+    public Void visitMatrix(TrinityParser.MatrixContext ctx) {
+        //TODO: fix
+        System.out.println("ERROR: visitMatrix should not be called.");
+        return null;
+    }
+
+    // TODO: these will be visited by default implementation (TrinityBaseVisitor)
     /*@Override
     public Void visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
 
@@ -497,32 +528,5 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return super.visitSingleExpression(ctx);
     }*/
 
-    @Override
-    public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-        //TODO:..
-        emit(((MatrixType) ctx.t).cgid);
-        return null;
-    }
-
-
-    @Override
-    public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-        //TODO: get the id :O
-        emit(((MatrixType) ctx.t).cgid);
-        /*MatrixType vector = (MatrixType)ctx.t;
-        if(ctx.vector().exprList() != null) {
-            String id = getUniqueId();
-            //TODO: change this (remove getText())
-            staticInit.add("static float " + id + "[" + vector.getCols() + "]={" +
-            ctx.vector().exprList().getText() + "};");
-            emit("(Matrix){.data=" + id + ",.rows=" + vector.getRows() + ",.cols=" + vector.getCols() + "}");
-        } else {
-            //TODO:
-            emit("{nope");
-            //ctx.vector().range().accept(this);
-            emit("}");
-        }*/
-        return null;
-    }
 
 }

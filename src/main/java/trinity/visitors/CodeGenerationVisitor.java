@@ -89,7 +89,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             for (NeedInit ni : nis) {
 
                 //TODO: better vector/matrix distinction! (maybe only make 1d arrays and arithmetic indexing)
-                if(ni.type.getRows() == 1)
+                /*if(ni.type.getRows() == 1)
                     emit("float " + ni.type.cgid + "[" + ni.type.getCols() + "];");
                 else
                     emit("float " + ni.type.cgid + "[" + ni.type.getCols() + "][" + ni.type.getRows() + "];");
@@ -105,11 +105,18 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                         ni.items.get(lol++).accept(this);
                         emit(";");
                     }
+                }*/
+
+                emit("float " + ni.type.cgid + "[" + ni.items.size() + "];");
+
+                for (int i = 0; i < ni.items.size(); i++) {
+                    emit("a[" + i + "]=");
+                    ni.items.get(i).accept(this);
+                    emit(";");
                 }
             }
         }
     }
-
 
     /*@Override
     public Void visitProg(TrinityParser.ProgContext ctx) {
@@ -330,12 +337,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
         // TODO: types and shit.
         //TODO: equals scalar
-        if(ctx.t instanceof PrimitiveType){
+        if (ctx.t instanceof PrimitiveType) {
             ctx.expr(0).accept(this);
             emit("*");
             ctx.expr(1).accept(this);
         } else {
-            emit("mult(");
+            emit("_mult(");
             ctx.expr(0).accept(this);
             emit(",");
             ctx.expr(1).accept(this);
@@ -408,13 +415,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitEquality(TrinityParser.EqualityContext ctx) {
-        //TODO: implemeeeent
-        if(ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType){
+        // Expect both operands to have same type
+        if (ctx.expr(0).t instanceof PrimitiveType) {
+            // Both a Scalar or Boolean
             ctx.expr(0).accept(this);
+            // Use same operator as trinity (== or !=)
             emit(ctx.op.getText());
             ctx.expr(1).accept(this);
-        } else {
-            if(ctx.op.getText().equals("!=")) {
+        } else if(ctx.expr(0).t instanceof MatrixType) {
+            if (ctx.op.getText().equals("!=")) {
                 emit("!");
             }
             emit("meq(");

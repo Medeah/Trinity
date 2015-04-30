@@ -355,7 +355,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         emit(ctx.ID().getText());
         emit("[");
-        ctx.expr().accept(this);
+            ctx.expr().accept(this);
         emit("]");
         return null;
     }

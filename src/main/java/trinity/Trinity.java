@@ -81,10 +81,10 @@ public class Trinity {
                     }
                 }
 
-                Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
+                /*Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
                 if (process.waitFor() != 0) {
                     System.err.println("Error compiling c code");
-                }
+                }*/
             }
 
         } catch (IOException ex) {

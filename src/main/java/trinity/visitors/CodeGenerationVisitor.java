@@ -1,13 +1,19 @@
 package trinity.visitors;
 
+import com.google.common.base.Charsets;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.*;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.io.Resources.asByteSource;
+import static com.google.common.io.Resources.getResource;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
@@ -26,10 +32,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         this.visit(tree);
 
         output += includes();
+        output += defines();
         //output += "typedef struct Matrix{float *data; int rows; int cols;} Matrix;";
 
         //TODO: don't?
         //output += generateStatic();
+
 
         //TODO: return better class or take output stream as input.
         GlobalsVisitor globals = new GlobalsVisitor();
@@ -37,6 +45,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             output += g + ";";
         }
 
+        output += stdlib();
         output += generateFunctions();
 
         //TODO: fix
@@ -47,10 +56,25 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return output;
     }
 
+    private String stdlib() {
+        //return "hej";
+        URL test = getResource("stdtrinity.c");
+        try {
+            return com.google.common.io.Resources.toString(test, Charsets.UTF_8);
+        } catch (IOException e) {
+            System.err.println("error loading stdlib");
+        }
+        return "";
+    }
+
+    private String defines() {
+        return "#define IDX2C(i,j,ld) (((j)*(ld))+(i))\n";
+    }
+
     private static void emit(String string) {
         // TODO: replace this function with the good stuff
         //System.out.print(string);
-        if(!funclevel)
+        if (!funclevel)
             body += string;
         else
             funcbody += string;
@@ -64,6 +88,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         //add("time.h");
         // add("windows.h");
         add("stdio.h");
+        add("math.h");
+        add("stdbool.h");
         //add("stdlib.h");
     }};
 
@@ -244,7 +270,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             }
 
             String incId = UniqueId.next();
-            int size  = vinm ? matrix.getRows() : matrix.getCols();
+            int size = vinm ? matrix.getRows() : matrix.getCols();
 
             emit("int " + incId + ";");
             emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
@@ -383,7 +409,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         emit(ctx.ID().getText());
         emit("[");
-            ctx.expr().accept(this);
+        ctx.expr().accept(this);
         emit("]");
         return null;
     }

@@ -1,8 +1,11 @@
 package trinity.visitors;
 
-import trinity.*;
+import trinity.ErrorReporter;
+import trinity.TrinityBaseVisitor;
+import trinity.TrinityParser;
+import trinity.TrinityVisitor;
 
-public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean>{
+public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean> {
 
     private ErrorReporter errorReporter;
 
@@ -15,7 +18,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         for (int i = 0; i < ctx.functionDecl().size(); i++){
             // Check every FunctionDecl for unreachable code or missing return statements.
             // If a check has returned false, then end visitor.
-            if(!ctx.functionDecl(i).accept(this)){
+            if (!ctx.functionDecl(i).accept(this)) {
                 return false;
             }
         }

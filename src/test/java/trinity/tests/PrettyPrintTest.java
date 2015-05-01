@@ -6,7 +6,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
-import trinity.*;
+import trinity.TrinityLexer;
+import trinity.TrinityParser;
 import trinity.visitors.PrettyPrintVisitor;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class PrettyPrintTest {
     }
 
     @Test
-    public void testPrettyPrinter() throws Exception  {
+    public void testPrettyPrinter() throws Exception {
         URL url = Resources.getResource(this.getClass(), "/trinity/tests/parsing-tests.tri");
         String pretty = Resources.toString(url, Charsets.UTF_8);
 

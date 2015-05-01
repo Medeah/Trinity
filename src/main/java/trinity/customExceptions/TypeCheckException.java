@@ -1,4 +1,4 @@
-package trinity.CustomExceptions;
+package trinity.customExceptions;
 
 public class TypeCheckException extends Exception {
 

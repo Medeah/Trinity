@@ -7,7 +7,7 @@ version = '0.1'
 mainClassName = 'trinity.Trinity'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.3'
+    gradleVersion = '2.3'
 }
 
 repositories {

@@ -4,18 +4,19 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.junit.Test;
+import trinity.TrinityLexer;
+import trinity.TrinityParser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import org.junit.Test;
-import trinity.*;
 
 import static org.junit.Assert.*;
 
 public class ParserTest {
 
     @Test
-    public void correctSyntax_parseFile() throws Exception  {
+    public void correctSyntax_parseFile() throws Exception {
         InputStream is = this.getClass().getResourceAsStream("/trinity/tests/parsing-tests.tri");
         TrinityParser parser = createParser(is);
         parser.prog();
@@ -23,7 +24,7 @@ public class ParserTest {
     }
 
     @Test
-    public void correctSyntax_numbers() throws Exception  {
+    public void correctSyntax_numbers() throws Exception {
         assertTrue(canParse("0;"));
         assertTrue(canParse("1;"));
         assertTrue(canParse("-12;"));
@@ -35,46 +36,46 @@ public class ParserTest {
     }
 
     @Test
-    public void correctSyntax_Dimensions() throws Exception  {
+    public void correctSyntax_Dimensions() throws Exception {
         assertTrue(canParse("Vector[1] v = [1,2,3];"));
         assertTrue(canParse("Matrix[2,3] m = [1,2,3][1,2,4];"));
     }
 
 
     @Test
-    public void wrongSyntax_Empty() throws Exception  {
+    public void wrongSyntax_Empty() throws Exception {
         assertTrue(canParse(""));
         assertFalse(canParse(";"));
     }
 
 
     @Test
-    public void wrongSyntax_numbers() throws Exception  {
+    public void wrongSyntax_numbers() throws Exception {
         assertFalse(canParse("00;"));
         assertFalse(canParse("01;"));
         assertFalse(canParse("01.2;"));
     }
 
     @Test
-    public void wrongSyntax_NoDimensions() throws Exception  {
+    public void wrongSyntax_NoDimensions() throws Exception {
         assertFalse(canParse("Vector v = [1,2,3];"));
         assertFalse(canParse("Matrix m = [1,2,3][1,2,4];"));
     }
 
     @Test
-    public void correctSyntax_lastLineComment() throws Exception  {
+    public void correctSyntax_lastLineComment() throws Exception {
         assertTrue(canParse("#comment"));
     }
 
     @Test
-    public void badSyntax_noSemiColon() throws Exception  {
+    public void badSyntax_noSemiColon() throws Exception {
         assertFalse(canParse("Scalar a = 1"));
         assertFalse(canParse("func()"));
         assertFalse(canParse("3 + 3"));
     }
 
     @Test
-    public void badSyntax_wrongType() throws Exception  {
+    public void badSyntax_wrongType() throws Exception {
         assertFalse(canParse("Matrixx m = [1][1];"));
         assertFalse(canParse("YOLOSWAG m = [1][1];"));
         assertFalse(canParse("m = 1;"));
@@ -84,14 +85,14 @@ public class ParserTest {
     }
 
     @Test
-    public void parseReturn() throws Exception  {
+    public void parseReturn() throws Exception {
         assertFalse(canParse("return 1;"));
         assertFalse(canParse("Scalar x() do return 1; return 1; end"));
         assertTrue(canParse("Scalar x() do return 1; end"));
     }
 
     @Test
-    public void badSyntax_wrongVectorMatrix() throws Exception  {
+    public void badSyntax_wrongVectorMatrix() throws Exception {
         assertFalse(canParse("[1,2,3;"));
         assertFalse(canParse("1,3];"));
         assertFalse(canParse("[1,2,];"));
@@ -100,13 +101,13 @@ public class ParserTest {
     }
 
     @Test
-    public void badSyntax_wrongFunctionCall() throws Exception  {
+    public void badSyntax_wrongFunctionCall() throws Exception {
         assertFalse(canParse("f(1,);"));
         assertFalse(canParse("f(,2,3);"));
     }
 
     @Test
-    public void badSyntax_missingParamType() throws Exception  {
+    public void badSyntax_missingParamType() throws Exception {
         assertFalse(canParse("Matrix m(var) do end"));
     }
 

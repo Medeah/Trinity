@@ -4,15 +4,16 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
-import org.junit.Ignore;
+import trinity.customExceptions.ParseException;
 import trinity.*;
-import trinity.CustomExceptions.ParseException;
 import trinity.visitors.TypeVisitor;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TypeVisitorTest {
+
+    //TODO: check the test file (parsing-tests or a new one for type-checking.)
 
     private boolean typeCheck(String str) throws Exception {
         ErrorReporter er = new StandardErrorReporter(false, str);
@@ -191,6 +192,13 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Boolean x() do if true then return true; elseif 1==1 then return true; else return false; end end"));
         assertFalse(typeCheck("Boolean x() do if true then return true; else return 1; end end"));
         assertTrue(typeCheck("Boolean x() do for Scalar s in [1..3] do return true; end end"));
+        assertFalse(typeCheck("Boolean b = true;\n" +
+                "\n" +
+                "do\n" +
+                "    return 1;\n" +
+                "end\n" +
+                "\n" +
+                "Scalar s = 1;"));
     }
 
     @Test
@@ -244,8 +252,6 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
     }
 
-
-
     /*@Test
     public void testTypeInference() throws Exception {
         // if you want it, then you should have put a ring on it?
@@ -254,6 +260,4 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Vector v = [1,2,3,4]; Vector[4] w = v;"));
         assertFalse(typeCheck("Vector v = [1,2,3,4]; Vector[3] w = v;"));
     }*/
-
-
 }

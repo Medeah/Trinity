@@ -7,24 +7,26 @@ public class PrimitiveType extends Type {
         this.ptype = ptype;
     }
 
-    public EnumType getPType () {
+    public EnumType getPType() {
         return ptype;
     }
 
-    @Override public boolean equals(Object other) {
+    @Override
+    public boolean equals(Object other) {
         boolean result = false;
         if (other instanceof PrimitiveType) {
-            PrimitiveType that = (PrimitiveType) other;
             result = this.ptype == ((PrimitiveType) other).ptype;
         }
         return result;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return ptype.hashCode();
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         if (ptype == EnumType.SCALAR) {
             return "Scalar";
         } else {

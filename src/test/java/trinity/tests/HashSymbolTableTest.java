@@ -1,17 +1,19 @@
 package trinity.tests;
 
-import trinity.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import trinity.CustomExceptions.SymbolAlreadyDefinedException;
-import trinity.CustomExceptions.SymbolNotFoundException;
-import trinity.types.*;
+import trinity.customExceptions.SymbolAlreadyDefinedException;
+import trinity.customExceptions.SymbolNotFoundException;
+import trinity.HashSymbolTable;
+import trinity.SymbolTable;
+import trinity.types.EnumType;
+import trinity.types.MatrixType;
+import trinity.types.PrimitiveType;
+import trinity.types.Type;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class HashSymbolTableTest {
 

@@ -5,7 +5,7 @@ Boolean t = true;
 # and stuff
 Scalar s = 1;
 Vector [ 3 ] v=[1,5,6];
-Vector[10] w=[1.. 9];
+Vector[10] w=[1.. 10];
 Matrix[1,2] m= [1,2][4,5];
 
 # Expressions

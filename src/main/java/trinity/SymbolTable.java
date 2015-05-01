@@ -1,7 +1,7 @@
 package trinity;
 
-import trinity.CustomExceptions.SymbolAlreadyDefinedException;
-import trinity.CustomExceptions.SymbolNotFoundException;
+import trinity.customExceptions.SymbolAlreadyDefinedException;
+import trinity.customExceptions.SymbolNotFoundException;
 import trinity.types.FunctionType;
 import trinity.types.Type;
 
@@ -18,7 +18,7 @@ public interface SymbolTable {
 
     boolean declaredLocally(String name);
 
-    FunctionType getCurrentFunction();
+    FunctionType getCurrentFunction() throws SymbolNotFoundException;
 
     void setCurrentFunction(FunctionType inp);
 }

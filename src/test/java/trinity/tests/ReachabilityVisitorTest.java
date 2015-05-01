@@ -4,9 +4,12 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Ignore;
-import trinity.*;
 import org.junit.Test;
-import trinity.CustomExceptions.ParseException;
+import trinity.customExceptions.ParseException;
+import trinity.ErrorReporter;
+import trinity.StandardErrorReporter;
+import trinity.TrinityLexer;
+import trinity.TrinityParser;
 import trinity.visitors.ReachabilityVisitor;
 
 import static org.junit.Assert.assertFalse;
@@ -14,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class    ReachabilityVisitorTest {
 
-    private boolean reachabilityTest(String str) throws Exception{
+    private boolean reachabilityTest(String str) throws Exception {
         ErrorReporter er = new StandardErrorReporter(false, str);
         ReachabilityVisitor ReachabilityVisitor = new ReachabilityVisitor(er);
 

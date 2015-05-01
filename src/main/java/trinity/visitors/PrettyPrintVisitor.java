@@ -104,7 +104,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
             ctx.stmt(i).accept(this);
             emit(System.lineSeparator());
         }
-        if(ctx.semiExpr() != null) {
+        if (ctx.semiExpr() != null) {
             indent();
             emit("return ");
             ctx.semiExpr().accept(this);
@@ -172,14 +172,14 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         ctx.block(0).accept(this);
 
         int i;
-        for(i = 1; i < ctx.expr().size(); i++) {
+        for (i = 1; i < ctx.expr().size(); i++) {
             emit("elseif ");
             ctx.expr(i).accept(this);
             emit(" then");
             ctx.block(i).accept(this);
         }
 
-        if(ctx.block(i) != null) {
+        if (ctx.block(i) != null) {
             emit("else");
             ctx.block(i).accept(this);
         }
@@ -316,7 +316,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitExprList(TrinityParser.ExprListContext ctx) {
         ctx.expr(0).accept(this);
-        for(int i = 1; i < ctx.expr().size(); i++) {
+        for (int i = 1; i < ctx.expr().size(); i++) {
             emit(", ");
             ctx.expr(i).accept(this);
         }
@@ -326,7 +326,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     @Override
     public Object visitVector(TrinityParser.VectorContext ctx) {
         emit("[");
-        if(ctx.exprList() != null) {
+        if (ctx.exprList() != null) {
             ctx.exprList().accept(this);
         } else {
             ctx.range().accept(this);
@@ -336,7 +336,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
-    public Object visitRange (TrinityParser.RangeContext ctx) {
+    public Object visitRange(TrinityParser.RangeContext ctx) {
         emit(ctx.NUMBER(0));
         emit("..");
         emit(ctx.NUMBER(1));

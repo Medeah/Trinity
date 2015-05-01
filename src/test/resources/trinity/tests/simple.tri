@@ -9,7 +9,8 @@ Scalar a() do
 end
 
 Scalar b() do
-    Scalar bi = 2;
+    Scalar bix = 2;
     return 3 + a();
 end
 
+print a();

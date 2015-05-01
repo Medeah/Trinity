@@ -4,8 +4,10 @@ import com.google.common.base.Charsets;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.*;
+import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
+import trinity.types.Type;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,7 +43,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
         //TODO: return better class or take output stream as input.
         GlobalsVisitor globals = new GlobalsVisitor();
-        for(String g :  globals.walk(tree)) {
+        for (String g : globals.walk(tree)) {
             output += g + ";";
         }
 
@@ -157,7 +159,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
-        if(scopeDepth != 0) {
+        if (scopeDepth != 0) {
             ctx.type().accept(this);
         }
         emit(ctx.ID().getText());
@@ -338,6 +340,31 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         emit("{");
         ctx.block().accept(this);
         emit("}");
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        Type expType = ctx.semiExpr().expr().t;
+        if (expType instanceof PrimitiveType) {
+            if (((PrimitiveType) expType).getPType() == EnumType.SCALAR) {
+                emit("print_s(");
+                ctx.semiExpr().expr().accept(this);
+                emit(");");
+            } else {
+                emit("print_b(");
+                ctx.semiExpr().expr().accept(this);
+                emit(");");
+            }
+        } else if (expType instanceof MatrixType) {
+            emit("print_m(");
+            ctx.semiExpr().expr().accept(this);
+            emit("," + ((MatrixType) expType).getRows());
+            emit("," + ((MatrixType) expType).getCols());
+            emit(");");
+        } else {
+            emit("printf(" + expType.toString() + ");");
+        }
         return null;
     }
 

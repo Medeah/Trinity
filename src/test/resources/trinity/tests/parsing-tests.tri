@@ -9,20 +9,20 @@ Scalar u = m[2, 3];
 m^2;
 m';
 for Scalar s in v do
-    print(s);
+    print s;
 end
 for Scalar v in [1, 2, 3] do
-    print(0);
+    print 0;
 end
 for Scalar v in [1..5] do
     for Scalar x in [1, 2] do
-        print(0);
+        print 0;
     end
 end
 Scalar mathias () do
     if frederik then
         for Scalar s in [1..10] do
-            print(10);
+            print 10;
         end
     else
         for Scalar v in [1, 2][1, 2] do
@@ -33,9 +33,9 @@ end
 if m == v * v then
     Matrix[2,1] x = [1][0];
 elseif 1 + 2 != 4 or 5 == 2 + 2 then
-    print(m);
+    print m;
 elseif true and false then
-    print(m);
+    print m;
 else
     Scalar leet = 1337;
 end

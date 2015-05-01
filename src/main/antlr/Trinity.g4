@@ -36,6 +36,7 @@ stmt
       ('elseif' expr 'then' block)*
       ('else' block)? 'end'                     # IfStatement
     | 'do' block 'end'                          # BlockStatement
+    | 'print' semiExpr                          # PrintStatement
     ;
 
 // Expressions

@@ -51,7 +51,9 @@ public class Trinity {
 
         //TODO: remove me son
         //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
-        options.files.add("src/test/resources/trinity/tests/simple.tri");
+        //options.files.add("src/test/resources/trinity/tests/simple.tri");
+        options.files.add("src/test/resources/trinity/tests/print.tri");
+
         options.formatc = true;
 
         if (options.version) {
@@ -81,10 +83,10 @@ public class Trinity {
                     }
                 }
 
-                /*Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
+                Process process = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
                 if (process.waitFor() != 0) {
                     System.err.println("Error compiling c code");
-                }*/
+                }
             }
 
         } catch (IOException ex) {

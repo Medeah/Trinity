@@ -102,6 +102,11 @@ public class GlobalsVisitor extends AbstractParseTreeVisitor<String> implements 
     }
 
     @Override
+    public String visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        return null;
+    }
+
+    @Override
     public String visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
         return null;
     }

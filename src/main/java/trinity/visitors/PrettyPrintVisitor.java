@@ -197,6 +197,13 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     }
 
     @Override
+    public Object visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        emit("print ");
+        ctx.semiExpr().accept(this);
+        return null;
+    }
+
+    @Override
     public Object visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
         ctx.expr(0).accept(this);
         emit(" ");

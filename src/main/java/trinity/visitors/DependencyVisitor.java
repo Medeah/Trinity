@@ -83,7 +83,10 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
         //visitChildren(ctx);
 
 
+        //TODO: ensure and remove
         assert ni.items.size() == ni.type.getCols() * ni.type.getRows();
+        if(ni.items.size() == ni.type.getCols() * ni.type.getRows())
+            System.out.println("DV ERROR");
 
         //TODO: rewrite this context to id...
 

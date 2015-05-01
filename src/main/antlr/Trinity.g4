@@ -67,4 +67,4 @@ exprList: expr (',' expr)* ;
 
 vector: '[' (exprList | range) ']' ;
 matrix: vector vector+ ;
-range:   NUMBER '..' NUMBER ;
+range:  NUMBER '..' NUMBER ;

@@ -1,6 +1,15 @@
-Matrix[3,4] A = [1,2][4,6][5,6] * [2,2,2,4][4,1,2,4];
+#Matrix[3,4] A = [1,2][4,6][5,6] * [2,2,2,4][4,1,2,4];
 
-Vector[4] j() do
-Vector[4] v = [1,2,3,4];
 
+Scalar m = 2;
+
+Scalar a() do
+    Scalar ai = 2;
+    return 4 + m;
 end
+
+Scalar b() do
+    Scalar bi = 2;
+    return 3 + a();
+end
+

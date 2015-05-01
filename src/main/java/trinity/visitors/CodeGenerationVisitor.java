@@ -3,16 +3,16 @@ package trinity.visitors;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.*;
-import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
-import trinity.types.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
+
+    private int scopeDepth = 0;
     //TODO: everything
     private static String output = "";
     private static String body = "";
@@ -30,6 +30,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
         //TODO: don't?
         //output += generateStatic();
+
+        //TODO: return better class or take output stream as input.
+        GlobalsVisitor globals = new GlobalsVisitor();
+        for(String g :  globals.walk(tree)) {
+            output += g + ";";
+        }
 
         output += generateFunctions();
 
@@ -105,25 +111,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (nis != null) {
             for (NeedInit ni : nis) {
 
-                //TODO: better vector/matrix distinction! (maybe only make 1d arrays and arithmetic indexing)
-                /*if(ni.type.getRows() == 1)
-                    emit("float " + ni.type.cgid + "[" + ni.type.getCols() + "];");
-                else
-                    emit("float " + ni.type.cgid + "[" + ni.type.getCols() + "][" + ni.type.getRows() + "];");
-
-                int lol = 0;
-                for (int i = 0; i < ni.type.getCols(); i++) {
-                    for (int j = 0; j < ni.type.getRows(); j++) {
-                        //TODO: better vector/matrix distinction!
-                        if(ni.type.getRows() == 1)
-                            emit("a[" + i + "]=");
-                        else
-                            emit("a[" + i + "][" + j + "]=");
-                        ni.items.get(lol++).accept(this);
-                        emit(";");
-                    }
-                }*/
-
                 emit("float " + ni.type.cgid + "[" + ni.items.size() + "];");
 
                 for (int i = 0; i < ni.items.size(); i++) {
@@ -144,7 +131,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
-        ctx.type().accept(this);
+        if(scopeDepth != 0) {
+            ctx.type().accept(this);
+        }
         emit(ctx.ID().getText());
         emit("=");
         ctx.semiExpr().accept(this);
@@ -214,6 +203,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitBlock(TrinityParser.BlockContext ctx) {
+        scopeDepth++;
         for (TrinityParser.StmtContext stmt : ctx.stmt()) {
             stmt.accept(this);
         }
@@ -222,7 +212,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emit("return ");
             ctx.semiExpr().accept(this);
         }
-
+        scopeDepth--;
         return null;
     }
 

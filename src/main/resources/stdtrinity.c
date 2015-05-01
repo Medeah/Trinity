@@ -81,26 +81,3 @@ float _log10(float s) {
 float _sqrt(float s) {
   return sqrt(s);
 }
-
-
-int main(void) {
-  float matrix[6] = {11, 21, 12, 22, 13, 23};
-  print_m(matrix,2 , 3);
-  float matri[1] = {11};
-  print_m(matri,1 , 1);
-  float matr[2] = {11, 22};
-  print_m(matr,1 , 2);
-  print_m(matr,2 , 1);
-
-  print_b(false);
-  print_b(true);
-
-  float f = -987.654321;
-  print_s(f);
-  print_s(_abs(f));
-
-  print_s(_cos (f));
-  print_s(_sqrt (100));
-
-  return 0;
-}

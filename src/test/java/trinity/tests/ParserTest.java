@@ -17,7 +17,7 @@ public class ParserTest {
 
     @Test
     public void correctSyntax_parseFile() throws Exception {
-        InputStream is = this.getClass().getResourceAsStream("/trinity/tests/parsing-tests.tri");
+        InputStream is = this.getClass().getResourceAsStream("parsing-tests.tri");
         TrinityParser parser = createParser(is);
         parser.prog();
         assertEquals(0, parser.getNumberOfSyntaxErrors());

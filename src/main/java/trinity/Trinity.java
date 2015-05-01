@@ -133,7 +133,7 @@ public class Trinity {
             throw new ParseException("Input contains syntax errors.");
         }
 
-        return new Pair<ParseTree, TrinityParser>(tree, parser);
+        return new Pair<>(tree, parser);
 
     }
 

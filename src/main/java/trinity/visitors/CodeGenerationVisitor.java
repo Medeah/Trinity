@@ -10,8 +10,8 @@ import trinity.types.PrimitiveType;
 import trinity.types.Type;
 
 import java.io.IOException;
-import java.net.URL;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Stack;
 
 import static com.google.common.io.Resources.getResource;
@@ -43,7 +43,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     private String stdlib() {
-        //return "hej";
         URL test = getResource("stdtrinity.c");
         try {
             return com.google.common.io.Resources.toString(test, Charsets.UTF_8);
@@ -53,9 +52,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return "";
     }
 
-    private Stack<StringWriter> emitStack = new Stack<StringWriter>();
+    private Stack<StringWriter> emitStack = new Stack<>();
+
     private void setEmitterContext(StringWriter writer) {
-        if(currentWriter != null) {
+        if (currentWriter != null) {
             emitStack.push(currentWriter);
         }
         currentWriter = writer;
@@ -67,6 +67,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     //TODO: dynamically set input stream, to avoid bad restoration code.
     private static StringWriter currentWriter; //= new StringWriter();
+
     private static void emit(String string) {
         currentWriter.append(string);
     }
@@ -86,6 +87,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     // TODO: who even know at this point...
     private DependencyVisitor dependencyVisitor = new DependencyVisitor();
+
     private void emitDependencies(ParserRuleContext ctx) {
         Iterable<NeedInit> nis = ctx.accept(dependencyVisitor);
 
@@ -107,7 +109,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
-        if(scopeDepth == 0) {
+        if (scopeDepth == 0) {
             setEmitterContext(globals);
 
             ctx.type().accept(this);
@@ -434,8 +436,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (ctx.expr().t instanceof PrimitiveType) {
             emit("-");
             ctx.expr().accept(this);
-        }
-        else if (ctx.expr().t instanceof MatrixType) {
+        } else if (ctx.expr().t instanceof MatrixType) {
             emit("fmmult(-1,");
             ctx.expr().accept(this);
             emit("," + ((MatrixType) ctx.expr().t).getRows());
@@ -565,8 +566,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     */
-
-
 
 
 }

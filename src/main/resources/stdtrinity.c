@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <omp.h>
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
@@ -29,6 +30,33 @@ bool print_s(float s) {
   printf("%f\n", s);
   return true;
 }
+
+float* fmmult(int s, float* A, int rowsA, int colsA) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rowsA * colsA * sizeof(float));
+
+	for (i = 0; i < rowsA * colsA; i++) {
+		resMatrix[i] = s * A[i];
+	}
+
+	return resMatrix;
+} // TODO: husk af kalde free() på matrix resMatrix
+
+float* transpose(float* A, int nrRowsA, int nrColsA) {
+	int n;
+	float* resMatrix;
+	resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
+
+	#pragma omp parallel for
+    for(n = 0; n < nrRowsA * nrColsA; n++) {
+        int i = n / nrRowsA;
+        int j = n % nrRowsA;
+        resMatrix[n] = A[nrColsA * j + i];
+    }
+
+    return resMatrix;
+}// TODO: husk af kalde free() på matrix resMatrix
 
 float _abs(float s) {
   return fabs(s);

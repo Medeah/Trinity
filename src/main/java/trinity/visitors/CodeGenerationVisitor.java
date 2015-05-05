@@ -412,9 +412,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitTranspose(TrinityParser.TransposeContext ctx) {
-        // TODO: transpose function (unique name...)
-        emit("traspose(");
+        emit("transpose(");
         ctx.expr().accept(this);
+        emit("," + ((MatrixType) ctx.expr().t).getRows());
+        emit("," + ((MatrixType) ctx.expr().t).getCols());
         emit(")");
         return null;
     }

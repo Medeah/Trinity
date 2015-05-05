@@ -104,7 +104,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         //add("stdlib.h");
     }};*/
 
-    private static List<String> prototypes = new ArrayList<String>();
+    //private static List<String> prototypes = new ArrayList<String>();
 
     /*private static String includes() {
         String out = "";
@@ -239,12 +239,17 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         for (TrinityParser.StmtContext stmt : ctx.stmt()) {
             stmt.accept(this);
         }
-
-        if (ctx.semiExpr() != null) {
-            emit("return ");
-            ctx.semiExpr().accept(this);
+        if (ctx.returnStmt() != null) {
+            ctx.returnStmt().accept(this);
         }
         scopeDepth--;
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        emit("return ");
+        ctx.semiExpr().accept(this);
         return null;
     }
 

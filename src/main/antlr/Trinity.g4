@@ -24,7 +24,9 @@ type
 
 // Statements
 
-block: stmt* ('return' semiExpr)? ;
+block: stmt* returnStmt? ;
+
+returnStmt: 'return' semiExpr ;
 
 semiExpr: expr ';';
 

@@ -104,14 +104,20 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
             ctx.stmt(i).accept(this);
             emit(System.lineSeparator());
         }
-        if (ctx.semiExpr() != null) {
-            indent();
-            emit("return ");
-            ctx.semiExpr().accept(this);
-            emit(System.lineSeparator());
+        if (ctx.returnStmt() != null) {
+            ctx.returnStmt().accept(this);
         }
         this.indentLevel--;
         indent();
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        indent();
+        emit("return ");
+        ctx.semiExpr().accept(this);
+        emit(System.lineSeparator());
         return null;
     }
 

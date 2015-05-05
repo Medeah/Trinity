@@ -314,7 +314,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emit("," + ((MatrixType) expType).getCols());
             emit(");");
         } else {
-            // TODO: functioncall should pass expType !!!!!!!
             emit("printf(" + expType.toString() + ");");
         }
         return null;

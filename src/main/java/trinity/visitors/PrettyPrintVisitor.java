@@ -36,6 +36,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         this(4);
     }
 
+    // Pretty print visitor for Trinity, will remove comments
     public PrettyPrintVisitor(int spaces) {
         this.spaces = spaces;
     }
@@ -401,27 +402,5 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitErrorNode(ErrorNode node) {
         return null;
     }
-
-    // TODO: comment stuff / remove
-//    BufferedTokenStream tokens;
-//    TokenStreamRewriter rewriter;
-//
-//    public trinity.visitors.PrettyPrintVisitor(BufferedTokenStream tokens) {
-//        this.tokens = tokens;
-//        rewriter = new TokenStreamRewriter(tokens);
-//    }
-
-//        Token semi = ctx.getStop();
-//        int i = semi.getTokenIndex();
-//        List<Token> cmtChannel = tokens.getHiddenTokensToRight(i, TrinityLexer.COMMENT);
-//        if (cmtChannel != null) {
-//            Token cmt = cmtChannel.get(0);
-//            if (cmt != null) {
-//                String txt = cmt.getText().substring(2);
-//                String newCmt = "/* " + txt.trim() + " */\n";
-//                rewriter.insertBefore(ctx.start, newCmt);
-//                rewriter.replace(cmt, "\n");
-//            }
-//        }
 
 }

@@ -11,47 +11,35 @@ import trinity.types.Type;
 
 import java.io.IOException;
 import java.net.URL;
-
 import java.io.StringWriter;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
-import static com.google.common.io.Resources.asByteSource;
 import static com.google.common.io.Resources.getResource;
 
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
     private int scopeDepth = 0;
-    private List<String> globals = new ArrayList<String>();
-    private List<String> funcs = new ArrayList<String>();
+    StringWriter funcBody = new StringWriter();
+    StringWriter globals = new StringWriter();
 
     public String generate(ParseTree tree) {
-
-        String output = "";
-        //StringWriter output = new StringWriter();
+        StringWriter output = new StringWriter();
         StringWriter mainBody = new StringWriter();
         setEmitterContext(mainBody);
 
         this.visit(tree);
 
-        output += stdlib();
-
-        output += "/* ENTRY POINT */\n";
-
-        for(String g :  globals) {
-            output += g + ";";
-        }
-
-        output += generateFunctions();
+        output.append(stdlib());
+        output.append("/* ENTRY POINT */\n");
+        output.append(globals.toString());
+        output.append(funcBody.toString());// generateFunctions();
 
         //TODO: fix
-        output += ("\nint main(void){");
-        output += mainBody.toString();
-        output += ("return 0;};"); //TODO: end-semi is just for indent.
+        output.append("\nint main(void){");
+        output.append(mainBody.toString());
+        output.append("return 0;};"); //TODO: end-semi is just for indent.
 
-        return output;
+        return output.toString();
     }
 
     private String stdlib() {
@@ -79,16 +67,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     //TODO: dynamically set input stream, to avoid bad restoration code.
     private static StringWriter currentWriter; //= new StringWriter();
-    //private static PrintWriter printWriter = new PrintWriter(body);
     private static void emit(String string) {
-        //final OutputStream os = new FileOutputStream("/tmp/out");
-        //final PrintStream printStream = new PrintStream(os);
-
-        //printWriter.close();
-
         currentWriter.append(string);
-        //currentWriter.print(string);
-
     }
 
     // TODO: find out what is always needed and what is not? (windows)
@@ -103,24 +83,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         add("stdbool.h");
         //add("stdlib.h");
     }};*/
-
-    //private static List<String> prototypes = new ArrayList<String>();
-
-    /*private static String includes() {
-        String out = "";
-        for (String path : includes) {
-            out += "#include <" + path + ">\n";
-        }
-        return out;
-    }*/
-
-    private String generateFunctions() {
-        String out = "";
-        for (String str : funcs) {
-            out += str;
-        }
-        return out;
-    }
 
     // TODO: who even know at this point...
     private DependencyVisitor dependencyVisitor = new DependencyVisitor();
@@ -142,23 +104,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         }
     }
 
-    /*@Override
-    public Void visitProg(TrinityParser.ProgContext ctx) {
-        visitChildren(ctx);
-        return null;
-    }*/
-
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
         if(scopeDepth == 0) {
-            StringWriter global = new StringWriter();
-            setEmitterContext(global);
+            setEmitterContext(globals);
 
             ctx.type().accept(this);
             emit(ctx.ID().getText());
 
-            globals.add(global.toString());
             restoreEmitterContext();
 
         } else {
@@ -172,8 +126,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-        StringWriter funcbody = new StringWriter();
-        setEmitterContext(funcbody);
+        setEmitterContext(funcBody);
 
         ctx.type().accept(this);
         emit(ctx.ID().getText());
@@ -185,7 +138,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         ctx.block().accept(this);
         emit("}");
 
-        funcs.add(funcbody.toString());
         restoreEmitterContext();
         return null;
     }
@@ -226,10 +178,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
         emit("float* ");
-        //emit(ctx.NUMBER(0).getText());
-        //emit("][");
-        //emit(ctx.NUMBER(1).getText());
-        //emit("] ");
         return null;
     }
 
@@ -259,11 +207,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         emit(";");
         return null;
     }
-
-
-    //TODO: move or something..
-    ///private final Type scalar = new PrimitiveType(EnumType.SCALAR);
-    //private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
@@ -615,7 +558,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return super.visitConstDeclaration(ctx);
     }
 
+    @Override
+    public Void visitProg(TrinityParser.ProgContext ctx) {
+        visitChildren(ctx);
+        return null;
+    }
+
     */
+
+
 
 
 }

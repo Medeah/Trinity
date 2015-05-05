@@ -484,8 +484,17 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitNegate(TrinityParser.NegateContext ctx) {
-        emit("-");
-        ctx.expr().accept(this);
+        if (ctx.expr().t instanceof PrimitiveType) {
+            emit("-");
+            ctx.expr().accept(this);
+        }
+        else if (ctx.expr().t instanceof MatrixType) {
+            emit("fmmult(-1,");
+            ctx.expr().accept(this);
+            emit("," + ((MatrixType) ctx.expr().t).getRows());
+            emit("," + ((MatrixType) ctx.expr().t).getCols());
+            emit(")");
+        }
         return null;
     }
 

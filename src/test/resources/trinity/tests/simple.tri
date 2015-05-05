@@ -1,5 +1,6 @@
 Matrix[2,3] M = [2, 4, 6] [3, 5, 1];
 Matrix[2,3] N = -M;
+Matrix[3,2] T = M';
 
 Scalar m = 2;
 
@@ -12,8 +13,5 @@ Scalar b() do
     Scalar bix = 2;
     return 3 + a();
 end
-
-Boolean b = True;
-Boolean j = !b;
 
 print a();

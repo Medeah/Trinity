@@ -35,8 +35,8 @@ public class PrettyPrintTest {
         ParseTree tree = parser.prog();
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor();
 
-        String prettyPrinted = prettyPrinter.prettyfy(tree);
+        prettyPrinter.visit(tree);
 
-        assertEquals(pretty, prettyPrinted);
+        assertEquals(pretty, prettyPrinter.getString());
     }
 }

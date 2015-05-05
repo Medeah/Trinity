@@ -14,11 +14,10 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 
     private int indentLevel = 0;
     private int spaces = 0;
-    //TODO: fix output method
-    private String outputString = "";
+    final private StringBuilder builder = new StringBuilder ();
 
     private void emit(String string) {
-        outputString += string;
+        builder.append(string);
     }
 
     private void emit(ParseTree node) {
@@ -41,9 +40,8 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         this.spaces = spaces;
     }
 
-    public String prettyfy(ParseTree tree) {
-        this.visit(tree);
-        return outputString;
+    public String getString() {
+        return builder.toString();
     }
 
     @Override

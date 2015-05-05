@@ -151,6 +151,7 @@ public class Trinity {
         ANTLRInputStream input = new ANTLRFileStream(filename);
         ParseTree tree = parse(input).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
-        System.out.print(prettyPrinter.prettyfy(tree));
+        prettyPrinter.visit(tree);
+        System.out.print(prettyPrinter.getString());
     }
 }

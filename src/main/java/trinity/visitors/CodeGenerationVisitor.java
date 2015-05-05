@@ -38,6 +38,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
         output += stdlib();
 
+        output += "/* ENTRY POINT */\n";
+
         for(String g :  globals) {
             output += g + ";";
         }
@@ -45,7 +47,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         output += generateFunctions();
 
         //TODO: fix
-        output += ("int main(void){");
+        output += ("\nint main(void){");
         output += mainBody.toString();
         output += ("return 0;};"); //TODO: end-semi is just for indent.
 
@@ -121,18 +123,18 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     // TODO: who even know at this point...
+    private DependencyVisitor dependencyVisitor = new DependencyVisitor();
     private void emitDependencies(ParserRuleContext ctx) {
-        DependencyVisitor dependencyVisitor = new DependencyVisitor();
         Iterable<NeedInit> nis = ctx.accept(dependencyVisitor);
 
         // Init routine
         if (nis != null) {
             for (NeedInit ni : nis) {
-
-                emit("float " + ni.type.cgid + "[" + ni.items.size() + "];");
+                //TODO: it might be possible to get cgid merged into item expr, but we should probably redo all this s*** instead
+                emit("float " + ni.id + "[" + ni.items.size() + "];");
 
                 for (int i = 0; i < ni.items.size(); i++) {
-                    emit(ni.type.cgid + "[" + i + "]=");
+                    emit(ni.id + "[" + i + "]=");
                     ni.items.get(i).accept(this);
                     emit(";");
                 }
@@ -145,8 +147,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         visitChildren(ctx);
         return null;
     }*/
-
-
 
     @Override
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
@@ -349,6 +349,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        emitDependencies(ctx.semiExpr().expr());
         Type expType = ctx.semiExpr().expr().t;
         if (expType instanceof PrimitiveType) {
             if (((PrimitiveType) expType).getPType() == EnumType.SCALAR) {
@@ -561,7 +562,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
         // TODO: reconsider
-        emit(((MatrixType) ctx.t).cgid);
+        emit(ctx.cgid);
         return null;
     }
 
@@ -569,20 +570,20 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         // TODO: reconsider
-        emit(((MatrixType) ctx.t).cgid);
+        emit(ctx.cgid);
         return null;
     }
 
     @Override
     public Void visitVector(TrinityParser.VectorContext ctx) {
-        // TODO: THIS SHOULD NEVER BE CALLED
+        // TODO: This should neber be called
         System.out.println("ERROR: visitVector should not be called.");
         return null;
     }
 
     @Override
     public Void visitMatrix(TrinityParser.MatrixContext ctx) {
-        //TODO: fix
+        // TODO: This should neber be called
         System.out.println("ERROR: visitMatrix should not be called.");
         return null;
     }

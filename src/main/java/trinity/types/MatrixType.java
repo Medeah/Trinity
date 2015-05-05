@@ -4,11 +4,6 @@ public class MatrixType extends Type {
     final private int rows;
     final private int cols;
 
-    //TODO: find a better way! this should not be part of the type.
-    // Right now I use this variable to store the generated ids for pre-initialized matrices
-    // so they can be referenced later on.
-    public String cgid = "";
-
     public MatrixType(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;

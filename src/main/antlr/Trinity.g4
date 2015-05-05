@@ -41,8 +41,11 @@ stmt
 
 // Expressions
 
+// TODO: the cgid is a hack for doing dependency referencing :(
+// The variable stores the generated ids for pre-initialized matrices and vectors
+// so they can be referenced later on.
 expr
-locals [Type t]
+locals [Type t, String cgid]
     : ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing

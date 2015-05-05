@@ -7,25 +7,24 @@ import trinity.types.MatrixType;
 
 import java.util.ArrayList;
 
+// TODO: Find a way to initialize vectors and matrices before referencing them without all this hacky shit.
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> implements TrinityVisitor<Iterable<NeedInit>> {
 
-    //TODO: accept vectors instead
+    // TODO: accept vectors instead
     @Override
     public Iterable<NeedInit> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-        ((MatrixType)ctx.t).cgid = UniqueId.next();
+
+        ctx.cgid = UniqueId.next();
 
         NeedInit ni = new NeedInit();
-        ni.type = ((MatrixType)ctx.t);
-
+        ni.id = ctx.cgid;
         ni.items = new ArrayList<TrinityParser.ExprContext>();
 
         //TODO: fix this
-        if(ctx.matrix() != null){
+        if(ctx.matrix() != null) {
             for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
                 if (vector.exprList() != null) {
                     ni.items.addAll(vector.exprList().expr());
-
-                    //ni.id = ((MatrixType) ctx.t).cgid;
                 } else if (vector.range() != null) {
                     //ni.items = ctx.vector().range();
                     //TODO: range
@@ -37,28 +36,22 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
             //throw new Exception
             System.out.println("Congratz! This should not happen :D");
         }
-        //visitChildren(ctx);
 
-
-        assert ni.items.size() == ni.type.getCols() * ni.type.getRows();
-
-        //TODO: rewrite this context to id...
-
-        //TODO: null
-        //Iterable<NeedInit> exprs = ctx.vector().exprList().accept(this);
-        //return ImmutableList.copyOf(ctx.vector().exprList().expr());
-        //return ImmutableList.of(ni);
+        MatrixType type = ((MatrixType)ctx.t);
+        //TODO: ensure and remove
+        assert ni.items.size() == type.getCols() * type.getRows();
+        if(ni.items.size() != type.getCols() * type.getRows())
+            System.out.println("DV ERROR");
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
     }
 
     @Override
     public Iterable<NeedInit> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-        ((MatrixType)ctx.t).cgid = UniqueId.next();
+        ctx.cgid = UniqueId.next();
 
         NeedInit ni = new NeedInit();
-        ni.type = ((MatrixType)ctx.t);
-
+        ni.id = ctx.cgid;
         ni.items = new ArrayList<TrinityParser.ExprContext>();
 
         //TODO: fix this
@@ -67,8 +60,6 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
             TrinityParser.VectorContext vector = ctx.vector();
                 if (vector.exprList() != null) {
                     ni.items.addAll(vector.exprList().expr());
-
-                    //ni.id = ((MatrixType) ctx.t).cgid;
                 } else if (vector.range() != null) {
                     //ni.items = ctx.vector().range();
                     //TODO: range
@@ -80,26 +71,16 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
             //throw new Exception
             System.out.println("Congratz! This should not happen :D");
         }
-        //visitChildren(ctx);
 
-
+        MatrixType type = ((MatrixType)ctx.t);
         //TODO: ensure and remove
-        assert ni.items.size() == ni.type.getCols() * ni.type.getRows();
-        if(ni.items.size() != ni.type.getCols() * ni.type.getRows())
+        assert ni.items.size() == type.getCols() * type.getRows();
+        if(ni.items.size() != type.getCols() * type.getRows())
             System.out.println("DV ERROR");
-
-        //TODO: rewrite this context to id...
-
-        //TODO: null
-        //Iterable<NeedInit> exprs = ctx.vector().exprList().accept(this);
-        //return ImmutableList.copyOf(ctx.vector().exprList().expr());
-        //return ImmutableList.of(ni);
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
 
     }
-
-
 
     @Override
     protected Iterable<NeedInit> aggregateResult(Iterable<NeedInit> aggregate, Iterable<NeedInit> nextResult) {

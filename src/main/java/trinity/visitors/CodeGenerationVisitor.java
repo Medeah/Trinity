@@ -112,6 +112,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
             ctx.type().accept(this);
             emit(ctx.ID().getText());
+            emit(";");
 
             restoreEmitterContext();
 

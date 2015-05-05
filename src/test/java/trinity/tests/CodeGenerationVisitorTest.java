@@ -35,6 +35,12 @@ public class CodeGenerationVisitorTest {
         return CharStreams.toString(inr);
     }
 
+    @AfterClass
+    public static void removeFiles() throws Exception {
+        delete(FileSystems.getDefault().getPath("test.c"));
+        delete(FileSystems.getDefault().getPath("a.out"));
+    }
+
     @Test
     public void parseReturn() throws Exception {
         assertEquals("1.000000\n", getOutput("print 1;"));
@@ -46,10 +52,23 @@ public class CodeGenerationVisitorTest {
         assertEquals("1.000000\n", getOutput("print sin(1);"));
     }
 
-    @AfterClass
-    public static void removeFiles() throws Exception {
-        delete(FileSystems.getDefault().getPath("test.c"));
-        delete(FileSystems.getDefault().getPath("a.out"));
+    @Test
+    public void forLoop() throws Exception {
+        assertEquals("1.000000\n2.000000\n3.000000\n4.000000\n", getOutput("for Scalar s in [1,2,3,4] do print s; end"));
+        assertEquals("[1.000000, 2.000000]\n[3.000000, 4.000000]\n", getOutput("for Vector[2] v in [1,2][3,4] do print v; end"));
+        assertEquals("1.000000\n2.000000\n3.000000\n4.000000\n", getOutput("for Vector[2] v in [1,2][3,4] do for Scalar s in v do print s; end end"));
+
+        assertEquals("4.000000\n6.000000\n", getOutput("Vector[2] v = [4,6]; for Scalar s in v do print s; end"));
     }
+    @Test
+    public void declarations() throws Exception {
+        assertEquals("4.000000\n", getOutput("Scalar s = 4; print s;"));
+        assertEquals("[4.000000, 6.000000]\n", getOutput("Vector[2] v = [4,6]; print v;"));
+        assertEquals("[1.000000, 3.000000, 5.000000]\n[2.000000, 4.000000, 6.000000]\n", getOutput("Matrix[2,3] m = [1,2,3][4,5,6]; print m;"));
+        assertEquals("true\n", getOutput("Boolean b = true; print b;"));
+
+    }
+
+
 
 }

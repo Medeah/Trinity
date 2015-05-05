@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
-#include <omp.h>
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
@@ -48,7 +47,6 @@ float* transpose(float* A, int nrRowsA, int nrColsA) {
 	float* resMatrix;
 	resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
 
-	#pragma omp parallel for
     for(n = 0; n < nrRowsA * nrColsA; n++) {
         int i = n / nrRowsA;
         int j = n % nrRowsA;

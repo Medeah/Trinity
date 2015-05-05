@@ -73,13 +73,13 @@ public class CodeGenerationVisitorTest {
 
         assertEquals("4.000000\n6.000000\n", getOutput("Vector[2] v = [4,6]; for Scalar s in v do print s; end"));
     }
+
     @Test
     public void declarations() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar s = 4; print s;"));
         assertEquals("[4.000000, 6.000000]\n", getOutput("Vector[2] v = [4,6]; print v;"));
-        assertEquals("[1.000000, 3.000000, 5.000000]\n[2.000000, 4.000000, 6.000000]\n", getOutput("Matrix[2,3] m = [1,2,3][4,5,6]; print m;"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[4.000000, 5.000000, 6.000000]\n", getOutput("Matrix[2,3] m = [1,2,3][4,5,6]; print m;"));
         assertEquals("true\n", getOutput("Boolean b = true; print b;"));
-
     }
 
     @Ignore

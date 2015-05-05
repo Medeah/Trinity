@@ -4,7 +4,8 @@
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
-bool print_m(float *m, int r, int c) {
+/* TODO: maybe we don't need this */
+bool print_m_c(float *m, int r, int c) {
   int i, j;
   for(i = 0; i < r; i++) {
     printf("[");
@@ -12,6 +13,19 @@ bool print_m(float *m, int r, int c) {
       printf("%f, ", m[IDX2C(i, j, r)]);
     }
     printf("%f]\n", m[IDX2C(i, j, r)]);
+  }
+  return true;
+}
+
+/* TODO: define? */
+bool print_m(float *m, int r, int c) {
+  int i, j;
+  for(i = 0; i < r; i++) {
+    printf("[%f", m[i*c]);
+    for(j = 1; j < c ; j++) {
+      printf(", %f", m[j+i*c]);
+    }
+    printf("]\n");
   }
   return true;
 }

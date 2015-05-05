@@ -7,9 +7,9 @@ public interface ErrorReporter {
 
     int getErrorAmount();
 
-    //TODO: lav bedre desc af denne
+    void reportError(String message);
+
     void reportError(String message, Token token);
 
-    //TODO: lav bedre desc af denne
     void reportError(String message, ParserRuleContext ctx);
 }

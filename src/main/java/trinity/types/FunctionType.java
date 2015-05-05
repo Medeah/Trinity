@@ -39,10 +39,13 @@ public class FunctionType extends Type {
 
     @Override
     public String toString() {
-        String out = returnType.toString();
+        String out = "";
         for (Type t : parameterTypes) {
-            out += t.toString();
+            out += t.toString() + " -> ";
         }
+
+        out += returnType.toString();
+
         return out;
     }
 }

@@ -1,5 +1,6 @@
 package trinity.visitors;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import trinity.customExceptions.SymbolAlreadyDefinedException;
 import trinity.customExceptions.SymbolNotFoundException;
@@ -10,16 +11,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
-    public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
-        this.errorReporter = errorReporter;
-        this.symbolTable = symbolTable;
-    }
 
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
     private final Type scalar = new PrimitiveType(EnumType.SCALAR);
     private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
+
+    public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
+        this.errorReporter = errorReporter;
+        this.symbolTable = symbolTable;
+
+        addstdlib();
+    }
+
+    private void addstdlib() {
+        Type numFunc = new FunctionType(scalar, ImmutableList.of(scalar));
+        List<String> funcs = ImmutableList.of("abs", "round", "floor", "ceil", "sin", "cos", "tan", "asin", "acos", "atan", "log", "log10", "sqrt");
+        try {
+            for (String func : funcs) {
+                symbolTable.enterSymbol(func, numFunc);
+            }
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("error adding standard library to symbol table");
+        }
+    }
 
     private boolean expect(Type expected, Type actual, ParserRuleContext ctx) {
         if (expected.equals(actual)) {
@@ -116,7 +132,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 }
             }
             ctx.t = type;
-            return funcType.getType();
+            return ctx.t = funcType.getType();
         } else {
             errorReporter.reportError(ctx.ID().getText() + " is not a function", ctx.getStart());
             return null;

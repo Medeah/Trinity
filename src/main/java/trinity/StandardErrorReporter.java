@@ -19,9 +19,16 @@ public class StandardErrorReporter implements ErrorReporter {
     }
 
     private void errorHandling(int line, int schar, String message) {
-        printError(line, schar, message);
-
         errorAmount++;
+
+        System.err.println(line + ":" + schar + " -> " + message);
+    }
+
+    @Override
+    public void reportError(String message) {
+        errorHandling(0, 0, message);
+
+        testFailOnError();
     }
 
     @Override
@@ -46,10 +53,6 @@ public class StandardErrorReporter implements ErrorReporter {
         }
 
         testFailOnError();
-    }
-
-    private void printError(int line, int schar, String message) {
-        System.err.println(line + ":" + schar + " -> " + message);
     }
 
     private void testFailOnError() {

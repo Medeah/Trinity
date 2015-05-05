@@ -54,6 +54,9 @@ public class Trinity {
         //TODO: remove me son
         //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
         options.files.add("src/test/resources/trinity/tests/simple.tri");
+        //options.files.add("src/test/resources/trinity/tests/print.tri");
+
+        options.formatc = true;
 
         if (options.version) {
             System.out.println("Trinity 0.1");
@@ -82,7 +85,7 @@ public class Trinity {
                     }
                 }
 
-                Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
+                Process process = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
                 if (process.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
@@ -92,7 +95,10 @@ public class Trinity {
             System.out.println("File not found: " + ex.getMessage());
             System.exit(1);
             //jc.usage();
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            System.exit(1);
+        } catch (TypeCheckException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
         }
@@ -131,7 +137,7 @@ public class Trinity {
             throw new ParseException("Input contains syntax errors.");
         }
 
-        return new Pair<ParseTree, TrinityParser>(tree, parser);
+        return new Pair<>(tree, parser);
 
     }
 

@@ -219,7 +219,13 @@ public class TypeVisitorTest {
     }
 
     @Test
-    public void ifBirdsCouldFly() throws Exception {
+    public void printTest() throws Exception {
+        assertTrue(typeCheck("print 1+1;"));
+        assertFalse(typeCheck("print 1+true;"));
+    }
+
+    @Test
+    public void ifTest() throws Exception {
         assertTrue(typeCheck("if true then 1+2; end"));
         assertTrue(typeCheck("if false then 1+3; elseif true then 1+2; end"));
         assertTrue(typeCheck("if false then 1+2; elseif true then 1+2; else 1+2; end"));

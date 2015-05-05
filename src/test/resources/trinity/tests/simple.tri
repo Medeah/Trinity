@@ -1,2 +1,22 @@
-Scalar a = 2 + 3;
-Scalar b = 2;
+Matrix[2,3] M = [2, 4, 6] [3, 5, 1];
+Matrix[2,3] N = -M;
+Matrix[3,2] T = M';
+
+Scalar m = 2;
+
+Scalar a() do
+    Scalar ai = 2;
+    return 4 + ai + m;
+end
+
+Scalar b() do
+    Scalar bi = 2;
+    return 2 + bi + a();
+end
+
+#print a();
+
+
+for Scalar gideon in [1,23,4,5,6,6,7,7,678] do
+    print gideon;
+end

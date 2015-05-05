@@ -149,7 +149,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     errorReporter.reportError("Incorrect return type for function", ctx.semiExpr());
                 }
             } catch (SymbolNotFoundException e) {
-                errorReporter.reportError("No fuction to return from", ctx.semiExpr());
+                errorReporter.reportError("No function to return from", ctx.semiExpr());
 
             }
             return returnType;
@@ -183,7 +183,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), contextType);
         } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("ID already exsists: " + ctx.ID().getText(), ctx.ID().getSymbol());
+            errorReporter.reportError("ID already exists: " + ctx.ID().getText(), ctx.ID().getSymbol());
         }
         ctx.block().accept(this);
 

@@ -17,22 +17,22 @@ m';
 
 # Loops and enumeration
 for Scalar s in v do
- print(s);
+ print s;
 end
 
-for Scalar v in [1,2,3] do print(0); end
+for Scalar v in [1,2,3] do print 0 ; end
 
-for Scalar v in [1..5] do for Scalar x in [1,2] do print(0); end end
+for Scalar v in [1..5] do for Scalar x in [1,2] do print 0 ; end end
 
 Scalar mathias() do
-if frederik then for Scalar s in [1..10] do print(10); end else for Scalar v in [1,2][1,2] do 1+1; end end
+if frederik then for Scalar s in [1..10] do print 10; end else for Scalar v in [1,2][1,2] do 1+1; end end
 end
 
 # Conditionals
 if m == v * v then   Matrix[2,1] x = [1][0];
 elseif 1 +2 != 4 or 5 ==2 + 2 then
-print(m);
-elseif true and false then print(  m); else
+print m ;
+elseif true and false then print  m; else
     Scalar leet = 1337; end
 
 if !something then

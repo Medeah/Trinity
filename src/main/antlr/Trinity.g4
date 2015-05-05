@@ -36,12 +36,16 @@ stmt
       ('elseif' expr 'then' block)*
       ('else' block)? 'end'                     # IfStatement
     | 'do' block 'end'                          # BlockStatement
+    | 'print' semiExpr                          # PrintStatement
     ;
 
 // Expressions
 
+// TODO: the cgid is a hack for doing dependency referencing :(
+// The variable stores the generated ids for pre-initialized matrices and vectors
+// so they can be referenced later on.
 expr
-locals [Type t]
+locals [Type t, String cgid]
     : ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing
@@ -67,4 +71,4 @@ exprList: expr (',' expr)* ;
 
 vector: '[' (exprList | range) ']' ;
 matrix: vector vector+ ;
-range:   NUMBER '..' NUMBER ;
+range:  NUMBER '..' NUMBER ;

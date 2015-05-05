@@ -82,12 +82,12 @@ public class CodeGenerationVisitorTest {
         assertEquals("true\n", getOutput("Boolean b = true; print b;"));
     }
 
-    @Ignore
+    @Test
     public void negation() throws Exception {
         assertEquals("-1.000000\n", getOutput("Scalar m = 1; Scalar n = -m; print n;"));
         assertEquals("3.000000\n", getOutput("Scalar m= -1; print -m;"));
         assertEquals("[-1.000000, -2.000000, -3.000000, -4.000000]\n", getOutput("Vector[4] v = [1, 2, 3, 4]; Vector[4] o = -v; print o;"));
-        assertEquals("[-1.000000, -2.000000]\n[-3.000000, -4.000000]\n[-5.000000, -1.000000]\n[-6.000000, -2.000000]\n", getOutput("Matrix[4,2] M = [1, 2][3, 4][5, 6][7, 8]; print -M;"));
+        assertEquals("[-1.000000, -2.000000]\n[-3.000000, -4.000000]\n[-5.000000, -1.000000]\n[-6.000000, -2.000000]\n", getOutput("Matrix[4,2] M = [1, 2][3, 4][5, 1][6, 2]; print -M;"));
     }
 
     @Ignore

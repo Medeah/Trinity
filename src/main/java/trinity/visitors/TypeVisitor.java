@@ -131,7 +131,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
             }
-            ctx.t = type;
             return ctx.t = funcType.getType();
         } else {
             errorReporter.reportError(ctx.ID().getText() + " is not a function", ctx.getStart());

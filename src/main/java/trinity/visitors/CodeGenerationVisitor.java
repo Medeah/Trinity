@@ -299,8 +299,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
             ctx.block().accept(this);
 
-            if (!vinm) emit(" printf(\"%f\\n\", res);"); //TODO: remove me
-
             emit("}");
         } else {
             // TODO: is this safe to remove.
@@ -368,6 +366,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emit("," + ((MatrixType) expType).getCols());
             emit(");");
         } else {
+            // TODO: functioncall should pass expType !!!!!!!
             emit("printf(" + expType.toString() + ");");
         }
         return null;

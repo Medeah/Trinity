@@ -46,10 +46,23 @@ public class CodeGenerationVisitorTest {
         assertEquals("1.000000\n", getOutput("print 1;"));
     }
 
-    //TODO : mange flere tests
-    @Ignore
-    public void sin() throws Exception {
-        assertEquals("1.000000\n", getOutput("print sin(1);"));
+    @Test
+    public void stdlib() throws Exception {
+        assertEquals("1.000000\n", getOutput("print abs(-1);"));
+        assertEquals("1.000000\n", getOutput("print abs(1);"));
+        assertEquals("1.000000\n", getOutput("print round(1.23);"));
+        assertEquals("1.000000\n", getOutput("print floor(1.23);"));
+        assertEquals("2.000000\n", getOutput("print ceil(1.23);"));
+        assertEquals("0.841471\n", getOutput("print sin(1);"));
+        assertEquals("0.540302\n", getOutput("print cos(1);"));
+        assertEquals("1.557408\n", getOutput("print tan(1);"));
+        assertEquals("0.523599\n", getOutput("print asin(0.5);"));
+        assertEquals("1.047198\n", getOutput("print acos(0.5);"));
+        assertEquals("0.785398\n", getOutput("print atan(1);"));
+        assertEquals("2.302585\n", getOutput("print log(10);"));
+        assertEquals("2.000000\n", getOutput("print log10(100);"));
+        assertEquals("10.000000\n", getOutput("print sqrt(100);"));
+        assertEquals("1.414214\n", getOutput("print sqrt(2);"));
     }
 
     @Test

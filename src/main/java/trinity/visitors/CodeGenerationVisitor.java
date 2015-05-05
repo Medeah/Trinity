@@ -130,7 +130,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         setEmitterContext(funcBody);
 
         ctx.type().accept(this);
-        emit(ctx.ID().getText());
+        emit("_" + ctx.ID().getText());
         emit("(");
         if (ctx.formalParameters() != null) {
             ctx.formalParameters().accept(this);
@@ -447,7 +447,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
-        emit(ctx.ID().getText());
+        emit("_" + ctx.ID().getText());
         emit("(");
         if (ctx.exprList() != null) {
             ctx.exprList().accept(this);

@@ -51,10 +51,7 @@ public class Trinity {
     public static void main(String[] args) throws Exception {
         JCommander jc = new JCommander(options, args);
 
-        //TODO: remove me son
-        //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
         options.files.add("src/test/resources/trinity/tests/simple.tri");
-        //options.files.add("src/test/resources/trinity/tests/print.tri");
 
         options.formatc = true;
 

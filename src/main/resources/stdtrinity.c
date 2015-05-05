@@ -101,7 +101,7 @@ float _log(float s) {
 }
 
 float _log10(float s) {
-  return log(s);
+  return log10(s);
 }
 
 float _sqrt(float s) {

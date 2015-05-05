@@ -344,12 +344,21 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitExponent(TrinityParser.ExponentContext ctx) {
-        // TODO: exponent on types???
-        ctx.expr(0).accept(this);
+        if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+            emit("pow(");
+            ctx.expr(0).accept(this);
+            emit(",");
+            ctx.expr(1).accept(this);
+            emit(")");
+        }
+        else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
+            emit("mfexpo(");
+            emit(")");
+        }
 
-        ctx.expr(1).accept(this);
         return null;
     }
+
 
     @Override
     public Void visitParens(TrinityParser.ParensContext ctx) {

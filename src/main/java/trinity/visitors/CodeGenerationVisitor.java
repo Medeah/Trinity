@@ -533,14 +533,14 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitVector(TrinityParser.VectorContext ctx) {
-        // TODO: This should neber be called
+        // TODO: This should never be called
         System.out.println("ERROR: visitVector should not be called.");
         return null;
     }
 
     @Override
     public Void visitMatrix(TrinityParser.MatrixContext ctx) {
-        // TODO: This should neber be called
+        // TODO: This should never be called
         System.out.println("ERROR: visitMatrix should not be called.");
         return null;
     }

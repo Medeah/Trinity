@@ -169,8 +169,6 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Scalar s() do return 3; end Scalar t = s();"));
         assertTrue(typeCheck("Vector[3] mat(Vector[3] a, Vector[3] b, Vector[3] c) do return [a[1], b[2], c[3]]; end Vector[3] v = mat([3,4,5], [5,6,7], [1,8,7]);"));
         assertFalse(typeCheck("Scalar s = 2; s();"));
-        //TODO: right now this is valid since parameters exists in body scope?
-        //assertFalse(typeCheck("Scalar s (Scalar s) do return s; end Scalar t = s(1);"));
     }
 
     @Test

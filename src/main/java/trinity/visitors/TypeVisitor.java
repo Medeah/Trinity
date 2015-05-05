@@ -68,10 +68,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
 
-        Type funcType = ctx.type().accept(this);
+        Type returnType = ctx.type().accept(this);
 
-        List<String> formalParameterIds = new ArrayList<String>();
-        List<Type> formalParameterTypes = new ArrayList<Type>();
+        List<String> formalParameterIds = new ArrayList<>();
+        List<Type> formalParameterTypes = new ArrayList<>();
 
         if (ctx.formalParameters() != null) {
             for (TrinityParser.FormalParameterContext formalParameter : ctx.formalParameters().formalParameter()) {
@@ -80,7 +80,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
         }
 
-        FunctionType functionDecl = new FunctionType(funcType, formalParameterTypes);
+        FunctionType functionDecl = new FunctionType(returnType, formalParameterTypes);
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
         } catch (SymbolAlreadyDefinedException e) {
@@ -90,7 +90,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         symbolTable.openScope();
         symbolTable.setCurrentFunction(functionDecl);
 
-        assert formalParameterIds.size() == formalParameterTypes.size();
+        if (formalParameterIds.size() != formalParameterTypes.size()) {
+            errorReporter.reportError("internel compiler error");
+        }
 
         for (int i = 0; i < formalParameterTypes.size(); i++) {
             try {

@@ -128,7 +128,6 @@ main (void)
   print_m (test, 1, 2);
   print_s (2 + 2);
   print_b (2 == 3);
-  print_s (sin (1));
-  sin (3);
+  yooyoyprintf (Scalar->Scalar);
   return 0;
 };

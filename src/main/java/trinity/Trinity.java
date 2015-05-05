@@ -105,8 +105,18 @@ public class Trinity {
 
     }
 
-    private static String compile(String filename) throws Exception {
-        Pair<ParseTree, TrinityParser> r = parse(filename);
+    public static String compiles(String trinityProgram) throws Exception{
+        ANTLRInputStream input = new ANTLRInputStream(trinityProgram);
+        return compile(input);
+    }
+
+    public static String compile(String filename) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filename);
+        return compile(input);
+    }
+
+    private static String compile(ANTLRInputStream is) throws Exception {
+        Pair<ParseTree, TrinityParser> r = parse(is);
         ParseTree tree = r.a;
         TrinityParser parser = r.b;
 
@@ -126,9 +136,8 @@ public class Trinity {
         return out;
     }
 
-    private static Pair<ParseTree, TrinityParser> parse(String filename) throws Exception {
-        ANTLRInputStream input = new ANTLRFileStream(filename);
-        trinity.TrinityLexer lexer = new TrinityLexer(input);
+    private static Pair<ParseTree, TrinityParser> parse(ANTLRInputStream is) throws Exception {
+        trinity.TrinityLexer lexer = new TrinityLexer(is);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
         ParseTree tree = parser.prog();
@@ -142,7 +151,8 @@ public class Trinity {
     }
 
     private static void prettyPrint(String filename, int indentation) throws Exception {
-        ParseTree tree = parse(filename).a;
+        ANTLRInputStream input = new ANTLRFileStream(filename);
+        ParseTree tree = parse(input).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         System.out.print(prettyPrinter.prettyfy(tree));
     }

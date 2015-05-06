@@ -1,5 +1,6 @@
 package trinity.visitors;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import trinity.customExceptions.SymbolAlreadyDefinedException;
 import trinity.customExceptions.SymbolNotFoundException;
@@ -10,16 +11,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
-    public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
-        this.errorReporter = errorReporter;
-        this.symbolTable = symbolTable;
-    }
 
     private ErrorReporter errorReporter;
     private SymbolTable symbolTable;
 
     private final Type scalar = new PrimitiveType(EnumType.SCALAR);
     private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
+
+    public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
+        this.errorReporter = errorReporter;
+        this.symbolTable = symbolTable;
+
+        addstdlib();
+    }
+
+    private void addstdlib() {
+        Type numFunc = new FunctionType(scalar, ImmutableList.of(scalar));
+        List<String> funcs = ImmutableList.of("abs", "round", "floor", "ceil", "sin", "cos", "tan", "asin", "acos", "atan", "log", "log10", "sqrt");
+        try {
+            for (String func : funcs) {
+                symbolTable.enterSymbol(func, numFunc);
+            }
+        } catch (SymbolAlreadyDefinedException e) {
+            errorReporter.reportError("error adding standard library to symbol table");
+        }
+    }
 
     private boolean expect(Type expected, Type actual, ParserRuleContext ctx) {
         if (expected.equals(actual)) {
@@ -52,10 +68,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     @Override
     public Type visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
 
-        Type funcType = ctx.type().accept(this);
+        Type returnType = ctx.type().accept(this);
 
-        List<String> formalParameterIds = new ArrayList<String>();
-        List<Type> formalParameterTypes = new ArrayList<Type>();
+        List<String> formalParameterIds = new ArrayList<>();
+        List<Type> formalParameterTypes = new ArrayList<>();
 
         if (ctx.formalParameters() != null) {
             for (TrinityParser.FormalParameterContext formalParameter : ctx.formalParameters().formalParameter()) {
@@ -64,7 +80,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
         }
 
-        FunctionType functionDecl = new FunctionType(funcType, formalParameterTypes);
+        FunctionType functionDecl = new FunctionType(returnType, formalParameterTypes);
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), functionDecl);
         } catch (SymbolAlreadyDefinedException e) {
@@ -74,7 +90,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         symbolTable.openScope();
         symbolTable.setCurrentFunction(functionDecl);
 
-        assert formalParameterIds.size() == formalParameterTypes.size();
+        if (formalParameterIds.size() != formalParameterTypes.size()) {
+            errorReporter.reportError("internel compiler error");
+        }
 
         for (int i = 0; i < formalParameterTypes.size(); i++) {
             try {
@@ -115,8 +133,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
             }
-            ctx.t = type;
-            return funcType.getType();
+            return ctx.t = funcType.getType();
         } else {
             errorReporter.reportError(ctx.ID().getText() + " is not a function", ctx.getStart());
             return null;
@@ -142,20 +159,25 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             ctx.stmt(i).accept(this);
         }
 
-        if (ctx.semiExpr() != null) {
-            Type returnType = ctx.semiExpr().accept(this);
-            try {
-                if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
-                    errorReporter.reportError("Incorrect return type for function", ctx.semiExpr());
-                }
-            } catch (SymbolNotFoundException e) {
-                errorReporter.reportError("No fuction to return from", ctx.semiExpr());
-
-            }
-            return returnType;
+        if (ctx.returnStmt() != null) {
+            return ctx.returnStmt().accept(this);
         }
 
         return null;
+    }
+
+    @Override
+    public Type visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        Type returnType = ctx.semiExpr().accept(this);
+        try {
+            if (!returnType.equals(symbolTable.getCurrentFunction().getType())) {
+                errorReporter.reportError("Incorrect return type for function", ctx.semiExpr());
+            }
+        } catch (SymbolNotFoundException e) {
+            errorReporter.reportError("No function to return from", ctx.semiExpr());
+
+        }
+        return returnType;
     }
 
     @Override
@@ -183,7 +205,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         try {
             symbolTable.enterSymbol(ctx.ID().getText(), contextType);
         } catch (SymbolAlreadyDefinedException e) {
-            errorReporter.reportError("ID already exsists: " + ctx.ID().getText(), ctx.ID().getSymbol());
+            errorReporter.reportError("ID already exists: " + ctx.ID().getText(), ctx.ID().getSymbol());
         }
         ctx.block().accept(this);
 
@@ -457,52 +479,51 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
         String operator = ctx.op.getText();
-        Type out = null;
 
-
-        if (operator.equals("*")) {
-            if (op1.equals(bool) || op2.equals(bool)) {
-                errorReporter.reportError("Cannot mult or div boolean", ctx);
-                out = null;
-            } else if (op1.equals(scalar)) {
-                out = op2;
-            }
-            // Nx1
-            else if (op1 instanceof MatrixType) {
+        if (op1.equals(bool) || op2.equals(bool)) {
+            errorReporter.reportError("Cannot mult or div boolean", ctx);
+            ctx.t = null;
+        } else if (op1.equals(scalar)) {
+            ctx.t = op2;
+        } else if (op1 instanceof MatrixType) {
+            if (operator.equals("*")) {
+                // Nx1
                 if (op2.equals(scalar)) {
-                    out = op1;
+                    ctx.t = op1;
                 } else if (op2 instanceof MatrixType) {
                     MatrixType matrix1 = (MatrixType) op1;
                     MatrixType matrix2 = (MatrixType) op2;
 
                     // Vector dot product
                     if (matrix1.getRows() == 1 && matrix2.getRows() == 1 && matrix1.getCols() == matrix2.getCols()) {
-                        out = scalar;
+                        ctx.t = scalar;
                     } else
 
                         // Matrix multiplication
                         if (matrix1.getCols() == matrix2.getRows()) {
-                            out = new MatrixType(matrix1.getRows(), matrix2.getCols());
+                            ctx.t = new MatrixType(matrix1.getRows(), matrix2.getCols());
                         } else {
                             errorReporter.reportError("Size mismatch", ctx);
-                            out = null;
+                            ctx.t = null;
                         }
                 } else {
                     errorReporter.reportError("Cannot multiply matrix with " + op2, ctx);
-                    out = null;
+                    ctx.t = null;
+                }
+            } else if (operator.equals("/")) {
+                if (op2.equals(scalar)) {
+                    ctx.t = op1;
+                } else {
+                    errorReporter.reportError("Cannot divde matrix with " + op2, ctx);
+                    ctx.t = null;
                 }
             }
-        } else if (operator.equals("/")) {
-            expect(scalar, op1, ctx.expr(0));
-            expect(scalar, op2, ctx.expr(1));
-            out = scalar;
-
         } else {
             errorReporter.reportError("what?", ctx);
-            out = null;
+            ctx.t = null;
         }
-        ctx.t = out;
-        return out;
+
+        return ctx.t;
     }
 
     @Override

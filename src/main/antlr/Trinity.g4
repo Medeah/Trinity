@@ -24,7 +24,9 @@ type
 
 // Statements
 
-block: stmt* ('return' semiExpr)? ;
+block: stmt* returnStmt? ;
+
+returnStmt: 'return' semiExpr ;
 
 semiExpr: expr ';';
 
@@ -36,12 +38,13 @@ stmt
       ('elseif' expr 'then' block)*
       ('else' block)? 'end'                     # IfStatement
     | 'do' block 'end'                          # BlockStatement
+    | 'print' semiExpr                          # PrintStatement
     ;
 
 // Expressions
 
 expr
-locals [Type t]
+locals [Type t, String ref]
     : ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing
@@ -67,4 +70,4 @@ exprList: expr (',' expr)* ;
 
 vector: '[' (exprList | range) ']' ;
 matrix: vector vector+ ;
-range:   NUMBER '..' NUMBER ;
+range:  NUMBER '..' NUMBER ;

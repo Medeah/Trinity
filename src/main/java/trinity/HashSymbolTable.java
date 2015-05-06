@@ -101,7 +101,6 @@ public class HashSymbolTable implements SymbolTable {
         return hashTable.containsKey(id) && hashTable.get(id).depth == getCurrentScopeDepth();
     }
 
-    // TODO can we do better?
     public FunctionType getCurrentFunction() throws SymbolNotFoundException {
         return (FunctionType) retrieveSymbol("##func");
     }

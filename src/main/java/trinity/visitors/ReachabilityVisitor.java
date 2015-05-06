@@ -76,7 +76,14 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     }
 
     @Override
-    public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx){
+    public Boolean visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        // TODO: update visitBlock to accommodate this new rule.
+        return false;
+    }
+
+
+    @Override
+    public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
         // Simply return whatever the block returns, but do accept empty blocks.
         return ctx.block().accept(this);
     }

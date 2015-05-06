@@ -8,17 +8,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
+import trinity.UniqueId;
 import trinity.types.Type;
 
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
     private int indentLevel = 0;
     private int spaces = 0;
-    //TODO: fix output method
-    private String outputString = "";
+    // TODO: builder should maybe be initialised during visit so it doesn't duplicate.
+    final private StringBuilder builder = new StringBuilder ();
 
     private void emit(String string) {
-        outputString += string;
+        builder.append(string);
     }
 
     private void emit(ParseTree node) {
@@ -37,13 +38,13 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         this(4);
     }
 
+    // Pretty print visitor for Trinity, will remove comments
     public PrettyPrintVisitor(int spaces) {
         this.spaces = spaces;
     }
 
-    public String prettyfy(ParseTree tree) {
-        this.visit(tree);
-        return outputString;
+    public String getString() {
+        return builder.toString();
     }
 
     @Override
@@ -104,14 +105,20 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
             ctx.stmt(i).accept(this);
             emit(System.lineSeparator());
         }
-        if (ctx.semiExpr() != null) {
-            indent();
-            emit("return ");
-            ctx.semiExpr().accept(this);
-            emit(System.lineSeparator());
+        if (ctx.returnStmt() != null) {
+            ctx.returnStmt().accept(this);
         }
         this.indentLevel--;
         indent();
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        indent();
+        emit("return ");
+        ctx.semiExpr().accept(this);
+        emit(System.lineSeparator());
         return null;
     }
 
@@ -193,6 +200,13 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         emit("do");
         ctx.block().accept(this);
         emit("end");
+        return null;
+    }
+
+    @Override
+    public Object visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        emit("print ");
+        ctx.semiExpr().accept(this);
         return null;
     }
 
@@ -390,27 +404,5 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     public Object visitErrorNode(ErrorNode node) {
         return null;
     }
-
-    // TODO: comment stuff / remove
-//    BufferedTokenStream tokens;
-//    TokenStreamRewriter rewriter;
-//
-//    public trinity.visitors.PrettyPrintVisitor(BufferedTokenStream tokens) {
-//        this.tokens = tokens;
-//        rewriter = new TokenStreamRewriter(tokens);
-//    }
-
-//        Token semi = ctx.getStop();
-//        int i = semi.getTokenIndex();
-//        List<Token> cmtChannel = tokens.getHiddenTokensToRight(i, TrinityLexer.COMMENT);
-//        if (cmtChannel != null) {
-//            Token cmt = cmtChannel.get(0);
-//            if (cmt != null) {
-//                String txt = cmt.getText().substring(2);
-//                String newCmt = "/* " + txt.trim() + " */\n";
-//                rewriter.insertBefore(ctx.start, newCmt);
-//                rewriter.replace(cmt, "\n");
-//            }
-//        }
 
 }

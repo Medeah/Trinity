@@ -15,6 +15,9 @@ import trinity.visitors.TypeVisitor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class Trinity {
 
     private static class CommandLineOptions {
         @Parameter(description = "filename")
-        private List<String> files = new ArrayList<String>();
+        private List<String> files = new ArrayList<>();
 
         @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
         private boolean prettyPrint;
@@ -51,9 +54,9 @@ public class Trinity {
     public static void main(String[] args) throws Exception {
         JCommander jc = new JCommander(options, args);
 
-        //TODO: remove me son
-        //options.files.add("src/test/resources/trinity/tests/parsing-tests-edit.tri");
         options.files.add("src/test/resources/trinity/tests/simple.tri");
+
+        options.formatc = true;
 
         if (options.version) {
             System.out.println("Trinity 0.1");
@@ -64,8 +67,8 @@ public class Trinity {
             jc.usage();
             System.exit(1);
         }
-        String file = options.files.get(0);
-        String filename = getNameWithoutExtension(file);
+        Path file = Paths.get(options.files.get(0));
+        String filename = getNameWithoutExtension(file.toString());
         try {
             if (options.prettyPrint) {
                 prettyPrint(file, options.indentation);
@@ -82,7 +85,7 @@ public class Trinity {
                     }
                 }
 
-                Process process = new ProcessBuilder(options.ccompiler, filename + ".c").start();
+                Process process = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
                 if (process.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
@@ -92,15 +95,28 @@ public class Trinity {
             System.out.println("File not found: " + ex.getMessage());
             System.exit(1);
             //jc.usage();
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            System.exit(1);
+        } catch (TypeCheckException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
         }
 
     }
 
-    private static String compile(String filename) throws Exception {
-        Pair<ParseTree, TrinityParser> r = parse(filename);
+    public static String compile(String trinityProgram) throws Exception{
+        ANTLRInputStream input = new ANTLRInputStream(trinityProgram);
+        return compile(input);
+    }
+
+    public static String compile(Path filePath) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filePath.toString());
+        return compile(input);
+    }
+
+    private static String compile(ANTLRInputStream is) throws Exception {
+        Pair<ParseTree, TrinityParser> r = parse(is);
         ParseTree tree = r.a;
         TrinityParser parser = r.b;
 
@@ -111,18 +127,18 @@ public class Trinity {
 
         typeChecker.visit(tree);
         if (reporter.getErrorAmount() > 0) {
-            throw new TypeCheckException("To many type errors aborting");
+            throw new TypeCheckException("Too many type errors aborting");
         }
 
         CodeGenerationVisitor generator = new CodeGenerationVisitor();
-        String out = generator.generate(tree);
+        generator.visit(tree);
+        String out = generator.getOutput();
 
         return out;
     }
 
-    private static Pair<ParseTree, TrinityParser> parse(String filename) throws Exception {
-        ANTLRInputStream input = new ANTLRFileStream(filename);
-        trinity.TrinityLexer lexer = new TrinityLexer(input);
+    private static Pair<ParseTree, TrinityParser> parse(ANTLRInputStream is) throws Exception {
+        trinity.TrinityLexer lexer = new TrinityLexer(is);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TrinityParser parser = new TrinityParser(tokens);
         ParseTree tree = parser.prog();
@@ -131,13 +147,15 @@ public class Trinity {
             throw new ParseException("Input contains syntax errors.");
         }
 
-        return new Pair<ParseTree, TrinityParser>(tree, parser);
+        return new Pair<>(tree, parser);
 
     }
 
-    private static void prettyPrint(String filename, int indentation) throws Exception {
-        ParseTree tree = parse(filename).a;
+    private static void prettyPrint(Path filename, int indentation) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filename.toString());
+        ParseTree tree = parse(input).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
-        System.out.print(prettyPrinter.prettyfy(tree));
+        prettyPrinter.visit(tree);
+        System.out.print(prettyPrinter.getString());
     }
 }

@@ -124,6 +124,13 @@ public class TypeVisitorTest {
     }
 
     @Test
+    public void matrixDivision() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] / 3;"));
+        assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] / [1,2][3,4];"));
+        assertTrue(typeCheck("Scalar a = 6 / 3;"));
+    }
+
+    @Test
     public void matrixAddition() throws Exception {
         assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2][3,4];"));
         assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2];"));
@@ -169,14 +176,18 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Scalar s() do return 3; end Scalar t = s();"));
         assertTrue(typeCheck("Vector[3] mat(Vector[3] a, Vector[3] b, Vector[3] c) do return [a[1], b[2], c[3]]; end Vector[3] v = mat([3,4,5], [5,6,7], [1,8,7]);"));
         assertFalse(typeCheck("Scalar s = 2; s();"));
-        //TODO: right now this is valid since parameters exists in body scope?
-        //assertFalse(typeCheck("Scalar s (Scalar s) do return s; end Scalar t = s(1);"));
     }
 
     @Test
     public void testFunctionCall() throws Exception {
         assertTrue(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(1, [1,2]);"));
         assertFalse(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(true, 1);"));
+
+        assertTrue(typeCheck("Boolean x(Scalar s) do return true; end Boolean b = x(2);"));
+        assertFalse(typeCheck("Boolean x(Scalar s) do return true; end Scalar b = x(2);"));
+        assertTrue(typeCheck("Boolean x(Scalar s) do return true; end Boolean b = x(2) and false;"));
+        assertTrue(typeCheck("Boolean x(Scalar s) do return true; end  print x(1);"));
+
     }
 
     @Test
@@ -219,7 +230,13 @@ public class TypeVisitorTest {
     }
 
     @Test
-    public void ifBirdsCouldFly() throws Exception {
+    public void printTest() throws Exception {
+        assertTrue(typeCheck("print 1+1;"));
+        assertFalse(typeCheck("print 1+true;"));
+    }
+
+    @Test
+    public void ifTest() throws Exception {
         assertTrue(typeCheck("if true then 1+2; end"));
         assertTrue(typeCheck("if false then 1+3; elseif true then 1+2; end"));
         assertTrue(typeCheck("if false then 1+2; elseif true then 1+2; else 1+2; end"));

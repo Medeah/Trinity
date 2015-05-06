@@ -387,10 +387,14 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emit("*");
             ctx.expr(1).accept(this);
         } else {
-            emit("_mult(");
+            emit("mmmult(");
             ctx.expr(0).accept(this);
+            emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+            emit("," + ((MatrixType) ctx.expr(0).t).getCols());
             emit(",");
             ctx.expr(1).accept(this);
+            emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+            emit("," + ((MatrixType) ctx.expr(1).t).getCols());
             emit(")");
         }
         return null;

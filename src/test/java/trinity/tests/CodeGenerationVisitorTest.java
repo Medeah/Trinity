@@ -85,17 +85,18 @@ public class CodeGenerationVisitorTest {
     @Test
     public void negation() throws Exception {
         assertEquals("-1.000000\n", getOutput("Scalar m = 1; Scalar n = -m; print n;"));
-        assertEquals("3.000000\n", getOutput("Scalar m= -1; print -m;"));
+        assertEquals("3.000000\n", getOutput("Scalar m= -3; print -m;"));
         assertEquals("[-1.000000, -2.000000, -3.000000, -4.000000]\n", getOutput("Vector[4] v = [1, 2, 3, 4]; Vector[4] o = -v; print o;"));
         assertEquals("[-1.000000, -2.000000]\n[-3.000000, -4.000000]\n[-5.000000, -1.000000]\n[-6.000000, -2.000000]\n", getOutput("Matrix[4,2] M = [1, 2][3, 4][5, 1][6, 2]; print -M;"));
     }
 
     @Ignore
     public void multiplication() throws Exception {
-        assertEquals("[2, 4, 6, 8, 10]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Scalar j = 2; print v*j;"));
+        assertEquals("125\n", "scalar a = 5; scalar b = 25; scalar r = a * b; print r;");
+        //assertEquals("[2, 4, 6, 8, 10]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Scalar j = 2; Vector k = v*j; print k;"));
     }
 
-    @Test
+    @Ignore
     public void matrixTranspose() throws Exception {
 
     }

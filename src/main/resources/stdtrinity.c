@@ -54,7 +54,7 @@ float* fmmult(int s, float* A, int rowsA, int colsA) {
 	}
 
 	return resMatrix;
-} // TODO: husk af kalde free() på matrix resMatrix
+} // TODO: call free() on matrix resMatrix
 
 float* transpose(float* A, int nrRowsA, int nrColsA) {
 	int n;
@@ -68,7 +68,30 @@ float* transpose(float* A, int nrRowsA, int nrColsA) {
     }
 
     return resMatrix;
-}// TODO: husk af kalde free() på matrix resMatrix
+}// TODO: call free() on matrix resMatrix
+
+float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
+	int rowsC, colsC, indexA, indexB, crA, ccA, crB, ccB, Cindex = 0;
+	rowsC = rowsA;
+	colsC = colsB;
+	float sum;
+	float* C;
+	C = malloc(rowsC * colsC * sizeof(float));
+
+	for (crA = 0; crA < rowsA; crA++) {
+		for (ccB = 0; ccB < colsB; ccB++) {
+			sum = 0;
+			for (ccA = 0; ccA < colsA; ccA++) {
+				crB = ccA;
+				sum += A[crA * colsA + ccA] * B[crB * colsB + ccB];
+			}
+		C[Cindex] = sum;
+		Cindex += 1;
+		}
+	}
+
+	return C;
+}// TODO: call free on C
 
 float _abs(float s) {
   return fabs(s);

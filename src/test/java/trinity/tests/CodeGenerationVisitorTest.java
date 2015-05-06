@@ -105,10 +105,16 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-1.000000, -2.000000]\n[-3.000000, -4.000000]\n[-5.000000, -1.000000]\n[-6.000000, -2.000000]\n", getOutput("Matrix[4,2] M = [1, 2][3, 4][5, 1][6, 2]; print -M;"));
     }
 
-    @Ignore
+    @Test
     public void multiplication() throws Exception {
-        assertEquals("125\n", "scalar a = 5; scalar b = 25; scalar r = a * b; print r;");
-        //assertEquals("[2, 4, 6, 8, 10]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Scalar j = 2; Vector k = v*j; print k;"));
+        assertEquals("125.000000\n", getOutput("Scalar a = 5; Scalar b = 25; Scalar r = a * b; print r;"));
+        assertEquals("-125.000000\n", getOutput("Scalar a = 5; Scalar b = -25; Scalar r = a * b; print r;"));
+        assertEquals("125.000000\n", getOutput("Scalar a = -5; Scalar b = -25; Scalar r = a * b; print r;"));
+        assertEquals("8.000000\n", getOutput("Scalar a = 2; Scalar b = 2; Scalar r = a * b * b; print r;"));
+        assertEquals("[2.000000, 4.000000, 6.000000, 8.000000, 10.000000]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Scalar j = 2; Vector[5] k = v*j; print k;"));
+        assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = m*j; print k;"));
+        assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = j*m; print k;"));
+        assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
     }
 
     @Ignore

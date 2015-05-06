@@ -18,7 +18,9 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         for (int i = 0; i < ctx.functionDecl().size(); i++){
             // Check every FunctionDecl for unreachable code or missing return statements.
             // If a check has returned false, then end visitor.
+
             if (!ctx.functionDecl(i).accept(this)) {
+                errorReporter.reportError("No return found in function.", ctx);
                 return false;
             }
         }
@@ -35,19 +37,18 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitBlock(TrinityParser.BlockContext ctx){
-        System.out.println("visitBlock");
 
-        if(ctx.getChildCount() == 0 || (ctx.getChildCount() == 1 && !ctx.stmt(0).accept(this))){
-            System.out.println("visitBlock error");
-
-            errorReporter.reportError("No return found.", ctx);
+        //TODO: Hmm assert false ved "do end", skal fixes.
+        if(ctx.stmt().size() == 0 && ctx.getChildCount() != 2){
+            //if no statements is found, and return does not exsist or not contain return object.
+            errorReporter.reportError("No return found 1.", ctx);
             return false;
         }
 
         for (int i = 0; i < ctx.stmt().size(); i++) {
-            System.out.println("visitBlock stmt");
+            //visit all statements in block
             if(!ctx.stmt(i).accept(this)) {
-                errorReporter.reportError("No return found.", ctx);
+                errorReporter.reportError("No return found 2.", ctx);
                 return false;
             }
         }
@@ -55,35 +56,20 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         return true;
     }
 
-    /*
-    @Override
-    public Boolean visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx){
-        System.out.println("test: ConstDeclarationContext");
-
-        return false;
-    }
-    */
-
     @Override
     public Boolean visitSingleExpression(TrinityParser.SingleExpressionContext ctx){
-
-        return false;
+        return ctx.semiExpr().accept(this);
     }
 
-    /*
     @Override
-    public Boolean visitForLoop(TrinityParser.ForLoopContext ctx){
-        System.out.println("test: ForLoopContext");
-
-        return false;
+    public Boolean visitSemiExpr(TrinityParser.SemiExprContext ctx){
+        return !(ctx.expr().accept(this) == null);
     }
-    */
 
     @Override
     public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx){
-        for (TrinityParser.BlockContext blockCtx : ctx.block()) {
-            System.out.println("omg: " + blockCtx.getText());
-            blockCtx.accept(this);
+        for (int i = 0; i < ctx.block().size(); i++){
+            ctx.getChild(i).accept(this);
         }
 
         return false;
@@ -91,7 +77,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx){
-        // Simply return whatever the block returns.
+        // Simply return whatever the block returns, but do accept empty blocks.
         return ctx.block().accept(this);
     }
 }

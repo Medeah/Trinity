@@ -56,6 +56,18 @@ float* fmmult(int s, float* A, int rowsA, int colsA) {
 	return resMatrix;
 } // TODO: call free() on matrix resMatrix
 
+float* mfdiv(int s, float* A, int rowsA, int colsA) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rowsA * colsA * sizeof(float));
+
+	for (i = 0; i < rowsA * colsA; i++) {
+		resMatrix[i] = A[i] / s;
+	}
+
+	return resMatrix;
+} // TODO: call free() on matrix resMatrix
+
 float* transpose(float* A, int nrRowsA, int nrColsA) {
 	int n;
 	float* resMatrix;

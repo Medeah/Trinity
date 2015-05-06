@@ -381,22 +381,55 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitMultiplyDivide(TrinityParser.MultiplyDivideContext ctx) {
-        // TODO: types and shit.
-        //TODO: equals scalar
-        if (ctx.t instanceof PrimitiveType) {
-            ctx.expr(0).accept(this);
-            emit("*");
-            ctx.expr(1).accept(this);
-        } else {
-            emit("mmmult(");
-            ctx.expr(0).accept(this);
-            emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-            emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-            emit(",");
-            ctx.expr(1).accept(this);
-            emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-            emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-            emit(")");
+        if (ctx.op.getText().equals("*")) {
+            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+                ctx.expr(0).accept(this);
+                emit("*");
+                ctx.expr(1).accept(this);
+            } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof MatrixType) {
+                emit("mmmult(");
+                ctx.expr(0).accept(this);
+                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emit(",");
+                ctx.expr(1).accept(this);
+                emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+                emit(")");
+            } else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
+                emit("fmmult(");
+                ctx.expr(0).accept(this);
+                emit(",");
+                ctx.expr(1).accept(this);
+                emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+                emit(")");
+            } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
+                emit("fmmult(");
+                ctx.expr(1).accept(this);
+                emit(",");
+                ctx.expr(0).accept(this);
+                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emit(")");
+            } // TODO: smarter way to destinguish between Matrix*Primitive and Primitive*Matrix
+        }
+
+        else {
+            // Op can only be "*" which we have done or "/" hence the else
+            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+                ctx.expr(0).accept(this);
+                emit("/");
+                ctx.expr(1).accept(this);
+            } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
+                emit("mfdiv(");
+                ctx.expr(1).accept(this);
+                emit(",");
+                ctx.expr(0).accept(this);
+                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emit(")");
+            }
         }
         return null;
     }

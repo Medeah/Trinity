@@ -82,12 +82,22 @@ public class CodeGenerationVisitorTest {
         assertEquals("13.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 != 1 then print 12; else print 13; end"));
     }
 
-    @Test
+    @Ignore
     public void testBooleans() throws Exception {
         assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
         assertEquals("true\n", getOutput("Boolean b = 4 != 3; print b;"));
-       // assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
+        assertEquals("true\n", getOutput("Boolean b = [1,2] == [1,2]; print b;"));
+        assertEquals("true\n", getOutput("Matrix m = [1,2][3,4]; Boolean b = [1,2][3,4] == m; print b;"));
+        assertEquals("false\n", getOutput("Matrix m = [1,2][3,5]; Boolean b = [1,2][3,4] == m; print b;"));
    }
+
+    @Ignore
+    public void testRange() throws Exception {
+        assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
+        assertEquals("[1,2,3,4]\n", getOutput("Vector[4] v = [1..4]; print v;"));
+    }
+
+    
 
     @Test
     public void declarations() throws Exception {

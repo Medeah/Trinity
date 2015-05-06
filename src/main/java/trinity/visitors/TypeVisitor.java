@@ -479,53 +479,51 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
         String operator = ctx.op.getText();
-        Type out = null;
 
         if (op1.equals(bool) || op2.equals(bool)) {
             errorReporter.reportError("Cannot mult or div boolean", ctx);
-            out = null;
+            ctx.t = null;
         } else if (op1.equals(scalar)) {
-            out = op2;
+            ctx.t = op2;
         } else if (op1 instanceof MatrixType) {
             if (operator.equals("*")) {
                 // Nx1
                 if (op2.equals(scalar)) {
-                    out = op1;
+                    ctx.t = op1;
                 } else if (op2 instanceof MatrixType) {
                     MatrixType matrix1 = (MatrixType) op1;
                     MatrixType matrix2 = (MatrixType) op2;
 
                     // Vector dot product
                     if (matrix1.getRows() == 1 && matrix2.getRows() == 1 && matrix1.getCols() == matrix2.getCols()) {
-                        out = scalar;
+                        ctx.t = scalar;
                     } else
 
                         // Matrix multiplication
                         if (matrix1.getCols() == matrix2.getRows()) {
-                            out = new MatrixType(matrix1.getRows(), matrix2.getCols());
+                            ctx.t = new MatrixType(matrix1.getRows(), matrix2.getCols());
                         } else {
                             errorReporter.reportError("Size mismatch", ctx);
-                            out = null;
+                            ctx.t = null;
                         }
                 } else {
                     errorReporter.reportError("Cannot multiply matrix with " + op2, ctx);
-                    out = null;
+                    ctx.t = null;
                 }
             } else if (operator.equals("/")) {
                 if (op2.equals(scalar)) {
-                    out = op1;
+                    ctx.t = op1;
                 } else {
                     errorReporter.reportError("Cannot divde matrix with " + op2, ctx);
-                    out = null;
+                    ctx.t = null;
                 }
             }
         } else {
             errorReporter.reportError("what?", ctx);
-            out = null;
+            ctx.t = null;
         }
 
-        ctx.t = out;
-        return out;
+        return ctx.t;
     }
 
     @Override

@@ -80,7 +80,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         // Init routine
         if (nis != null) {
             for (NeedInit ni : nis) {
-                //TODO: it might be possible to get cgid merged into item expr, but we should probably redo all this s*** instead
+                //TODO: it might be possible to get ref merged into item expr, but we should probably redo all this s*** instead
                 emit("float " + ni.id + "[" + ni.items.size() + "];");
 
                 for (int i = 0; i < ni.items.size(); i++) {
@@ -567,7 +567,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
         // TODO: reconsider
-        emit(ctx.cgid);
+        emit(ctx.ref);
         return null;
     }
 
@@ -575,7 +575,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         // TODO: reconsider
-        emit(ctx.cgid);
+        emit(ctx.ref);
         return null;
     }
 

@@ -7,24 +7,28 @@ import trinity.types.MatrixType;
 
 import java.util.ArrayList;
 
-// TODO: Find a way to initialize vectors and matrices before referencing them without all this hacky shit.
+/**
+ * Visit vector and matrix literals and aggregates a list of all element expressions, and stores a unique id for later referencing.
+ */
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> implements TrinityVisitor<Iterable<NeedInit>> {
 
     // TODO: accept vectors instead
+    // TODO: the ref is a hack for doing dependency referencing :(
+    // The variable stores the generated ids for pre-initialized matrices and vectors
+    // so they can be referenced later on.
     @Override
     public Iterable<NeedInit> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+        ctx.ref = UniqueId.next();
 
-        ctx.cgid = UniqueId.next();
-
-        NeedInit ni = new NeedInit();
-        ni.id = ctx.cgid;
-        ni.items = new ArrayList<TrinityParser.ExprContext>();
+        NeedInit needInit = new NeedInit();
+        needInit.id = ctx.ref;
+        needInit.items = new ArrayList<>();
 
         //TODO: fix this
         if(ctx.matrix() != null) {
             for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
                 if (vector.exprList() != null) {
-                    ni.items.addAll(vector.exprList().expr());
+                    needInit.items.addAll(vector.exprList().expr());
                 } else if (vector.range() != null) {
                     //ni.items = ctx.vector().range();
                     //TODO: range
@@ -39,27 +43,27 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
 
         MatrixType type = ((MatrixType)ctx.t);
         //TODO: ensure and remove
-        assert ni.items.size() == type.getCols() * type.getRows();
-        if(ni.items.size() != type.getCols() * type.getRows())
+        assert needInit.items.size() == type.getCols() * type.getRows();
+        if(needInit.items.size() != type.getCols() * type.getRows())
             System.out.println("DV ERROR");
 
-        return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(needInit));
     }
 
     @Override
     public Iterable<NeedInit> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
-        ctx.cgid = UniqueId.next();
+        ctx.ref = UniqueId.next();
 
-        NeedInit ni = new NeedInit();
-        ni.id = ctx.cgid;
-        ni.items = new ArrayList<TrinityParser.ExprContext>();
+        NeedInit needInit = new NeedInit();
+        needInit.id = ctx.ref;
+        needInit.items = new ArrayList<TrinityParser.ExprContext>();
 
         //TODO: fix this
         if(ctx.vector() != null){
             //for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
             TrinityParser.VectorContext vector = ctx.vector();
                 if (vector.exprList() != null) {
-                    ni.items.addAll(vector.exprList().expr());
+                    needInit.items.addAll(vector.exprList().expr());
                 } else if (vector.range() != null) {
                     //ni.items = ctx.vector().range();
                     //TODO: range
@@ -74,21 +78,21 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> im
 
         MatrixType type = ((MatrixType)ctx.t);
         //TODO: ensure and remove
-        assert ni.items.size() == type.getCols() * type.getRows();
-        if(ni.items.size() != type.getCols() * type.getRows())
+        assert needInit.items.size() == type.getCols() * type.getRows();
+        if(needInit.items.size() != type.getCols() * type.getRows())
             System.out.println("DV ERROR");
 
-        return aggregateResult(visitChildren(ctx), ImmutableList.of(ni));
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(needInit));
 
     }
 
     @Override
     protected Iterable<NeedInit> aggregateResult(Iterable<NeedInit> aggregate, Iterable<NeedInit> nextResult) {
-        if(aggregate == null)
+        if(aggregate == null) {
             return nextResult;
-        else if(nextResult == null)
+        } else if(nextResult == null) {
             return aggregate;
-        else
-            return Iterables.concat(aggregate, nextResult);
+        }
+        return Iterables.concat(aggregate, nextResult);
     }
 }

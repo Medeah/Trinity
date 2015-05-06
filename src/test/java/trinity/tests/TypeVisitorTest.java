@@ -124,6 +124,13 @@ public class TypeVisitorTest {
     }
 
     @Test
+    public void matrixDivision() throws Exception {
+        assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] / 3;"));
+        assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] / [1,2][3,4];"));
+        assertTrue(typeCheck("Scalar a = 6 / 3;"));
+    }
+
+    @Test
     public void matrixAddition() throws Exception {
         assertTrue(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2][3,4];"));
         assertFalse(typeCheck("Matrix[2,2] m = [1,2][3,4] + [1,2];"));

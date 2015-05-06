@@ -481,16 +481,14 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         String operator = ctx.op.getText();
         Type out = null;
 
-
-        if (operator.equals("*")) {
-            if (op1.equals(bool) || op2.equals(bool)) {
-                errorReporter.reportError("Cannot mult or div boolean", ctx);
-                out = null;
-            } else if (op1.equals(scalar)) {
-                out = op2;
-            }
-            // Nx1
-            else if (op1 instanceof MatrixType) {
+        if (op1.equals(bool) || op2.equals(bool)) {
+            errorReporter.reportError("Cannot mult or div boolean", ctx);
+            out = null;
+        } else if (op1.equals(scalar)) {
+            out = op2;
+        } else if (op1 instanceof MatrixType) {
+            if (operator.equals("*")) {
+                // Nx1
                 if (op2.equals(scalar)) {
                     out = op1;
                 } else if (op2 instanceof MatrixType) {
@@ -513,16 +511,19 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     errorReporter.reportError("Cannot multiply matrix with " + op2, ctx);
                     out = null;
                 }
+            } else if (operator.equals("/")) {
+                if (op2.equals(scalar)) {
+                    out = op1;
+                } else {
+                    errorReporter.reportError("Cannot divde matrix with " + op2, ctx);
+                    out = null;
+                }
             }
-        } else if (operator.equals("/")) {
-            expect(scalar, op1, ctx.expr(0));
-            expect(scalar, op2, ctx.expr(1));
-            out = scalar;
-
         } else {
             errorReporter.reportError("what?", ctx);
             out = null;
         }
+
         ctx.t = out;
         return out;
     }

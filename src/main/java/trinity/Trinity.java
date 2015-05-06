@@ -15,6 +15,9 @@ import trinity.visitors.TypeVisitor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class Trinity {
 
     private static class CommandLineOptions {
         @Parameter(description = "filename")
-        private List<String> files = new ArrayList<String>();
+        private List<String> files = new ArrayList<>();
 
         @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
         private boolean prettyPrint;
@@ -64,8 +67,8 @@ public class Trinity {
             jc.usage();
             System.exit(1);
         }
-        String file = options.files.get(0);
-        String filename = getNameWithoutExtension(file);
+        Path file = Paths.get(options.files.get(0));
+        String filename = getNameWithoutExtension(file.toString());
         try {
             if (options.prettyPrint) {
                 prettyPrint(file, options.indentation);
@@ -102,13 +105,13 @@ public class Trinity {
 
     }
 
-    public static String compiles(String trinityProgram) throws Exception{
+    public static String compile(String trinityProgram) throws Exception{
         ANTLRInputStream input = new ANTLRInputStream(trinityProgram);
         return compile(input);
     }
 
-    public static String compile(String filename) throws Exception {
-        ANTLRInputStream input = new ANTLRFileStream(filename);
+    public static String compile(Path filePath) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filePath.toString());
         return compile(input);
     }
 
@@ -124,11 +127,12 @@ public class Trinity {
 
         typeChecker.visit(tree);
         if (reporter.getErrorAmount() > 0) {
-            throw new TypeCheckException("To many type errors aborting");
+            throw new TypeCheckException("Too many type errors aborting");
         }
 
         CodeGenerationVisitor generator = new CodeGenerationVisitor();
-        String out = generator.generate(tree);
+        generator.visit(tree);
+        String out = generator.getOutput();
 
         return out;
     }
@@ -147,8 +151,8 @@ public class Trinity {
 
     }
 
-    private static void prettyPrint(String filename, int indentation) throws Exception {
-        ANTLRInputStream input = new ANTLRFileStream(filename);
+    private static void prettyPrint(Path filename, int indentation) throws Exception {
+        ANTLRInputStream input = new ANTLRFileStream(filename.toString());
         ParseTree tree = parse(input).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);

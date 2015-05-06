@@ -2,7 +2,6 @@ package trinity.visitors;
 
 import com.google.common.base.Charsets;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import trinity.*;
 import trinity.types.EnumType;
 import trinity.types.MatrixType;
@@ -10,7 +9,6 @@ import trinity.types.PrimitiveType;
 import trinity.types.Type;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Stack;
 
@@ -19,15 +17,15 @@ import static com.google.common.io.Resources.getResource;
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
     private int scopeDepth = 0;
-    StringWriter funcBody = new StringWriter();
-    StringWriter globals = new StringWriter();
+    private StringBuilder output;
+    private StringBuilder mainBody;
+    private StringBuilder funcBody;
+    private StringBuilder globals;
 
-    public String generate(ParseTree tree) {
-        StringWriter output = new StringWriter();
-        StringWriter mainBody = new StringWriter();
-        setEmitterContext(mainBody);
-
-        this.visit(tree);
+    public String getOutput() {
+        if(output == null) {
+            return "";
+        }
 
         output.append(stdlib());
         output.append("/* ENTRY POINT */\n");
@@ -52,9 +50,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return "";
     }
 
-    private Stack<StringWriter> emitStack = new Stack<>();
+    // TODO: make emit class or organize code
+    private Stack<StringBuilder> emitStack = new Stack<>();
 
-    private void setEmitterContext(StringWriter writer) {
+    private void setEmitterContext(StringBuilder writer) {
         if (currentWriter != null) {
             emitStack.push(currentWriter);
         }
@@ -66,24 +65,11 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     //TODO: dynamically set input stream, to avoid bad restoration code.
-    private static StringWriter currentWriter; //= new StringWriter();
+    private static StringBuilder currentWriter; //= new StringBuilder();
 
     private static void emit(String string) {
         currentWriter.append(string);
     }
-
-    // TODO: find out what is always needed and what is not? (windows)
-    /*private static List<String> includes = new ArrayList<String>() {{
-        //add("cuda_runtime.h");
-        //add("curand.h");
-        //add("cublas_v2.h");
-        //add("time.h");
-        // add("windows.h");
-        add("stdio.h");
-        add("math.h");
-        add("stdbool.h");
-        //add("stdlib.h");
-    }};*/
 
     // TODO: who even know at this point...
     private DependencyVisitor dependencyVisitor = new DependencyVisitor();
@@ -104,6 +90,21 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 }
             }
         }
+    }
+
+    @Override
+    public Void visitProg(TrinityParser.ProgContext ctx) {
+        // Initialize
+        scopeDepth = 0;
+        output = new StringBuilder();
+        mainBody = new StringBuilder();
+        funcBody = new StringBuilder();
+        globals = new StringBuilder();
+
+        setEmitterContext(mainBody);
+
+        visitChildren(ctx);
+        return null;
     }
 
     @Override
@@ -572,13 +573,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return super.visitConstDeclaration(ctx);
     }
 
-    @Override
-    public Void visitProg(TrinityParser.ProgContext ctx) {
-        visitChildren(ctx);
-        return null;
-    }
 
     */
+
 
 
 }

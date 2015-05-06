@@ -14,6 +14,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 
     private int indentLevel = 0;
     private int spaces = 0;
+    // TODO: builder should maybe be initialised during visit so it doesn't duplicate.
     final private StringBuilder builder = new StringBuilder ();
 
     private void emit(String string) {

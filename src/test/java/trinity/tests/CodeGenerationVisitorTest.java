@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class CodeGenerationVisitorTest {
 
     private static String getOutput(String input) throws Exception {
-        String out = Trinity.compiles(input);
+        String out = Trinity.compile(input);
         PrintWriter pw = new PrintWriter("test.c");
         pw.println(out);
         pw.flush();
@@ -73,6 +73,21 @@ public class CodeGenerationVisitorTest {
 
         assertEquals("4.000000\n6.000000\n", getOutput("Vector[2] v = [4,6]; for Scalar s in v do print s; end"));
     }
+
+    @Ignore
+    public void ifStatements() throws Exception {
+        assertEquals("1.000000\n", getOutput("if true then print 1; else print 2; end"));
+        assertEquals("3.000000\n", getOutput("if 3 < 2 then print 2; else print 3; end"));
+        assertEquals("12.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 == 1 then print 12; else print 3; end"));
+        assertEquals("13.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 != 1 then print 12; else print 13; end"));
+    }
+
+    @Test
+    public void testBooleans() throws Exception {
+        assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
+        assertEquals("true\n", getOutput("Boolean b = 4 != 3; print b;"));
+       // assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
+   }
 
     @Test
     public void declarations() throws Exception {

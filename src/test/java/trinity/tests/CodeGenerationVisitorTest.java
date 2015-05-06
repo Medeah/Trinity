@@ -117,9 +117,17 @@ public class CodeGenerationVisitorTest {
         assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
     }
 
-    @Ignore
-    public void matrixTranspose() throws Exception {
+    @Test
+    public void Division() throws Exception {
+        assertEquals("4.000000\n", getOutput("Scalar a = 100; Scalar t = 25; print a / t;"));
+        assertEquals("[1.000000, 2.000000, 4.000000, 8.000000]\n", getOutput("Vector[4] v = [2, 4, 8, 16]; Scalar n = 2; print v / n;"));
+        assertEquals("[8.000000, 7.000000]\n[6.000000, 5.000000]\n[4.000000, 3.000000]\n[2.000000, 1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = 2; print m / i;"));
+        assertEquals("[-8.000000, -7.000000]\n[-6.000000, -5.000000]\n[-4.000000, -3.000000]\n[-2.000000, -1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = -2; print m / i;"));
+    }
 
+    @Ignore
+    public void Transpose() throws Exception {
+        assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, 5.000000, 8.000000]\n[3.000000, 6.000000, 9.000000]\n[10.000000, 11.000000, 12.000000]\n","Matrix[3,4] m = [1, 2, 3, 10][4, 5, 6, 11][7 , 8, 9, 12]; Matrix[4,3] t = m'; print t;");
     }
 
 

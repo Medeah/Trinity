@@ -128,7 +128,7 @@ public class CodeGenerationVisitorTest {
     }
 
     @Test
-    public void Division() throws Exception {
+    public void division() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar a = 100; Scalar t = 25; print a / t;"));
         assertEquals("[1.000000, 2.000000, 4.000000, 8.000000]\n", getOutput("Vector[4] v = [2, 4, 8, 16]; Scalar n = 2; print v / n;"));
         assertEquals("[8.000000, 7.000000]\n[6.000000, 5.000000]\n[4.000000, 3.000000]\n[2.000000, 1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = 2; print m / i;"));
@@ -136,26 +136,33 @@ public class CodeGenerationVisitorTest {
     }
 
     @Test
-    public void Not() throws Exception {
+    public void not() throws Exception {
         assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
         assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));
     }
 
     @Test
-    public void Transpose() throws Exception {
+    public void transpose() throws Exception {
         assertEquals("[1.000000, 7.000000]\n[5.000000, -5.000000]\n[6.000000, -1.000000]\n", getOutput("Matrix[2,3] m = [1, 5, 6][7, -5, -1]; Matrix[3,2] t = m'; print t;"));
         assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, -5.000000, 8.000000]\n[3.000000, -6.000000, 9.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, -5, -6][7, 8, 9]; print m';"));
-    } // TODO: is it neccessary to test vector transpose??
-
-    @Test
-    public void Addition() throws Exception {
-        assertEquals("7.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a + b;"));
-        //assertEquals("-5.000000", getOutput("Scalar a = -35; Scalar b = 30; print a + b;"));
+        assertEquals("[1.000000]\n[2.000000]\n[3.000000]\n[4.000000]\n[5.000000]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Matrix[5,1] m = v'; print m;"));
+        assertEquals("[1.000000, 2.000000, 3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[5,1] m = [1][2][3][4][5]; Vector[5] v = m'; print v;"));
     }
 
     @Test
-    public void Subtraction() throws Exception {
+    public void addition() throws Exception {
+        assertEquals("7.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a + b;"));
+        assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = 30; print a + b;"));
+        assertEquals("[-11.000000, -9.000000, -7.000000, 13.000000]\n[13.000000, 13.000000, 13.000000, 3.000000]\n[5.000000, 13.000000, 13.000000, 13.000000]\n", getOutput("Matrix[3,4] m = [1, 2, 3, 4][5, 6, 7, 8][9, 10, 11, 12]; Matrix[3,4] n = [-12, -11, -10, 9][8, 7, 6, -5][-4, 3, 2, 1]; print m + n;"));
+        assertEquals("[5.000000, 7.000000, 9.000000]\n", getOutput("Vector[3] v = [4, 5, 6]; Vector[3] l = [1, 2, 3]; print v + l;"));
+    }
 
+    @Test
+    public void subtraction() throws Exception {
+        assertEquals("3.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a - b;"));
+        assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = -30; print a - b;"));
+        assertEquals("[3.000000, 3.000000, 9.000000]\n", getOutput("Vector[3] v = [4, 5, 6]; Vector[3] l = [1, 2, -3]; print v - l;"));
+        assertEquals("[-3.000000, -13.000000]\n[3.000000, 8.000000]\n[4.000000, -3.000000]\n", getOutput("Matrix[3,2] m = [4, -5][-6, 3][-2, 1]; Matrix[3,2] n = [7, 8][-9, -5][-6, 4]; print m - n;"));
     }
 
 }

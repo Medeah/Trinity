@@ -112,7 +112,7 @@ float* mmadd(float* A, float* B, int rows, int cols) {
 	resMatrix = malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
-		resMatrix[i] = B[i] + A[i];
+		resMatrix[i] = A[i] + B[i];
 	}
 
 	return resMatrix;
@@ -124,7 +124,7 @@ float* mmsubt(float* A, float* B, int rows, int cols) {
 	resMatrix = malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
-		resMatrix[i] = B[i] - A[i];
+		resMatrix[i] = A[i] - B[i];
 	}
 
 	return resMatrix;

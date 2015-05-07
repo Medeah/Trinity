@@ -60,8 +60,7 @@ public class    ReachabilityVisitorTest {
                 "end"));
     }
 
-    //TODO: remove ignore and fix
-    @Ignore
+    @Test
     public void testBlockHell() throws Exception {
         assertFalse(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
@@ -86,16 +85,16 @@ public class    ReachabilityVisitorTest {
                 "end"));
         assertTrue(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
-                //"        do\n" +
-                //"        end\n" +
+                "        do\n" +
+                "        end\n" +
                 "        return 1;" +
                 "    end\n" +
                 "end"));
         assertTrue(reachabilityTest("Scalar s () do\n" +
-                //"    do\n" +
-                //"        do\n" +
-                //"        end\n" +
-                //"    end\n" +
+                "    do\n" +
+                "        do\n" +
+                "        end\n" +
+                "    end\n" +
                 "    return 1;" +
                 "end"));
     }
@@ -127,7 +126,7 @@ public class    ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testBlockHellContinuedTrueOnly() throws Exception{
         assertTrue(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
@@ -173,7 +172,7 @@ public class    ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testFunctionsWithIfStatementTrueOnly() throws Exception{
         assertTrue(reachabilityTest("Boolean b () do\n" +
                 "    if true then\n" +

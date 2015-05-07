@@ -30,26 +30,30 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-
         //TODO: Remember to check block for return-controls thrown too early.
         return ctx.block().accept(this);
     }
 
     @Override
     public Boolean visitBlock(TrinityParser.BlockContext ctx){
+        int stmtSize = ctx.stmt().size();
+        boolean isReturnNull = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : true;
 
-        //TODO: Hmm assert false ved "do end", skal fixes.
-        if(ctx.stmt().size() == 0 && ctx.getChildCount() != 2){
-            //if no statements is found, and return does not exsist or not contain return object.
-            errorReporter.reportError("No return found 1.", ctx);
+        //checks if a function does not contain any statements or returns.
+        //ignores blocks who is not directly in the function base.
+        if(ctx.parent instanceof TrinityParser.FunctionDeclContext && stmtSize == 0 && isReturnNull){
+            errorReporter.reportError("Empty functions is not allowed.", ctx);
             return false;
         }
 
-        for (int i = 0; i < ctx.stmt().size(); i++) {
-            //visit all statements in block
-            if(!ctx.stmt(i).accept(this)) {
-                errorReporter.reportError("No return found 2.", ctx);
-                return false;
+        if(stmtSize == 0 && isReturnNull) {
+            return false;
+        }else{
+            for (int i = 0; i < stmtSize; i++) {
+                if(!ctx.stmt(i).accept(this) && isReturnNull){
+                    errorReporter.reportError("No return found in inner blocks.", ctx);
+                    return false;
+                }
             }
         }
 
@@ -69,7 +73,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     @Override
     public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx){
         for (int i = 0; i < ctx.block().size(); i++){
-            ctx.getChild(i).accept(this);
+            ctx.block(i).accept(this);
         }
 
         return false;
@@ -78,13 +82,23 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     @Override
     public Boolean visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
         // TODO: update visitBlock to accommodate this new rule.
-        return false;
+        if(ctx.semiExpr().isEmpty()){
+            return false;
+        }
+
+        return true;
     }
 
 
     @Override
     public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
         // Simply return whatever the block returns, but do accept empty blocks.
-        return ctx.block().accept(this);
+        if(ctx.block().getText().isEmpty()){
+            return false;
+        }else if (ctx.block().returnStmt() != null){
+            return ctx.block().returnStmt().accept(this);
+        }
+
+        return false;
     }
 }

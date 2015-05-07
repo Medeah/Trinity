@@ -135,9 +135,16 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-8.000000, -7.000000]\n[-6.000000, -5.000000]\n[-4.000000, -3.000000]\n[-2.000000, -1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = -2; print m / i;"));
     }
 
-    @Ignore
+    @Test
+    public void Not() throws Exception {
+        assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
+        assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));
+    }
+
+    @Test
     public void Transpose() throws Exception {
-        assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, 5.000000, 8.000000]\n[3.000000, 6.000000, 9.000000]\n[10.000000, 11.000000, 12.000000]\n","Matrix[3,4] m = [1, 2, 3, 10][4, 5, 6, 11][7 , 8, 9, 12]; Matrix[4,3] t = m'; print t;");
+        assertEquals("[1.000000, 7.000000]\n[5.000000, -5.000000]\n[6.000000, -1.000000]\n", getOutput("Matrix[2,3] m = [1, 5, 6][7, -5, -1]; Matrix[3,2] t = m'; print t;"));
+        assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, -5.000000, 8.000000]\n[3.000000, -6.000000, 9.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, -5, -6][7, 8, 9]; print m';"));
     }
 
 

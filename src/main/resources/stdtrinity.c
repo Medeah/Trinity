@@ -44,7 +44,7 @@ bool print_s(float s) {
   return true;
 }
 
-float* fmmult(int s, float* A, int rowsA, int colsA) {
+float* fmmult(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
@@ -56,7 +56,7 @@ float* fmmult(int s, float* A, int rowsA, int colsA) {
 	return resMatrix;
 } // TODO: call free() on matrix resMatrix
 
-float* mfdiv(int s, float* A, int rowsA, int colsA) {
+float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));

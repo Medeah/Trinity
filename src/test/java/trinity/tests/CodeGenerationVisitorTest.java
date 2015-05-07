@@ -145,8 +145,17 @@ public class CodeGenerationVisitorTest {
     public void Transpose() throws Exception {
         assertEquals("[1.000000, 7.000000]\n[5.000000, -5.000000]\n[6.000000, -1.000000]\n", getOutput("Matrix[2,3] m = [1, 5, 6][7, -5, -1]; Matrix[3,2] t = m'; print t;"));
         assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, -5.000000, 8.000000]\n[3.000000, -6.000000, 9.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, -5, -6][7, 8, 9]; print m';"));
+    } // TODO: is it neccessary to test vector transpose??
+
+    @Test
+    public void Addition() throws Exception {
+        assertEquals("7.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a + b;"));
+        //assertEquals("-5.000000", getOutput("Scalar a = -35; Scalar b = 30; print a + b;"));
     }
 
+    @Test
+    public void Subtraction() throws Exception {
 
+    }
 
 }

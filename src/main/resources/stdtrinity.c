@@ -106,6 +106,30 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	return C;
 }/* TODO: call free on C */
 
+float* mmadd(float* A, float* B, int rows, int cols) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rows * cols * sizeof(float));
+
+	for (i = 0; i < rows * cols; i++) {
+		resMatrix[i] = B[i] + A[i];
+	}
+
+	return resMatrix;
+}
+
+float* mmsubt(float* A, float* B, int rows, int cols) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rows * cols * sizeof(float));
+
+	for (i = 0; i < rows * cols; i++) {
+		resMatrix[i] = B[i] - A[i];
+	}
+
+	return resMatrix;
+}
+
 float _abs(float s) {
   return fabs(s);
 }

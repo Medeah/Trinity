@@ -546,9 +546,36 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
-        ctx.expr(0).accept(this);
-        emit(ctx.op.getText());
-        ctx.expr(1).accept(this);
+        if (ctx.op.getText().equals("+")){
+            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+                ctx.expr(0).accept(this);
+                emit("+");
+                ctx.expr(1).accept(this);
+            } else {
+                emit("mmadd(");
+                ctx.expr(0).accept(this);
+                emit(",");
+                ctx.expr(1).accept(this);
+                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emit(")");
+            }
+        } else {
+            // Op can only be "+" which we have done or "-" hence the else
+            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+                ctx.expr(0).accept(this);
+                emit("-");
+                ctx.expr(1).accept(this);
+            } else {
+                emit("mmsubt(");
+                ctx.expr(0).accept(this);
+                emit(",");
+                ctx.expr(1).accept(this);
+                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emit(")");
+            }
+        }
         return null;
     }
 

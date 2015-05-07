@@ -91,12 +91,14 @@ public class CodeGenerationVisitorTest {
         assertEquals("false\n", getOutput("Matrix m = [1,2][3,5]; Boolean b = [1,2][3,4] == m; print b;"));
    }
 
-    @Ignore
+    @Test
     public void testRange() throws Exception {
         assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
         assertEquals("[1.000000, 2.000000, 3.000000, 4.000000]\n", getOutput("Vector[4] v = [1..4]; print v;"));
         assertEquals("true\n", getOutput("print [1,2,3][3,4,5] == [1..3][3..5];"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3..5]; print v;"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1,2,3][3..5]; print v;"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3,4,5]; print v;"));
     }
 
     @Test

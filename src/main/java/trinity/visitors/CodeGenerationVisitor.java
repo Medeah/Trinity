@@ -97,9 +97,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
                 // Init array elements
                 for (int i = 0; i < staticMatrix.items.size(); i++) {
-                    emit(staticMatrix.id + "[" + i + "]=");
-                    staticMatrix.items.get(i).accept(this);
-                    emit(";");
+                    ParserRuleContext item = staticMatrix.items.get(i);
+                    if(item instanceof TrinityParser.ExprContext) {
+                        emit(staticMatrix.id + "[" + i + "]=");
+                        item.accept(this);
+                        emit(";");
+                    } else if (item instanceof TrinityParser.RangeContext) {
+                        // TODO: skod range
+                    }
+
                 }
 
             }

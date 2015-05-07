@@ -26,9 +26,11 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
                 if (vector.exprList() != null) {
                     staticMatrix.items.addAll(vector.exprList().expr());
                 } else if (vector.range() != null) {
+                    //staticMatrix.range = vector.range();
+                    staticMatrix.items.add(vector.range());
                     //ni.items = vector.range();
                     //TODO: range
-                    System.out.println("dv: no range yet!");
+                    //System.out.println("dv: no range yet!");
                 }
             }
         }
@@ -48,11 +50,7 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
 
         StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, ctx.matrix().vector());
 
-        //TODO: ensure and remove
-        MatrixType type = ((MatrixType) ctx.t);
-        assert staticMatrix.items.size() == type.getCols() * type.getRows();
-        if (staticMatrix.items.size() != type.getCols() * type.getRows())
-            System.out.println("DV ERROR");
+        assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }
@@ -63,11 +61,7 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
 
         StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, singletonList(ctx.vector()));
 
-        //TODO: ensure and remove
-        MatrixType type = ((MatrixType) ctx.t);
-        assert staticMatrix.items.size() == type.getCols() * type.getRows();
-        if (staticMatrix.items.size() != type.getCols() * type.getRows())
-            System.out.println("DV ERROR");
+        assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }

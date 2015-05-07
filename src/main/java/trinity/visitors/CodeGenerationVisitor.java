@@ -91,7 +91,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (matrices != null) {
             for (StaticMatrix staticMatrix : matrices) {
                 // Declare array
-                emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
+                //emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
+                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.items.size() + ");");
 
                 // Init array elements
                 for (int i = 0; i < staticMatrix.items.size(); i++) {
@@ -99,6 +100,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                     staticMatrix.items.get(i).accept(this);
                     emit(";");
                 }
+
             }
         }
     }
@@ -211,6 +213,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
+        emitDependencies(ctx.semiExpr());
         emit("return ");
         ctx.semiExpr().accept(this);
         return null;

@@ -107,6 +107,19 @@ public class CodeGenerationVisitorTest {
         assertEquals("true\n", getOutput("Boolean b = true; print b;"));
     }
 
+    @Test
+    public void functions() throws Exception {
+        assertEquals("18.000000\n", getOutput("Scalar mulle(Scalar a, Scalar b) do return a*b; end print mulle(3,6);"));
+
+        //TODO: fix dotproduct and test under multiplication
+        //assertEquals("18.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
+
+        //assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
+        assertEquals("[4,5,6]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
+
+
+    }
+
     @Ignore
     public void negation() throws Exception {
         assertEquals("-1.000000\n", getOutput("Scalar m = 1; Scalar n = -m; print n;"));

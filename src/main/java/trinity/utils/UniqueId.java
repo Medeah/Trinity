@@ -1,4 +1,4 @@
-package trinity;
+package trinity.utils;
 
 /**
  * Class for generating unique ids

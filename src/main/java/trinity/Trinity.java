@@ -15,7 +15,6 @@ import trinity.visitors.TypeVisitor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -156,6 +155,6 @@ public class Trinity {
         ParseTree tree = parse(input).a;
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
-        System.out.print(prettyPrinter.getString());
+        System.out.print(prettyPrinter.getOutput());
     }
 }

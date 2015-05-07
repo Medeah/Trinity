@@ -37,6 +37,6 @@ public class PrettyPrintTest {
 
         prettyPrinter.visit(tree);
 
-        assertEquals(pretty, prettyPrinter.getString());
+        assertEquals(pretty, prettyPrinter.getOutput());
     }
 }

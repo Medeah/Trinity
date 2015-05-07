@@ -7,6 +7,7 @@ import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
 import trinity.types.Type;
+import trinity.utils.UniqueId;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,12 +21,12 @@ import static com.google.common.io.Resources.getResource;
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
     private int scopeDepth = 0;
-    private StringBuilder output;
-    private StringBuilder mainBody;
-    private StringBuilder funcBody;
-    private StringBuilder globals;
+    private static final StringBuilder output = new StringBuilder();
+    private static final StringBuilder mainBody = new StringBuilder();
+    private static final StringBuilder funcBody = new StringBuilder();
+    private static final StringBuilder globals = new StringBuilder();
 
-    private DependencyVisitor dependencyVisitor = new DependencyVisitor();
+    private final DependencyVisitor dependencyVisitor = new DependencyVisitor();
 
     /**
      * Get C code output after calling visit.
@@ -107,12 +108,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitProg(TrinityParser.ProgContext ctx) {
-        // Initialize
+        // Reset variables and StringBuilders
         scopeDepth = 0;
-        output = new StringBuilder();
-        mainBody = new StringBuilder();
-        funcBody = new StringBuilder();
-        globals = new StringBuilder();
+        output.setLength(0);
+        mainBody.setLength(0);
+        funcBody.setLength(0);
+        globals.setLength(0);
 
         setEmitterContext(mainBody);
 

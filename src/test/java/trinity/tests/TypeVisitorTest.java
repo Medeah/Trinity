@@ -3,6 +3,7 @@ package trinity.tests;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.junit.Ignore;
 import org.junit.Test;
 import trinity.customExceptions.ParseException;
 import trinity.*;
@@ -249,7 +250,6 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Scalar s = 3; if s > 2 then 1+1; end"));
         assertTrue(typeCheck("Scalar s = 25; if (s/5) == 5 then 1+1; end"));
 
-
         assertFalse(typeCheck("if false then 1+2; elseif false then 3+3; elseif true then 1+true; end "));
         assertFalse(typeCheck("if false then true+false; end"));
         assertFalse(typeCheck("if true or false then [1,2,4][6,7,8][3,7,6]+345; end"));
@@ -259,9 +259,11 @@ public class TypeVisitorTest {
 
     }
 
+    // TODO: check bounds ved ranges, indexering, etc.
+
     @Test
     public void overflowStuff() throws Exception {
-        //TODO: fuck
+        // TODO: type check overflow / loss of precision af floats
         //assertFalse(typeCheck("Scalar a = " + Float.MAX_VALUE + 1 + ";"));
         assertFalse(typeCheck("Vector[" + Integer.MAX_VALUE + 1 + "] a() do end"));
         assertFalse(typeCheck("Matrix[" + Integer.MAX_VALUE + 1 + ",2] a() do end"));
@@ -269,12 +271,12 @@ public class TypeVisitorTest {
         assertTrue(typeCheck("Matrix[" + Integer.MAX_VALUE + ",2] a() do end"));
     }
 
-    /*@Test
+    // TODO: type inference.
+    @Ignore
     public void testTypeInference() throws Exception {
-        // if you want it, then you should have put a ring on it?
         assertTrue(typeCheck("Matrix m = [1,2][3,4][5,6]; Matrix[3,2] n = m;"));
         assertFalse(typeCheck("Matrix m = [1,2][3,4]; Matrix[3,2] n = m;"));
         assertTrue(typeCheck("Vector v = [1,2,3,4]; Vector[4] w = v;"));
         assertFalse(typeCheck("Vector v = [1,2,3,4]; Vector[3] w = v;"));
-    }*/
+    }
 }

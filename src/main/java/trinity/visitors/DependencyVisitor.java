@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import trinity.*;
 import trinity.types.MatrixType;
+import trinity.utils.UniqueId;
 
 import java.util.ArrayList;
 import java.util.List;

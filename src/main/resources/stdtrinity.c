@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
@@ -44,7 +45,7 @@ bool print_s(float s) {
   return true;
 }
 
-float* fmmult(int s, float* A, int rowsA, int colsA) {
+float* fmmult(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
@@ -54,9 +55,9 @@ float* fmmult(int s, float* A, int rowsA, int colsA) {
 	}
 
 	return resMatrix;
-} // TODO: call free() on matrix resMatrix
+} /* TODO: call free() on matrix resMatrix */
 
-float* mfdiv(int s, float* A, int rowsA, int colsA) {
+float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
@@ -66,7 +67,7 @@ float* mfdiv(int s, float* A, int rowsA, int colsA) {
 	}
 
 	return resMatrix;
-} // TODO: call free() on matrix resMatrix
+} /* TODO: call free() on matrix resMatrix */
 
 float* transpose(float* A, int nrRowsA, int nrColsA) {
 	int n;
@@ -80,7 +81,7 @@ float* transpose(float* A, int nrRowsA, int nrColsA) {
     }
 
     return resMatrix;
-}// TODO: call free() on matrix resMatrix
+}/* TODO: call free() on matrix resMatrix */
 
 float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	int rowsC, colsC, indexA, indexB, crA, ccA, crB, ccB, Cindex = 0;
@@ -103,7 +104,53 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	}
 
 	return C;
-}// TODO: call free on C
+}/* TODO: call free on C */
+
+float dotProduct(float* A, float* B, size_t size) {
+	float sum = 0.0f;
+	int i;
+
+	for (i = 0; i < size; i++) {
+		sum += A[i] * B[i];
+	}
+
+	return sum;
+}
+
+bool mmeq(float* A, float* B, size_t rows, size_t cols) {
+	int i;
+
+	for (i = 0; i < rows * cols; i++) {
+		if (A[i] != B[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+float* mmadd(float* A, float* B, int rows, int cols) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rows * cols * sizeof(float));
+
+	for (i = 0; i < rows * cols; i++) {
+		resMatrix[i] = A[i] + B[i];
+	}
+
+	return resMatrix;
+}
+
+float* mmsubt(float* A, float* B, int rows, int cols) {
+	int i;
+	float* resMatrix;
+	resMatrix = malloc(rows * cols * sizeof(float));
+
+	for (i = 0; i < rows * cols; i++) {
+		resMatrix[i] = A[i] - B[i];
+	}
+
+	return resMatrix;
+}
 
 float _abs(float s) {
   return fabs(s);

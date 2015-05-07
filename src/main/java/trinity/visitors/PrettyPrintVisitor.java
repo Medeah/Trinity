@@ -8,29 +8,33 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
-import trinity.UniqueId;
 import trinity.types.Type;
 
+// TODO: keep comments and whitespace?
+
+/**
+ * Pretty print visitor for the Trinity Language
+ */
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
     private int indentLevel = 0;
     private int spaces = 0;
-    // TODO: builder should maybe be initialised during visit so it doesn't duplicate.
-    final private StringBuilder builder = new StringBuilder ();
 
-    private void emit(String string) {
+    private static final StringBuilder builder = new StringBuilder ();
+
+    private static void emit(String string) {
         builder.append(string);
     }
 
-    private void emit(ParseTree node) {
+    private static void emit(ParseTree node) {
         emit(node.getText());
     }
 
-    private void emit(Token token) {
+    private static void emit(Token token) {
         emit(token.getText());
     }
 
-    private void indent() {
+    private final void indent() {
         emit(Strings.repeat(" ", indentLevel * spaces));
     }
 
@@ -43,12 +47,18 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
         this.spaces = spaces;
     }
 
-    public String getString() {
+    /**
+     * Get pretty printed code after calling visit
+     * @return pretty printed code
+     */
+    public String getOutput() {
         return builder.toString();
     }
 
     @Override
     public Object visitProg(TrinityParser.ProgContext ctx) {
+        // Clear the StringBuilder
+        builder.setLength(0);
         for (ParseTree child : ctx.children) {
             child.accept(this);
             emit(System.lineSeparator());

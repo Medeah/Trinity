@@ -94,10 +94,10 @@ public class CodeGenerationVisitorTest {
     @Ignore
     public void testRange() throws Exception {
         assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
-        assertEquals("[1,2,3,4]\n", getOutput("Vector[4] v = [1..4]; print v;"));
+        assertEquals("[1.000000, 2.000000, 3.000000, 4.000000]\n", getOutput("Vector[4] v = [1..4]; print v;"));
+        assertEquals("true\n", getOutput("print [1,2,3][3,4,5] == [1..3][3..5];"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3..5]; print v;"));
     }
-
-    
 
     @Test
     public void declarations() throws Exception {
@@ -105,6 +105,14 @@ public class CodeGenerationVisitorTest {
         assertEquals("[4.000000, 6.000000]\n", getOutput("Vector[2] v = [4,6]; print v;"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[4.000000, 5.000000, 6.000000]\n", getOutput("Matrix[2,3] m = [1,2,3][4,5,6]; print m;"));
         assertEquals("true\n", getOutput("Boolean b = true; print b;"));
+    }
+
+    @Test
+    public void functions() throws Exception {
+        assertEquals("18.000000\n", getOutput("Scalar mulle(Scalar a, Scalar b) do return a*b; end print mulle(3,6);"));
+        assertEquals("32.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
+        assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
+        assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
     }
 
     @Test
@@ -125,21 +133,67 @@ public class CodeGenerationVisitorTest {
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = m*j; print k;"));
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = j*m; print k;"));
         assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
+        assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
     }
 
     @Test
-    public void Division() throws Exception {
+    public void division() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar a = 100; Scalar t = 25; print a / t;"));
         assertEquals("[1.000000, 2.000000, 4.000000, 8.000000]\n", getOutput("Vector[4] v = [2, 4, 8, 16]; Scalar n = 2; print v / n;"));
         assertEquals("[8.000000, 7.000000]\n[6.000000, 5.000000]\n[4.000000, 3.000000]\n[2.000000, 1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = 2; print m / i;"));
-        assertEquals("[-8.000000, -7.000000]\n[-6.000000, -5.000000]\n[-4.000000, -3.000000]\n[-2.000000, -1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = -2; print m / i;"));
+        assertEquals("[-8.000000, -7.000000, -6.000000, -5.000000]\n", getOutput("Vector[4] v = [16, 14, 12, 10]; Scalar i = -2; print v / i;"));
     }
 
-    @Ignore
-    public void Transpose() throws Exception {
-        assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, 5.000000, 8.000000]\n[3.000000, 6.000000, 9.000000]\n[10.000000, 11.000000, 12.000000]\n","Matrix[3,4] m = [1, 2, 3, 10][4, 5, 6, 11][7 , 8, 9, 12]; Matrix[4,3] t = m'; print t;");
+    @Test
+    public void not() throws Exception {
+        assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
+        assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));
     }
 
+    @Test
+    public void transpose() throws Exception {
+        assertEquals("[1.000000, 7.000000]\n[5.000000, -5.000000]\n[6.000000, -1.000000]\n", getOutput("Matrix[2,3] m = [1, 5, 6][7, -5, -1]; Matrix[3,2] t = m'; print t;"));
+        assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, -5.000000, 8.000000]\n[3.000000, -6.000000, 9.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, -5, -6][7, 8, 9]; print m';"));
+        assertEquals("[1.000000]\n[2.000000]\n[3.000000]\n[4.000000]\n[5.000000]\n", getOutput("Vector[5] v = [1, 2, 3, 4, 5]; Matrix[5,1] m = v'; print m;"));
+        assertEquals("[1.000000, 2.000000, 3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[5,1] m = [1][2][3][4][5]; Vector[5] v = m'; print v;"));
+    }
 
+    @Test
+    public void addition() throws Exception {
+        assertEquals("7.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a + b;"));
+        assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = 30; print a + b;"));
+        assertEquals("[-11.000000, -9.000000, -7.000000, 13.000000]\n[13.000000, 13.000000, 13.000000, 3.000000]\n[5.000000, 13.000000, 13.000000, 13.000000]\n", getOutput("Matrix[3,4] m = [1, 2, 3, 4][5, 6, 7, 8][9, 10, 11, 12]; Matrix[3,4] n = [-12, -11, -10, 9][8, 7, 6, -5][-4, 3, 2, 1]; print m + n;"));
+        assertEquals("[5.000000, 7.000000, 9.000000]\n", getOutput("Vector[3] v = [4, 5, 6]; Vector[3] l = [1, 2, 3]; print v + l;"));
+    }
+
+    @Test
+    public void subtraction() throws Exception {
+        assertEquals("3.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a - b;"));
+        assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = -30; print a - b;"));
+        assertEquals("[3.000000, 3.000000, 9.000000]\n", getOutput("Vector[3] v = [4, 5, 6]; Vector[3] l = [1, 2, -3]; print v - l;"));
+        assertEquals("[-3.000000, -13.000000]\n[3.000000, 8.000000]\n[4.000000, -3.000000]\n", getOutput("Matrix[3,2] m = [4, -5][-6, 3][-2, 1]; Matrix[3,2] n = [7, 8][-9, -5][-6, 4]; print m - n;"));
+    }
+
+    @Test
+    public void equality() throws Exception {
+        assertEquals("true\n", getOutput("Boolean t = true; Boolean o = true; print t == o;"));
+        assertEquals("true\n", getOutput("Boolean t = false; Boolean o = false; print t == o;"));
+        assertEquals("false\n", getOutput("Boolean t = true; Boolean o = false; print t == o;"));
+        assertEquals("false\n", getOutput("Boolean t = true; Boolean o = true; print t != o;"));
+        assertEquals("false\n", getOutput("Boolean t = false; Boolean o = false; print t != o;"));
+        assertEquals("true\n", getOutput("Boolean t = true; Boolean o = false; print t != o;"));
+        assertEquals("true\n", getOutput("Scalar s = 12; Scalar c = 12; print s == c;"));
+        assertEquals("false\n", getOutput("Scalar s = -12; Scalar c = 12; print s == c;"));
+        assertEquals("false\n", getOutput("Scalar s = 12; Scalar c = 12; print s != c;"));
+        assertEquals("true\n", getOutput("Scalar s = -12; Scalar c = 12; print s != c;"));
+        assertEquals("true\n", getOutput("Vector[5] d = [1, 2, 3, 4, 5]; Vector[5] q = [1, 2, 3, 4, 5]; print d == q;"));
+        assertEquals("false\n", getOutput("Vector[5] d = [1, 2, 3, 4, 5]; Vector[5] q = [100, 2, 3, 4, 5]; print d == q;"));
+        assertEquals("false\n", getOutput("Vector[5] d = [1, 2, 3, 4, 5]; Vector[5] q = [1, 2, 3, 4, 5]; print d != q;"));
+        assertEquals("true\n", getOutput("Vector[5] d = [1, 2, 3, 4, 5]; Vector[5] q = [100, 2, 3, 4, 5]; print d != q;"));
+        assertEquals("true\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m == n;"));
+        assertEquals("false\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m == n;"));
+        assertEquals("false\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m != n;"));
+        assertEquals("true\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m != n;"));
+    }
 
 }

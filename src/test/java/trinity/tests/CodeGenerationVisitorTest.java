@@ -41,12 +41,12 @@ public class CodeGenerationVisitorTest {
         delete(FileSystems.getDefault().getPath("a.out"));
     }
 
-    @Test
+    @Ignore
     public void parseReturn() throws Exception {
         assertEquals("1.000000\n", getOutput("print 1;"));
     }
 
-    @Test
+    @Ignore
     public void stdlib() throws Exception {
         assertEquals("1.000000\n", getOutput("print abs(-1);"));
         assertEquals("1.000000\n", getOutput("print abs(1);"));
@@ -65,7 +65,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("1.414214\n", getOutput("print sqrt(2);"));
     }
 
-    @Test
+    @Ignore
     public void forLoop() throws Exception {
         assertEquals("1.000000\n2.000000\n3.000000\n4.000000\n", getOutput("for Scalar s in [1,2,3,4] do print s; end"));
         assertEquals("[1.000000, 2.000000]\n[3.000000, 4.000000]\n", getOutput("for Vector[2] v in [1,2][3,4] do print v; end"));
@@ -99,7 +99,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3..5]; print v;"));
     }
 
-    @Test
+    @Ignore
     public void declarations() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar s = 4; print s;"));
         assertEquals("[4.000000, 6.000000]\n", getOutput("Vector[2] v = [4,6]; print v;"));
@@ -107,7 +107,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("true\n", getOutput("Boolean b = true; print b;"));
     }
 
-    @Test
+    @Ignore
     public void functions() throws Exception {
         assertEquals("18.000000\n", getOutput("Scalar mulle(Scalar a, Scalar b) do return a*b; end print mulle(3,6);"));
         assertEquals("32.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
@@ -115,7 +115,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
     }
 
-    @Test
+    @Ignore
     public void negation() throws Exception {
         assertEquals("-1.000000\n", getOutput("Scalar m = 1; Scalar n = -m; print n;"));
         assertEquals("3.000000\n", getOutput("Scalar m= -3; print -m;"));
@@ -123,7 +123,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-1.000000, -2.000000]\n[-3.000000, -4.000000]\n[-5.000000, -1.000000]\n[-6.000000, -2.000000]\n", getOutput("Matrix[4,2] M = [1, 2][3, 4][5, 1][6, 2]; print -M;"));
     }
 
-    @Test
+    @Ignore
     public void multiplication() throws Exception {
         assertEquals("125.000000\n", getOutput("Scalar a = 5; Scalar b = 25; Scalar r = a * b; print r;"));
         assertEquals("-125.000000\n", getOutput("Scalar a = 5; Scalar b = -25; Scalar r = a * b; print r;"));
@@ -136,7 +136,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
     }
 
-    @Test
+    @Ignore
     public void division() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar a = 100; Scalar t = 25; print a / t;"));
         assertEquals("[1.000000, 2.000000, 4.000000, 8.000000]\n", getOutput("Vector[4] v = [2, 4, 8, 16]; Scalar n = 2; print v / n;"));
@@ -144,13 +144,13 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-8.000000, -7.000000, -6.000000, -5.000000]\n", getOutput("Vector[4] v = [16, 14, 12, 10]; Scalar i = -2; print v / i;"));
     }
 
-    @Test
+    @Ignore
     public void not() throws Exception {
         assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
         assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));
     }
 
-    @Test
+    @Ignore
     public void transpose() throws Exception {
         assertEquals("[1.000000, 7.000000]\n[5.000000, -5.000000]\n[6.000000, -1.000000]\n", getOutput("Matrix[2,3] m = [1, 5, 6][7, -5, -1]; Matrix[3,2] t = m'; print t;"));
         assertEquals("[1.000000, 4.000000, 7.000000]\n[2.000000, -5.000000, 8.000000]\n[3.000000, -6.000000, 9.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, -5, -6][7, 8, 9]; print m';"));
@@ -158,7 +158,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[1.000000, 2.000000, 3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[5,1] m = [1][2][3][4][5]; Vector[5] v = m'; print v;"));
     }
 
-    @Test
+    @Ignore
     public void addition() throws Exception {
         assertEquals("7.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a + b;"));
         assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = 30; print a + b;"));
@@ -166,7 +166,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[5.000000, 7.000000, 9.000000]\n", getOutput("Vector[3] v = [4, 5, 6]; Vector[3] l = [1, 2, 3]; print v + l;"));
     }
 
-    @Test
+    @Ignore
     public void subtraction() throws Exception {
         assertEquals("3.000000\n", getOutput("Scalar a = 5; Scalar b = 2; print a - b;"));
         assertEquals("-5.000000\n", getOutput("Scalar a = -35; Scalar b = -30; print a - b;"));
@@ -174,7 +174,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-3.000000, -13.000000]\n[3.000000, 8.000000]\n[4.000000, -3.000000]\n", getOutput("Matrix[3,2] m = [4, -5][-6, 3][-2, 1]; Matrix[3,2] n = [7, 8][-9, -5][-6, 4]; print m - n;"));
     }
 
-    @Test
+    @Ignore
     public void equality() throws Exception {
         assertEquals("true\n", getOutput("Boolean t = true; Boolean o = true; print t == o;"));
         assertEquals("true\n", getOutput("Boolean t = false; Boolean o = false; print t == o;"));

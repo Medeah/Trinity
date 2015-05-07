@@ -43,25 +43,25 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     @Override
     public Boolean visitBlock(TrinityParser.BlockContext ctx){
         int stmtSize = ctx.stmt().size();
-        boolean isReturnNull = (ctx.returnStmt() != null) ? !ctx.returnStmt().accept(this) : true;
+        boolean isReturnNotNull = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : false;
 
         //checks if a function does not contain any statements or returns.
         //ignores blocks who is not directly in the function base.
-        if(ctx.parent instanceof TrinityParser.FunctionDeclContext && stmtSize == 0 && isReturnNull){
+        if(ctx.parent instanceof TrinityParser.FunctionDeclContext && stmtSize == 0 && !isReturnNotNull){
             errorReporter.reportError("Empty functions is not allowed.", ctx);
             return false;
         }
 
-        if(stmtSize == 0 && isReturnNull) {
+        if(stmtSize == 0 && !isReturnNotNull) {
             return false;
         }else{
             for (int i = 0; i < stmtSize; i++) {
                 boolean tmp = ctx.stmt(i).accept(this);
                 System.out.println("Current code: " + ctx.getText());
                 System.out.println("Line: " + ctx.stmt(i).getText());
-                System.out.println("Current return: " + isReturnNull);
+                System.out.println("Current return: " + isReturnNotNull);
                 System.out.println("Current...: " + tmp);
-                if(!tmp && isReturnNull){
+                if(!tmp && !isReturnNotNull){
                     errorReporter.reportError("No return found in inner blocks.", ctx);
                 }
             }

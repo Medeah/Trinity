@@ -6,91 +6,76 @@ import trinity.*;
 import trinity.types.MatrixType;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 /**
- * Visit vector and matrix literals and aggregates a list of all element expressions, and stores a unique id for later referencing.
+ * Visit vector and matrix literals to aggregates a list of all element expressions, and store a unique id for future reference.
  */
-public class DependencyVisitor extends TrinityBaseVisitor<Iterable<NeedInit>> implements TrinityVisitor<Iterable<NeedInit>> {
+public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>> implements TrinityVisitor<Iterable<StaticMatrix>> {
 
-    // TODO: accept vectors instead
-    // TODO: the ref is a hack for doing dependency referencing :(
-    // The variable stores the generated ids for pre-initialized matrices and vectors
-    // so they can be referenced later on.
-    @Override
-    public Iterable<NeedInit> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-        ctx.ref = UniqueId.next();
+    private static StaticMatrix createStaticMatrix(String id, List<TrinityParser.VectorContext> vectors) {
+        StaticMatrix staticMatrix = new StaticMatrix();
+        staticMatrix.id = id;
+        staticMatrix.items = new ArrayList<>();
 
-        NeedInit needInit = new NeedInit();
-        needInit.id = ctx.ref;
-        needInit.items = new ArrayList<>();
-
-        //TODO: fix this
-        if(ctx.matrix() != null) {
-            for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
+        if (vectors != null) {
+            for (TrinityParser.VectorContext vector : vectors) {
                 if (vector.exprList() != null) {
-                    needInit.items.addAll(vector.exprList().expr());
+                    staticMatrix.items.addAll(vector.exprList().expr());
                 } else if (vector.range() != null) {
-                    //ni.items = ctx.vector().range();
+                    //ni.items = vector.range();
                     //TODO: range
                     System.out.println("dv: no range yet!");
                 }
             }
-        } else {
-            //TODO: remove the risk.
-            //throw new Exception
-            System.out.println("Congratz! This should not happen :D");
         }
 
-        MatrixType type = ((MatrixType)ctx.t);
-        //TODO: ensure and remove
-        assert needInit.items.size() == type.getCols() * type.getRows();
-        if(needInit.items.size() != type.getCols() * type.getRows())
-            System.out.println("DV ERROR");
-
-        return aggregateResult(visitChildren(ctx), ImmutableList.of(needInit));
+        return staticMatrix;
     }
 
+    // The ref variable stores the generated ids for pre-initialized matrices and vectors
+    // so they can be referenced later on.
     @Override
-    public Iterable<NeedInit> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+    public Iterable<StaticMatrix> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
+        if (ctx.matrix() != null) {
+            return null;
+        }
+
         ctx.ref = UniqueId.next();
 
-        NeedInit needInit = new NeedInit();
-        needInit.id = ctx.ref;
-        needInit.items = new ArrayList<TrinityParser.ExprContext>();
+        StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, ctx.matrix().vector());
 
-        //TODO: fix this
-        if(ctx.vector() != null){
-            //for(TrinityParser.VectorContext vector : ctx.matrix().vector()) {
-            TrinityParser.VectorContext vector = ctx.vector();
-                if (vector.exprList() != null) {
-                    needInit.items.addAll(vector.exprList().expr());
-                } else if (vector.range() != null) {
-                    //ni.items = ctx.vector().range();
-                    //TODO: range
-                    System.out.println("dv: no range yet!");
-                }
-            //}
-        } else {
-            //TODO: remove the risk.
-            //throw new Exception
-            System.out.println("Congratz! This should not happen :D");
-        }
-
-        MatrixType type = ((MatrixType)ctx.t);
         //TODO: ensure and remove
-        assert needInit.items.size() == type.getCols() * type.getRows();
-        if(needInit.items.size() != type.getCols() * type.getRows())
+        MatrixType type = ((MatrixType) ctx.t);
+        assert staticMatrix.items.size() == type.getCols() * type.getRows();
+        if (staticMatrix.items.size() != type.getCols() * type.getRows())
             System.out.println("DV ERROR");
 
-        return aggregateResult(visitChildren(ctx), ImmutableList.of(needInit));
-
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }
 
     @Override
-    protected Iterable<NeedInit> aggregateResult(Iterable<NeedInit> aggregate, Iterable<NeedInit> nextResult) {
-        if(aggregate == null) {
+    public Iterable<StaticMatrix> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
+        ctx.ref = UniqueId.next();
+
+        StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, singletonList(ctx.vector()));
+
+        //TODO: ensure and remove
+        MatrixType type = ((MatrixType) ctx.t);
+        assert staticMatrix.items.size() == type.getCols() * type.getRows();
+        if (staticMatrix.items.size() != type.getCols() * type.getRows())
+            System.out.println("DV ERROR");
+
+        return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
+    }
+
+    @Override
+    protected Iterable<StaticMatrix> aggregateResult(Iterable<StaticMatrix> aggregate, Iterable<StaticMatrix> nextResult) {
+        if (aggregate == null) {
             return nextResult;
-        } else if(nextResult == null) {
+        } else if (nextResult == null) {
             return aggregate;
         }
         return Iterables.concat(aggregate, nextResult);

@@ -1,6 +1,6 @@
 Matrix[2,3] M = [2, 4, 6] [3, 5, 1];
-Matrix[2,3] N = -M;
-Matrix[3,2] T = M';
+#Matrix[2,3] N = -M;
+#Matrix[3,2] T = M';
 
 Scalar m = 2;
 
@@ -20,5 +20,15 @@ print b();
 
 
 for Scalar gideon in [1,23+2,4/2*2,5,6,6,7,7,678] do
-    print gideon;
+    #print gideon;
+end
+
+
+Matrix[3,4] baumann = [1, 23+5, a(), 40][3*2+2, 5-3, -23, 10/2][7^2, 3, 34, 121];
+
+for Vector[4] blegmand in baumann do
+    for Scalar gideon in blegmand do
+        print gideon;
+    end
+    print 100000000;
 end

@@ -92,7 +92,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             for (StaticMatrix staticMatrix : matrices) {
                 // Declare array
                 //emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
-                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.items.size() + ");");
+                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.items.size() + "*sizeof(float));");
 
                 // Init array elements
                 for (int i = 0; i < staticMatrix.items.size(); i++) {

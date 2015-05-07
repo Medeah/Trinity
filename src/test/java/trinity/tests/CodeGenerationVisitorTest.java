@@ -110,14 +110,9 @@ public class CodeGenerationVisitorTest {
     @Test
     public void functions() throws Exception {
         assertEquals("18.000000\n", getOutput("Scalar mulle(Scalar a, Scalar b) do return a*b; end print mulle(3,6);"));
-
-        //TODO: fix dotproduct and test under multiplication
-        //assertEquals("18.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
-
-        //assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
-        assertEquals("[4,5,6]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
-
-
+        assertEquals("32.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
+        assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
+        assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
     }
 
     @Ignore
@@ -138,7 +133,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = m*j; print k;"));
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = j*m; print k;"));
         assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
-        //assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
+        assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
     }
 
     @Ignore

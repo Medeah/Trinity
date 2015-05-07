@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
@@ -54,7 +55,7 @@ float* fmmult(float s, float* A, int rowsA, int colsA) {
 	}
 
 	return resMatrix;
-} // TODO: call free() on matrix resMatrix
+} /* TODO: call free() on matrix resMatrix */
 
 float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	int i;
@@ -66,7 +67,7 @@ float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	}
 
 	return resMatrix;
-} // TODO: call free() on matrix resMatrix
+} /* TODO: call free() on matrix resMatrix */
 
 float* transpose(float* A, int nrRowsA, int nrColsA) {
 	int n;
@@ -80,7 +81,7 @@ float* transpose(float* A, int nrRowsA, int nrColsA) {
     }
 
     return resMatrix;
-}// TODO: call free() on matrix resMatrix
+}/* TODO: call free() on matrix resMatrix */
 
 float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	int rowsC, colsC, indexA, indexB, crA, ccA, crB, ccB, Cindex = 0;
@@ -103,7 +104,7 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	}
 
 	return C;
-}// TODO: call free on C
+}/* TODO: call free on C */
 
 float _abs(float s) {
   return fabs(s);

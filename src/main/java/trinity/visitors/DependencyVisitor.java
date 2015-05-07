@@ -39,7 +39,7 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
     // so they can be referenced later on.
     @Override
     public Iterable<StaticMatrix> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
-        if (ctx.matrix() != null) {
+        if (ctx.matrix() == null) {
             return null;
         }
 

@@ -398,16 +398,25 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 emit("*");
                 ctx.expr(1).accept(this);
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof MatrixType) {
-                emit("mmmult(");
-                ctx.expr(0).accept(this);
-                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emit(",");
-                ctx.expr(1).accept(this);
-                emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-                emit(")");
-            } else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
+                if (((MatrixType) ctx.expr(0).t).getRows() == 1 && ((MatrixType) ctx.expr(1).t).getRows() == 1) {
+                    emit("dotProduct(");
+                    ctx.expr(0).accept(this);
+                    emit(",");
+                    ctx.expr(1).accept(this);
+                    emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                    emit(")");
+                } else {
+                    emit("mmmult(");
+                    ctx.expr(0).accept(this);
+                    emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                    emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                    emit(",");
+                    ctx.expr(1).accept(this);
+                    emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+                    emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+                    emit(")");
+                }
+            }else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
                 emit("fmmult(");
                 ctx.expr(0).accept(this);
                 emit(",");

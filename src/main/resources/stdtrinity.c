@@ -106,6 +106,17 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	return C;
 }/* TODO: call free on C */
 
+float dotProduct(float* A, float* B, size_t size) {
+	float sum = 0.0f;
+	int i;
+
+	for (i = 0; i < colsA; i++) {
+		sum += A[i] * B[i];
+	}
+
+	return sum;
+}
+
 float* mmadd(float* A, float* B, int rows, int cols) {
 	int i;
 	float* resMatrix;

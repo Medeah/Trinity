@@ -541,10 +541,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             if (ctx.op.getText().equals("!=")) {
                 emit("!");
             }
-            emit("meq(");
+            emit("mmeq(");
             ctx.expr(0).accept(this);
             emit(",");
             ctx.expr(1).accept(this);
+            emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+            emit("," + ((MatrixType) ctx.expr(1).t).getCols());
             emit(")");
         }
 

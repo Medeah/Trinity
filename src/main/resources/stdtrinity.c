@@ -117,6 +117,17 @@ float dotProduct(float* A, float* B, size_t size) {
 	return sum;
 }
 
+bool mmeq(float* A, float* B, size_t rows, size_t cols) {
+	int i;
+
+	for (i = 0; i < rows * cols; i++) {
+		if (A[i] != B[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
 float* mmadd(float* A, float* B, int rows, int cols) {
 	int i;
 	float* resMatrix;

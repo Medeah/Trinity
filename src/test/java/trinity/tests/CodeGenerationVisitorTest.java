@@ -35,7 +35,7 @@ public class CodeGenerationVisitorTest {
         return CharStreams.toString(inr);
     }
 
-    @AfterClass
+    //@AfterClass
     public static void removeFiles() throws Exception {
         delete(FileSystems.getDefault().getPath("test.c"));
         delete(FileSystems.getDefault().getPath("a.out"));
@@ -74,7 +74,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("4.000000\n6.000000\n", getOutput("Vector[2] v = [4,6]; for Scalar s in v do print s; end"));
     }
 
-    @Ignore
+    @Test
     public void ifStatements() throws Exception {
         assertEquals("1.000000\n", getOutput("if true then print 1; else print 2; end"));
         assertEquals("3.000000\n", getOutput("if 3 < 2 then print 2; else print 3; end"));
@@ -82,23 +82,21 @@ public class CodeGenerationVisitorTest {
         assertEquals("13.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 != 1 then print 12; else print 13; end"));
     }
 
-    @Ignore
-    public void testBooleans() throws Exception {
-        assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
-        assertEquals("true\n", getOutput("Boolean b = 4 != 3; print b;"));
-        assertEquals("true\n", getOutput("Boolean b = [1,2] == [1,2]; print b;"));
-        assertEquals("true\n", getOutput("Matrix m = [1,2][3,4]; Boolean b = [1,2][3,4] == m; print b;"));
-        assertEquals("false\n", getOutput("Matrix m = [1,2][3,5]; Boolean b = [1,2][3,4] == m; print b;"));
-   }
-
     @Test
     public void testRange() throws Exception {
         assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
         assertEquals("[1.000000, 2.000000, 3.000000, 4.000000]\n", getOutput("Vector[4] v = [1..4]; print v;"));
+        assertEquals("[8.000000, 7.000000, 6.000000]\n", getOutput("Vector[3] v = [8..6]; print v;"));
         assertEquals("true\n", getOutput("print [1,2,3][3,4,5] == [1..3][3..5];"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3..5]; print v;"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1,2,3][3..5]; print v;"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3,4,5]; print v;"));
+    }
+
+    @Test
+    public void matrixDependency() throws Exception {
+        assertEquals("[7.000000, 8.000000, 9.000000]\n[3.000000, 4.000000, 6.000000]\n[187.000000, 24.000000, 5.000000]\n",
+                getOutput("Scalar x(Vector[2] v) do return v[1]; end Vector[2] w = [3,4]; Matrix[3,3] nest = [7..9][3,x(w),6][[1,[3,4]*[6,7]]*[3,4],24,5]; print nest;"));
     }
 
     @Test

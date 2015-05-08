@@ -77,16 +77,17 @@ public class Trinity {
                 PrintWriter pw = new PrintWriter(filename + ".c");
                 pw.println(out);
                 pw.flush();
-                if (options.formatc) {
-                    Process process = new ProcessBuilder("indent", filename + ".c").start();
-                    if (process.waitFor() != 0) {
-                        System.err.println("error running indent, do you have it installed?");
-                    }
+
+                Process ccProcess = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
+                if (ccProcess.waitFor() != 0) {
+                    System.err.println("Error compiling c code");
                 }
 
-                Process process = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
-                if (process.waitFor() != 0) {
-                    System.err.println("Error compiling c code");
+                if (options.formatc) {
+                    Process indentProcess = new ProcessBuilder("indent", filename + ".c").start();
+                    if (indentProcess.waitFor() != 0) {
+                        System.err.println("error running indent, do you have it installed?");
+                    }
                 }
             }
 

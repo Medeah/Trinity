@@ -12,6 +12,7 @@ import trinity.utils.UniqueId;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Stack;
+import java.util.Vector;
 
 import static com.google.common.io.Resources.getResource;
 
@@ -93,20 +94,35 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             for (StaticMatrix staticMatrix : matrices) {
                 // Declare array
                 //emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
-                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.items.size() + "*sizeof(float));");
+                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.size + "*sizeof(float));");
 
-                // Init array elements
-                for (int i = 0; i < staticMatrix.items.size(); i++) {
-                    ParserRuleContext item = staticMatrix.items.get(i);
-                    if(item instanceof TrinityParser.ExprContext) {
-                        emit(staticMatrix.id + "[" + i + "]=");
-                        item.accept(this);
-                        emit(";");
-                    } else if (item instanceof TrinityParser.RangeContext) {
-                        // TODO: skod range
+                // TODO: this could be implemented as a init visitor.
+                // Init array elements from expressions or ranges
+                int i = 0;
+                for (TrinityParser.VectorContext vector : staticMatrix.rows) {
+                    if(vector.exprList() != null) {
+                        for (TrinityParser.ExprContext expr : vector.exprList().expr()) {
+                            emit(staticMatrix.id + "[" + i++ + "]=");
+                            expr.accept(this);
+                            emit(";");
+                        }
+                    } else if (vector.range() != null) {
+                        int from = new Integer(vector.range().NUMBER(0).getText());
+                        int to = new Integer(vector.range().NUMBER(1).getText());
+                        int step = from > to ? -1 : 1;
+
+                        // TODO: refactor
+                        for (int r = from; true; r += step, i++) {
+                            emit(staticMatrix.id + "[" + i + "]=" + r + ";");
+                            if (r == to) {
+                                i++;
+                                break;
+                            }
+                        }
                     }
-
                 }
+
+                assert i == staticMatrix.size;
 
             }
         }
@@ -612,14 +628,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitRange(TrinityParser.RangeContext ctx) {
-        int start = new Integer(ctx.NUMBER(0).getText());
+       /* int start = new Integer(ctx.NUMBER(0).getText());
         int end = new Integer(ctx.NUMBER(1).getText());
         int step = start > end ? -1 : 1;
 
         emit(Integer.toString(start));
         for (int i = start + 1; i < end; i += step) {
             emit("," + i);
-        }
+        }*/
+        emit("{range}");
         return null;
     }
 

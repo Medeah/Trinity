@@ -16,23 +16,27 @@ import static java.util.Collections.singletonList;
  */
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>> implements TrinityVisitor<Iterable<StaticMatrix>> {
 
-    private static StaticMatrix createStaticMatrix(String id, List<TrinityParser.VectorContext> vectors) {
+    private static StaticMatrix createStaticMatrix_xxx(String id, List<TrinityParser.VectorContext> vectors) {
         StaticMatrix staticMatrix = new StaticMatrix();
         staticMatrix.id = id;
-        staticMatrix.items = new ArrayList<>();
+        //staticMatrix.items = new ArrayList<>();
+        //staticMatrix.rows= new ArrayList<>();
 
         if (vectors != null) {
-            for (TrinityParser.VectorContext vector : vectors) {
+            staticMatrix.rows = vectors;
+
+            /*for (TrinityParser.VectorContext vector : vectors) {
                 if (vector.exprList() != null) {
                     staticMatrix.items.addAll(vector.exprList().expr());
                 } else if (vector.range() != null) {
                     //staticMatrix.range = vector.range();
                     staticMatrix.items.add(vector.range());
+
                     //ni.items = vector.range();
                     //TODO: range
                     //System.out.println("dv: no range yet!");
                 }
-            }
+            }*/
         }
 
         return staticMatrix;
@@ -48,9 +52,15 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
 
         ctx.ref = UniqueId.next();
 
-        StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, ctx.matrix().vector());
+        //StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, ctx.matrix().vector());
 
-        assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
+        StaticMatrix staticMatrix = new StaticMatrix();
+        staticMatrix.id = ctx.ref;
+        staticMatrix.rows = ctx.matrix().vector();
+
+        staticMatrix.size = ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
+
+        //assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }
@@ -59,9 +69,14 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
     public Iterable<StaticMatrix> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         ctx.ref = UniqueId.next();
 
-        StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, singletonList(ctx.vector()));
+        //StaticMatrix staticMatrix = createStaticMatrix(ctx.ref, singletonList(ctx.vector()));
+        StaticMatrix staticMatrix = new StaticMatrix();
+        staticMatrix.id = ctx.ref;
+        staticMatrix.rows = singletonList(ctx.vector());
 
-        assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
+        staticMatrix.size =  ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
+
+        //assert staticMatrix.items.size() == ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }

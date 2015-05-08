@@ -74,15 +74,13 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx){
-        boolean returnFound = (ctx.block().size() != 0) ? true : false;
+        boolean contentFound = (ctx.block().size() != 0) ? true : false;
 
         for (int i = 0; i < ctx.block().size(); i++){
-            if(!ctx.block(i).accept(this)){
-                returnFound = false;
-            }
+            if(!ctx.block(i).accept(this)){ contentFound = false; }
         }
 
-        return returnFound;
+        return contentFound;
     }
 
 
@@ -103,6 +101,8 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         return ctx.block().accept(this);
     }
 
-
-
+    @Override
+    public Boolean visitForLoop(TrinityParser.ForLoopContext ctx) {
+        return true;
+    }
 }

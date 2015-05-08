@@ -37,13 +37,6 @@ public class ReachabilityVisitorTest {
         return er.getErrorAmount() == 0;
     }
 
-    @Ignore
-    public void testSimpleIfFunctionFalseOnly() throws Exception {
-        assertFalse(reachabilityTest("if false then\n" +
-                "    1+1;\n" +
-                "end"));
-    }
-
     @Test
     public void testSimpleFunctionFalseOnly() throws Exception {
         assertFalse(reachabilityTest("Scalar s () do\n" +
@@ -175,7 +168,7 @@ public class ReachabilityVisitorTest {
     @Test
     public void testFunctionsWithIfStatementTrueOnly() throws Exception {
         assertTrue(reachabilityTest("Boolean b () do\n" +
-                "    if true then\n" +
+                "    if c then\n" +
                 "        return true;\n" +
                 "    else\n" +
                 "        return false;\n" +
@@ -183,7 +176,7 @@ public class ReachabilityVisitorTest {
                 "end"));
         assertTrue(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
-                "        if true then\n" +
+                "        if cf then\n" +
                 "            return true;\n" +
                 "        else\n" +
                 "            return false;\n" +
@@ -200,7 +193,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop1() throws Exception {
         assertFalse(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
@@ -211,7 +204,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop2() throws Exception {
         assertFalse(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
@@ -222,7 +215,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop3() throws Exception {
         assertTrue(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
@@ -234,7 +227,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop4() throws Exception {
         assertTrue(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
@@ -246,7 +239,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop5() throws Exception {
         assertTrue(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
@@ -255,7 +248,7 @@ public class ReachabilityVisitorTest {
                 "end"));
     }
 
-    @Ignore
+    @Test
     public void testForloop6() throws Exception {
         assertTrue(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +

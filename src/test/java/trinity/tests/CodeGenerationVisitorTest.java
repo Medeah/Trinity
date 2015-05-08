@@ -222,4 +222,11 @@ public class CodeGenerationVisitorTest {
         assertEquals("false\n", getOutput("Scalar s = 2; Scalar d = 45; print s >= d;"));
     }
 
+    @Test
+    public void parens() throws Exception {
+        assertEquals("30.000000\n", getOutput("Scalar a = 3; Scalar b = 7; print (a + b) * a;"));
+        assertEquals("[24.000000, 24.000000]\n[48.000000, 48.000000]\n", getOutput("Matrix[2,2] m = [2, 2][4, 4]; Matrix[2,2] n = m / 2; print (m + m) * m;"));
+        assertEquals("[-24.000000, -24.000000]\n[-48.000000, -48.000000]\n", getOutput("Matrix[2,2] m = [2, 2][4, 4]; Matrix[2,2] n = m / 2; print -((m + m) * m) ;"));
+    }
+
 }

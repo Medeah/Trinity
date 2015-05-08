@@ -382,7 +382,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         }
 
         return null;
-    }// TODO: Throw error when exponent is <0
+    }// TODO: Make matric exponential function
 
 
     @Override

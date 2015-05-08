@@ -133,6 +133,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = m*j; print k;"));
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = j*m; print k;"));
         assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
+        assertEquals("[7.000000, 10.000000]\n[15.000000, 22.000000]\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m * n;"));
         assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
     }
 
@@ -194,6 +195,17 @@ public class CodeGenerationVisitorTest {
         assertEquals("false\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m == n;"));
         assertEquals("false\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m != n;"));
         assertEquals("true\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m != n;"));
+    }
+
+    @Test
+    public void relation() throws Exception {
+        assertEquals("true\n", getOutput("Scalar a = 22.5; Scalar t = 22; Boolean b = a > t; print b;"));
+        assertEquals("false\n", getOutput("Scalar a = 22.5; Scalar t = 22; Boolean b = a < t; print b;"));
+        assertEquals("false\n", getOutput("Scalar a = 22; Scalar t = 22; Boolean b = a < t; print b;"));
+        assertEquals("true\n", getOutput("Scalar e = 45; Scalar r = 45; print e <= r;"));
+        assertEquals("false\n", getOutput("Scalar e = 93; Scalar r = 45; print e <= r;"));
+        assertEquals("true\n", getOutput("Scalar s = 93; Scalar d = 45; print s >= d;"));
+        assertEquals("false\n", getOutput("Scalar s = 2; Scalar d = 45; print s >= d;"));
     }
 
 }

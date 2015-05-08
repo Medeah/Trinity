@@ -390,8 +390,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         expect(op1, op2, ctx);
 
-        if (op1.equals(bool) && op2.equals(bool)) {
-            errorReporter.reportError("Cannot compare booleans", ctx);
+        if (!op1.equals(scalar) && !op2.equals(scalar)) {
+            errorReporter.reportError("Can only compare scalars", ctx);
         }
 
         return ctx.t = bool;
@@ -458,7 +458,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         expect(scalar, op2, ctx.expr(1));
 
         return ctx.t = op1;
-    }
+    } // TODO: It is not possible for matrix types. (old TODO:Check that the exponent is not negative for matrix types)
 
     @Override
     public Type visitAddSubtract(TrinityParser.AddSubtractContext ctx) {

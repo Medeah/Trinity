@@ -106,6 +106,24 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 	return C;
 }/* TODO: call free on C */
 
+float* eye(size_t size) {
+	int i, j;
+
+	float* C;
+	C = malloc(size * size * sizeof(float));
+
+	for (i = 0; i < size* size; i++)
+	{
+		C[i] = 0.0f;
+	}
+
+	for (i = 0; i < size; i++) {
+			C[i * (size + 1)] = 1.0f;
+	}
+
+	return C;
+}
+
 float dotProduct(float* A, float* B, size_t size) {
 	float sum = 0.0f;
 	int i;

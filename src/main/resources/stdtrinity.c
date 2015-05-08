@@ -3,7 +3,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define IDX2R(i,j,ld) (((i)*(ld))+(j))
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
+#define IDX2F(i,j,ld) ((((j)-1)*(ld))+((i)-1))
+#define IDX2T(i,j,ld) ((((i)-1)*(ld))+((j)-1))
 
 /* TODO: maybe we don't need this */
 bool print_m_c(float *m, int r, int c) {

@@ -13,7 +13,7 @@ public class UniqueId {
      * @return a unique identifier
      */
     public static String next() {
-        return "_u" + idc++;
+        return "u" + idc++;
     }
 
     private UniqueId() {

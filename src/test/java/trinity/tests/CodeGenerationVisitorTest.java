@@ -35,7 +35,7 @@ public class CodeGenerationVisitorTest {
         return CharStreams.toString(inr);
     }
 
-    //@AfterClass
+    @AfterClass
     public static void removeFiles() throws Exception {
         delete(FileSystems.getDefault().getPath("test.c"));
         delete(FileSystems.getDefault().getPath("a.out"));
@@ -119,6 +119,14 @@ public class CodeGenerationVisitorTest {
         assertEquals("32.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
         assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
         assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
+    }
+
+    @Ignore
+    public void indexing() throws Exception {
+        //TODO: this shit
+        assertEquals("2.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
+        assertEquals("3.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[2];"));
+
     }
 
     @Test

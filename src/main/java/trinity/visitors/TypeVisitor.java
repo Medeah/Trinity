@@ -296,10 +296,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         expect(scalar, ctx.expr().accept(this), ctx.expr());
 
-        Type symbol;
-
-        Type out;
-
+        Type symbol = null;
         try {
             symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
@@ -309,22 +306,22 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (symbol instanceof MatrixType) {
             MatrixType matrix = (MatrixType) symbol;
             if (matrix.getRows() == 1) {
-                out = scalar;
+                ctx.t = scalar;
             } else {
-                out = new MatrixType(1, matrix.getCols()); // vector
+                ctx.t = new MatrixType(1, matrix.getCols()); // vector
             }
+            // TODO: ugly hack: use literal ref to pass dimensions codegen
+            ctx.ref = Integer.toString(matrix.getCols());
         } else {
-
-            errorReporter.reportError("hmm error", ctx);
-            out = null;
+            errorReporter.reportError("Can only index vectors and matrices.", ctx);
+            ctx.t = null;
         }
-        ctx.t = out;
-        return out;
+
+        return  ctx.t;
     }
 
     @Override
     public Type visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        Type out;
         expect(scalar, ctx.expr(0).accept(this), ctx.expr(0));
         expect(scalar, ctx.expr(1).accept(this), ctx.expr(1));
 
@@ -337,14 +334,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         if (symbol instanceof MatrixType) {
-            out = scalar;
+            ctx.t = scalar;
+            // TODO: ugly hack: use literal ref to pass dimensions codegen
+            MatrixType matrix = (MatrixType) symbol;
+            ctx.ref = matrix.getRows() + "x" + matrix.getCols();
         } else {
-            errorReporter.reportError("hmm error", ctx);
+            errorReporter.reportError("Can only index vectors and matrices.", ctx);
             return null;
         }
 
-        ctx.t = out;
-        return out;
+        return ctx.t;
     }
 
     @Override

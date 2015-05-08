@@ -80,6 +80,12 @@ public class CodeGenerationVisitorTest {
         assertEquals("3.000000\n", getOutput("if 3 < 2 then print 2; else print 3; end"));
         assertEquals("12.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 == 1 then print 12; else print 3; end"));
         assertEquals("13.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 != 1 then print 12; else print 13; end"));
+
+        assertEquals("1.000000\n", getOutput("Scalar s = 2; Scalar d = 2; Scalar a = 33; Boolean i = (s == d); Boolean y = (d < a); if i and y then print 1; else print 2; end"));
+        assertEquals("3.000000\n", getOutput("Boolean b = false; Boolean c = true; if b and c then print 2; else print 3; end"));
+        assertEquals("2.000000\n", getOutput("if true or false then print 2; else print 3; end"));
+        assertEquals("3.000000\n", getOutput("if false or false then print 2; else print 3; end"));
+
     }
 
     @Test
@@ -145,7 +151,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-8.000000, -7.000000, -6.000000, -5.000000]\n", getOutput("Vector[4] v = [16, 14, 12, 10]; Scalar i = -2; print v / i;"));
     }
 
-    @Ignore
+    @Test
     public void not() throws Exception {
         assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
         assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));

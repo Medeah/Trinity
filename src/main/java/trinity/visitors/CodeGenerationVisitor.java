@@ -378,12 +378,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         }
         else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
             emit("mfexpo(");
+            ctx.expr(0).accept(this);
+            emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+            emit(",");
+            ctx.expr(1).accept(this);
             emit(")");
         }
 
         return null;
-    }// TODO: Make matric exponential function
-
+    }
 
     @Override
     public Void visitParens(TrinityParser.ParensContext ctx) {
@@ -488,7 +491,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         //emit("_" + ctx.ID().getText() + "[IDX2R(" + indexVar1 + "," + indexVar2 +"," + cols + ")]");
         emit("_" + ctx.ID().getText() + "[IDX2T(");
         ctx.expr(0).accept(this);
-                emit(",");
+        emit(",");
         ctx.expr(1).accept(this);
                 emit("," + cols + ")]");
         return null;

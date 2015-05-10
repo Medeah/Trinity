@@ -127,6 +127,35 @@ float* eye(size_t size) {
 	return C;
 }
 
+float* mfexpo(float* A, size_t size, int exponent) {
+	int crA, ccA, crB, ccB, Cindex = 0, j = 0, i = 0;
+	float sum;
+	float* C;
+	C = malloc(size * size * sizeof(float));
+
+	if (exponent > 1) {
+		for(j; j < size * size; j++) {
+		C[j] = A[j];
+		}
+		while (exponent > 1) {
+			if (exponent % 2 == 0) {
+				C = mmmult(C, size, size, A, size, size);
+				exponent = exponent - 1;
+			} else {
+				C = mmmult(C, size, size, A, size, size);
+				exponent = exponent - 1;
+			}
+		}
+	} else if (exponent == 1) {
+		return A;
+	} else {
+		C = eye(size);
+		return C;
+	}
+
+	return C;
+}
+
 float dotProduct(float* A, float* B, size_t size) {
 	float sum = 0.0f;
 	int i;

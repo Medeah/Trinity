@@ -229,4 +229,13 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-24.000000, -24.000000]\n[-48.000000, -48.000000]\n", getOutput("Matrix[2,2] m = [2, 2][4, 4]; Matrix[2,2] n = m / 2; print -((m + m) * m) ;"));
     }
 
+    @Test
+    public void exponential() throws Exception {
+        assertEquals("262144.000000\n", getOutput("Scalar a = 8; Scalar b = 6; print a ^ b;"));
+        assertEquals("0.015625\n", getOutput("Scalar a = 8; Scalar b = -2; print a ^ b;"));
+        assertEquals("[121824.000000, 149688.000000, 177552.000000]\n[275886.000000, 338985.000000, 402084.000000]\n[429948.000000, 528282.000000, 626616.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, 5, 6][7, 8, 9]; Scalar e = 5; print m ^ e;"));
+        assertEquals("[9.000000, 8.000000, 7.000000]\n[6.000000, 5.000000, 4.000000]\n[3.000000, 2.000000, 1.000000]\n", getOutput("Matrix[3,3] l = [9, 8, 7][6, 5, 4][3, 2, 1]; Matrix[3,3] x = l ^ 1; print x;"));
+        assertEquals("[1.000000, 0.000000, 0.000000, 0.000000]\n[0.000000, 1.000000, 0.000000, 0.000000]\n[0.000000, 0.000000, 1.000000, 0.000000]\n[0.000000, 0.000000, 0.000000, 1.000000]\n", getOutput("Matrix[4,4] y = [5, -9, -8, -7][5, -6, -5, -4][5, 4, 5, 6][5, 7, 8, 9]; print y ^ 0;"));
+    }
+
 }

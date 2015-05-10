@@ -152,8 +152,6 @@ float* mfexpo(float* A, size_t size, int exponent) {
 		C = eye(size);
 		return C;
 	}
-
-	return C;
 }
 
 float dotProduct(float* A, float* B, size_t size) {

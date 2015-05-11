@@ -65,9 +65,14 @@ float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
 
-	for (i = 0; i < rowsA * colsA; i++) {
-		resMatrix[i] = A[i] / s;
-	}
+	if (s != 0){
+    		for (i = 0; i < rowsA * colsA; i++) {
+    			resMatrix[i] = A[i] / s;
+    			//printf("%.1f \n", B[i]);
+    		}
+    	} else {
+    		stdError("It is impossible to divide by", s);
+    	}
 
 	return resMatrix;
 } /* TODO: call free() on matrix resMatrix */
@@ -113,12 +118,7 @@ float* eye(size_t size) {
 	int i, j;
 
 	float* C;
-	C = malloc(size * size * sizeof(float));
-
-	for (i = 0; i < size* size; i++)
-	{
-		C[i] = 0.0f;
-	}
+	C = calloc(size * size, sizeof(float));
 
 	for (i = 0; i < size; i++) {
 			C[i * (size + 1)] = 1.0f;
@@ -127,31 +127,32 @@ float* eye(size_t size) {
 	return C;
 }
 
-float* mfexpo(float* A, size_t size, int exponent) {
-	int crA, ccA, crB, ccB, Cindex = 0, j = 0, i = 0;
+float* mfexpo(float* A, size_t size, float exponent) {
+	int crA, ccA, crB, ccB, j = 0, expo;
 	float sum;
 	float* C;
 	C = malloc(size * size * sizeof(float));
+	/* rounding of the exponent. Decimal number not currently supported.*/
+	expo = round(exponent);
 
-	if (exponent > 1) {
+	if (expo > 1) {
 		for(j; j < size * size; j++) {
 		C[j] = A[j];
 		}
-		while (exponent > 1) {
-			if (exponent % 2 == 0) {
-				C = mmmult(C, size, size, A, size, size);
-				exponent = exponent - 1;
-			} else {
-				C = mmmult(C, size, size, A, size, size);
-				exponent = exponent - 1;
-			}
+		while (expo > 1) {
+			C = mmmult(C, size, size, A, size, size);
+			expo = expo - 1;
 		}
-	} else if (exponent == 1) {
+	} else if (expo == 1) {
 		return A;
-	} else {
+	} else if (expo == 0) {
 		C = eye(size);
 		return C;
+	} else {
+		stdError("The exponential function cannot be calculated with the current exponent value", exponent);
 	}
+
+	return C;
 }
 
 float dotProduct(float* A, float* B, size_t size) {
@@ -198,6 +199,13 @@ float* mmsubt(float* A, float* B, int rows, int cols) {
 	}
 
 	return resMatrix;
+}
+
+int stdError(char* errorString, int value) {
+
+	printf("%s:\n %d\n", errorString, value);
+
+	return(EXIT_FAILURE);
 }
 
 float _abs(float s) {

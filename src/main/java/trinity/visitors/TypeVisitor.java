@@ -457,7 +457,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         expect(scalar, op2, ctx.expr(1));
 
         return ctx.t = op1;
-    } // TODO:Check that the exponent is not negative for matrix types
+    } // TODO:Check that the exponent is not negative for matrix types and round numbers to whole numbers for MatrixT
 
     @Override
     public Type visitAddSubtract(TrinityParser.AddSubtractContext ctx) {

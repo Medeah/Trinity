@@ -48,6 +48,13 @@ bool print_s(float s) {
   return true;
 }
 
+int stdError(char* errorString, int value) {
+
+	printf("%s:\n %d\n", errorString, value);
+
+	return(EXIT_FAILURE);
+}
+
 float* fmmult(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
@@ -135,10 +142,11 @@ float* mfexpo(float* A, size_t size, float exponent) {
 	/* rounding of the exponent. Decimal number not currently supported.*/
 	expo = round(exponent);
 
+    for(j; j < size * size; j++) {
+    	C[j] = A[j];
+    }
+
 	if (expo > 1) {
-		for(j; j < size * size; j++) {
-		C[j] = A[j];
-		}
 		while (expo > 1) {
 			C = mmmult(C, size, size, A, size, size);
 			expo = expo - 1;
@@ -199,13 +207,6 @@ float* mmsubt(float* A, float* B, int rows, int cols) {
 	}
 
 	return resMatrix;
-}
-
-int stdError(char* errorString, int value) {
-
-	printf("%s:\n %d\n", errorString, value);
-
-	return(EXIT_FAILURE);
 }
 
 float _abs(float s) {

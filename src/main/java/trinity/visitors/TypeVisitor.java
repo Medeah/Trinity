@@ -255,8 +255,15 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitRange(TrinityParser.RangeContext ctx) {
-        int from = new Integer(ctx.NUMBER(0).getText());
-        int to = new Integer(ctx.NUMBER(1).getText());
+        int from, to;
+        try {
+            from = new Integer(ctx.NUMBER(0).getText());
+            to = new Integer(ctx.NUMBER(1).getText());
+        } catch (NumberFormatException ex) {
+            errorReporter.reportError("internal error, visitExprList", ctx);
+            return null;
+        }
+
         int size = Math.abs(to - from) + 1;
 
         return new MatrixType(1, size); // vector

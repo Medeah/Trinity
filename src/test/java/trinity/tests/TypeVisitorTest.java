@@ -260,6 +260,13 @@ public class TypeVisitorTest {
 
     }
 
+    @Test
+    public void testDecimalRange() throws Exception {
+        assertFalse(typeCheck("[2.5..3];"));
+        assertFalse(typeCheck("[2..3.5];"));
+        assertFalse(typeCheck("[2..3.4];"));
+    }
+
     // TODO: check bounds ved ranges, indexering, etc.
 
     @Test

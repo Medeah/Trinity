@@ -30,10 +30,11 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     /**
      * Get C code output after calling visit.
+     *
      * @return C code
      */
     public String getOutput() {
-        if(output == null) {
+        if (output == null) {
             return "";
         }
 
@@ -83,6 +84,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     /**
      * Visit expression and emit initialization code for all vector and matrix literals.
+     *
      * @param ctx parse tree rule to search
      */
     private void emitDependencies(ParserRuleContext ctx) {
@@ -99,7 +101,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 // Init array elements from expressions or ranges
                 int i = 0;
                 for (TrinityParser.VectorContext vector : staticMatrix.rows) {
-                    if(vector.exprList() != null) {
+                    if (vector.exprList() != null) {
                         // Initialize each array element with expression.
                         for (TrinityParser.ExprContext expr : vector.exprList().expr()) {
                             emit(staticMatrix.id + "[" + i++ + "]=");
@@ -116,7 +118,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
                         emit("int " + incId + ";");
                         emit("int " + valId + ";");
-                        emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i+=Math.abs(to - from)+1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
+                        emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i += Math.abs(to - from) + 1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
                         emit(staticMatrix.id + "[" + incId + "]=" + valId + ";");
                         emit("}");
                     }
@@ -372,8 +374,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emit(",");
             ctx.expr(1).accept(this);
             emit(")");
-        }
-        else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
+        } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
             emit("mfexpo(");
             ctx.expr(0).accept(this);
             emit("," + ((MatrixType) ctx.expr(0).t).getRows());
@@ -429,7 +430,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                     emit("," + ((MatrixType) ctx.expr(1).t).getCols());
                     emit(")");
                 }
-            }else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
+            } else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
                 emit("fmmult(");
                 ctx.expr(0).accept(this);
                 emit(",");
@@ -446,9 +447,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 emit("," + ((MatrixType) ctx.expr(0).t).getCols());
                 emit(")");
             } // TODO: smarter way to destinguish between Matrix*Primitive and Primitive*Matrix
-        }
-
-        else {
+        } else {
             // Op can only be "*" which we have done or "/" hence the else
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
@@ -585,7 +584,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
-        if (ctx.op.getText().equals("+")){
+        if (ctx.op.getText().equals("+")) {
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
                 emit("+");

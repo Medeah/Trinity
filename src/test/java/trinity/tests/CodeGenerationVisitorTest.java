@@ -85,7 +85,6 @@ public class CodeGenerationVisitorTest {
         assertEquals("3.000000\n", getOutput("Boolean b = false; Boolean c = true; if b and c then print 2; else print 3; end"));
         assertEquals("2.000000\n", getOutput("if true or false then print 2; else print 3; end"));
         assertEquals("3.000000\n", getOutput("if false or false then print 2; else print 3; end"));
-
     }
 
     @Test
@@ -102,7 +101,7 @@ public class CodeGenerationVisitorTest {
     @Test
     public void matrixDependency() throws Exception {
         assertEquals("[7.000000, 8.000000, 9.000000]\n[3.000000, 4.000000, 6.000000]\n[187.000000, 24.000000, 5.000000]\n",
-                getOutput("Scalar x(Vector[2] v) do return v[1]; end Vector[2] w = [3,4]; Matrix[3,3] nest = [7..9][3,x(w),6][[1,[3,4]*[6,7]]*[3,4],24,5]; print nest;"));
+                getOutput("Scalar x(Vector[2] v) do return v[2]; end Vector[2] w = [3,4]; Matrix[3,3] nest = [7..9][3,x(w),6][[1,[3,4]*[6,7]]*[3,4],24,5]; print nest;"));
     }
 
     @Test
@@ -121,12 +120,18 @@ public class CodeGenerationVisitorTest {
         assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
     }
 
-    @Ignore
+    @Test
     public void indexing() throws Exception {
-        //TODO: this shit
-        assertEquals("2.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
-        assertEquals("3.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[2];"));
+        assertEquals("2.000000\n3.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[1]; print a[2];"));
+        assertEquals("15.000000\n", getOutput("Vector[10] a = [11..20]; print a[5];"));
+        assertEquals("12.000000\n2.000000\n4.000000\n", getOutput("Matrix[3,5] a = [11..15][4,6,8,2,1][3..7]; print a[1,2]; print a[2,4]; print a[3,2];"));
+    }
 
+    @Ignore
+    public void indexingBounds() throws Exception {
+        // TODO: bounds checking
+        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
+        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[4];"));
     }
 
     @Test

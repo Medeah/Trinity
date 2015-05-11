@@ -487,9 +487,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         // TODO: bounds check
+        // TODO: maybe use IDX2T define here as well (instead of -1)
         emit("_" + ctx.ID().getText() + "[(int)(");
         ctx.expr().accept(this);
-        emit(")]");
+        emit(")-1]");
         return null;
     }
 

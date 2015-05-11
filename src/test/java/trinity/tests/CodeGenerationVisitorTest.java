@@ -74,29 +74,34 @@ public class CodeGenerationVisitorTest {
         assertEquals("4.000000\n6.000000\n", getOutput("Vector[2] v = [4,6]; for Scalar s in v do print s; end"));
     }
 
-    @Ignore
+    @Test
     public void ifStatements() throws Exception {
         assertEquals("1.000000\n", getOutput("if true then print 1; else print 2; end"));
         assertEquals("3.000000\n", getOutput("if 3 < 2 then print 2; else print 3; end"));
         assertEquals("12.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 == 1 then print 12; else print 3; end"));
         assertEquals("13.000000\n", getOutput("if [1,2] == [1,3] then print 21; elseif 1 != 1 then print 12; else print 13; end"));
+
+        assertEquals("1.000000\n", getOutput("Scalar s = 2; Scalar d = 2; Scalar a = 33; Boolean i = (s == d); Boolean y = (d < a); if i and y then print 1; else print 2; end"));
+        assertEquals("3.000000\n", getOutput("Boolean b = false; Boolean c = true; if b and c then print 2; else print 3; end"));
+        assertEquals("2.000000\n", getOutput("if true or false then print 2; else print 3; end"));
+        assertEquals("3.000000\n", getOutput("if false or false then print 2; else print 3; end"));
     }
 
-    @Ignore
-    public void testBooleans() throws Exception {
-        assertEquals("false\n", getOutput("Boolean b = 4 == 3; print b;"));
-        assertEquals("true\n", getOutput("Boolean b = 4 != 3; print b;"));
-        assertEquals("true\n", getOutput("Boolean b = [1,2] == [1,2]; print b;"));
-        assertEquals("true\n", getOutput("Matrix m = [1,2][3,4]; Boolean b = [1,2][3,4] == m; print b;"));
-        assertEquals("false\n", getOutput("Matrix m = [1,2][3,5]; Boolean b = [1,2][3,4] == m; print b;"));
-   }
-
-    @Ignore
+    @Test
     public void testRange() throws Exception {
         assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
         assertEquals("[1.000000, 2.000000, 3.000000, 4.000000]\n", getOutput("Vector[4] v = [1..4]; print v;"));
+        assertEquals("[8.000000, 7.000000, 6.000000]\n", getOutput("Vector[3] v = [8..6]; print v;"));
         assertEquals("true\n", getOutput("print [1,2,3][3,4,5] == [1..3][3..5];"));
         assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3..5]; print v;"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1,2,3][3..5]; print v;"));
+        assertEquals("[1.000000, 2.000000, 3.000000]\n[3.000000, 4.000000, 5.000000]\n", getOutput("Matrix[2,3] v = [1..3][3,4,5]; print v;"));
+    }
+
+    @Test
+    public void matrixDependency() throws Exception {
+        assertEquals("[7.000000, 8.000000, 9.000000]\n[3.000000, 4.000000, 6.000000]\n[187.000000, 24.000000, 5.000000]\n",
+                getOutput("Scalar x(Vector[2] v) do return v[2]; end Vector[2] w = [3,4]; Matrix[3,3] nest = [7..9][3,x(w),6][[1,[3,4]*[6,7]]*[3,4],24,5]; print nest;"));
     }
 
     @Test
@@ -113,6 +118,20 @@ public class CodeGenerationVisitorTest {
         assertEquals("32.000000\n", getOutput("Scalar dotp(Vector[3] a, Vector[3] b) do Scalar x = 0; return a*b; end Vector[3] v1 = [1,2,3]; print dotp(v1,[4,5,6]);"));
         assertEquals("[28.000000]\n", getOutput("Matrix[1,1] crazy(Vector[2] a, Vector[2] b) do return a*b'; end Vector[2] dave = [2,3]; print crazy(dave,[5,6]);"));
         assertEquals("[4.000000, 5.000000, 6.000000]\n", getOutput("Vector[3] vectosaurus(Scalar a, Scalar b, Scalar c) do return [a,b,c]; end print vectosaurus(4,5,6);"));
+    }
+
+    @Test
+    public void indexing() throws Exception {
+        assertEquals("2.000000\n3.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[1]; print a[2];"));
+        assertEquals("15.000000\n", getOutput("Vector[10] a = [11..20]; print a[5];"));
+        assertEquals("12.000000\n2.000000\n4.000000\n", getOutput("Matrix[3,5] a = [11..15][4,6,8,2,1][3..7]; print a[1,2]; print a[2,4]; print a[3,2];"));
+    }
+
+    @Ignore
+    public void indexingBounds() throws Exception {
+        // TODO: bounds checking
+        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
+        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[4];"));
     }
 
     @Test
@@ -133,6 +152,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = m*j; print k;"));
         assertEquals("[2.000000, 4.000000]\n[6.000000, 8.000000]\n[10.000000, 12.000000]\n", getOutput("Matrix[3,2] m = [1, 2][ 3, 4][5, 6]; Scalar j = 2; Matrix[3,2] k = j*m; print k;"));
         assertEquals("[5.000000, -10.000000]\n[15.000000, -10.000000]\n[23.000000, -14.000000]\n", getOutput("Matrix[3,2] a = [-1, 2][3, 4][5, 6]; Matrix[2,2] b = [1, 2][3, -4]; Matrix[3,2] c = a * b; print c;"));
+        assertEquals("[7.000000, 10.000000]\n[15.000000, 22.000000]\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m * n;"));
         assertEquals("221.000000\n", getOutput("Vector[4] v = [50, 2, 3, 4]; Vector[4] d = [4, 5, 1, 2]; print v * d;"));
     }
 
@@ -144,7 +164,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("[-8.000000, -7.000000, -6.000000, -5.000000]\n", getOutput("Vector[4] v = [16, 14, 12, 10]; Scalar i = -2; print v / i;"));
     }
 
-    @Ignore
+    @Test
     public void not() throws Exception {
         assertEquals("true\n", getOutput("Boolean b = 4 == 3; print !b;"));
         assertEquals("false\n", getOutput("Boolean b = 4 != 3; print !b;"));
@@ -194,6 +214,33 @@ public class CodeGenerationVisitorTest {
         assertEquals("false\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m == n;"));
         assertEquals("false\n", getOutput("Matrix[2,2] m = [1, 2][3, 4]; Matrix[2,2] n = [1, 2][3, 4]; print m != n;"));
         assertEquals("true\n", getOutput("Matrix[2,3] m = [1, 2, 3][4, 5, 6]; Matrix[2,3] n = [6, 5, 4][3, 2, 1]; print m != n;"));
+    }
+
+    @Test
+    public void relation() throws Exception {
+        assertEquals("true\n", getOutput("Scalar a = 22.5; Scalar t = 22; Boolean b = a > t; print b;"));
+        assertEquals("false\n", getOutput("Scalar a = 22.5; Scalar t = 22; Boolean b = a < t; print b;"));
+        assertEquals("false\n", getOutput("Scalar a = 22; Scalar t = 22; Boolean b = a < t; print b;"));
+        assertEquals("true\n", getOutput("Scalar e = 45; Scalar r = 45; print e <= r;"));
+        assertEquals("false\n", getOutput("Scalar e = 93; Scalar r = 45; print e <= r;"));
+        assertEquals("true\n", getOutput("Scalar s = 93; Scalar d = 45; print s >= d;"));
+        assertEquals("false\n", getOutput("Scalar s = 2; Scalar d = 45; print s >= d;"));
+    }
+
+    @Test
+    public void parens() throws Exception {
+        assertEquals("30.000000\n", getOutput("Scalar a = 3; Scalar b = 7; print (a + b) * a;"));
+        assertEquals("[24.000000, 24.000000]\n[48.000000, 48.000000]\n", getOutput("Matrix[2,2] m = [2, 2][4, 4]; Matrix[2,2] n = m / 2; print (m + m) * m;"));
+        assertEquals("[-24.000000, -24.000000]\n[-48.000000, -48.000000]\n", getOutput("Matrix[2,2] m = [2, 2][4, 4]; Matrix[2,2] n = m / 2; print -((m + m) * m) ;"));
+    }
+
+    @Test
+    public void exponential() throws Exception {
+        assertEquals("262144.000000\n", getOutput("Scalar a = 8; Scalar b = 6; print a ^ b;"));
+        assertEquals("0.015625\n", getOutput("Scalar a = 8; Scalar b = -2; print a ^ b;"));
+        assertEquals("[121824.000000, 149688.000000, 177552.000000]\n[275886.000000, 338985.000000, 402084.000000]\n[429948.000000, 528282.000000, 626616.000000]\n", getOutput("Matrix[3,3] m = [1, 2, 3][4, 5, 6][7, 8, 9]; Scalar e = 5; print m ^ e;"));
+        assertEquals("[9.000000, 8.000000, 7.000000]\n[6.000000, 5.000000, 4.000000]\n[3.000000, 2.000000, 1.000000]\n", getOutput("Matrix[3,3] l = [9, 8, 7][6, 5, 4][3, 2, 1]; Matrix[3,3] x = l ^ 1; print x;"));
+        assertEquals("[1.000000, 0.000000, 0.000000, 0.000000]\n[0.000000, 1.000000, 0.000000, 0.000000]\n[0.000000, 0.000000, 1.000000, 0.000000]\n[0.000000, 0.000000, 0.000000, 1.000000]\n", getOutput("Matrix[4,4] y = [5, -9, -8, -7][5, -6, -5, -4][5, 4, 5, 6][5, 7, 8, 9]; print y ^ 0;"));
     }
 
 }

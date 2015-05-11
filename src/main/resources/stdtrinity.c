@@ -3,7 +3,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define IDX2R(i,j,ld) (((i)*(ld))+(j))
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
+#define IDX2F(i,j,ld) ((((j)-1)*(ld))+((i)-1))
+#define IDX2T(i,j,ld) ((((i)-1)*(ld))+((j)-1))
 
 /* TODO: maybe we don't need this */
 bool print_m_c(float *m, int r, int c) {
@@ -45,6 +48,13 @@ bool print_s(float s) {
   return true;
 }
 
+int stdError(char* errorString, int value) {
+
+	printf("%s:\n %d\n", errorString, value);
+
+	return(EXIT_FAILURE);
+}
+
 float* fmmult(float s, float* A, int rowsA, int colsA) {
 	int i;
 	float* resMatrix;
@@ -62,9 +72,14 @@ float* mfdiv(float s, float* A, int rowsA, int colsA) {
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
 
-	for (i = 0; i < rowsA * colsA; i++) {
-		resMatrix[i] = A[i] / s;
-	}
+	if (s != 0){
+    		for (i = 0; i < rowsA * colsA; i++) {
+    			resMatrix[i] = A[i] / s;
+    			//printf("%.1f \n", B[i]);
+    		}
+    	} else {
+    		stdError("It is impossible to divide by", s);
+    	}
 
 	return resMatrix;
 } /* TODO: call free() on matrix resMatrix */
@@ -105,6 +120,48 @@ float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
 
 	return C;
 }/* TODO: call free on C */
+
+float* eye(size_t size) {
+	int i, j;
+
+	float* C;
+	C = calloc(size * size, sizeof(float));
+
+	for (i = 0; i < size; i++) {
+			C[i * (size + 1)] = 1.0f;
+	}
+
+	return C;
+}
+
+float* mfexpo(float* A, size_t size, float exponent) {
+	int crA, ccA, crB, ccB, j = 0, expo;
+	float sum;
+	float* C;
+	C = malloc(size * size * sizeof(float));
+	/* rounding of the exponent. Decimal number not currently supported.*/
+	expo = round(exponent);
+
+    for(j; j < size * size; j++) {
+    	C[j] = A[j];
+    }
+
+	if (expo > 1) {
+		while (expo > 1) {
+			C = mmmult(C, size, size, A, size, size);
+			expo = expo - 1;
+		}
+	} else if (expo == 1) {
+		return A;
+	} else if (expo == 0) {
+		C = eye(size);
+		return C;
+	} else {
+		stdError("The exponential function cannot be calculated with the current exponent value", exponent);
+	}
+
+	return C;
+}
 
 float dotProduct(float* A, float* B, size_t size) {
 	float sum = 0.0f;

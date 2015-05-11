@@ -183,12 +183,13 @@ public class TypeVisitorTest {
     public void testFunctionCall() throws Exception {
         assertTrue(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(1, [1,2]);"));
         assertFalse(typeCheck("Boolean x(Scalar s, Vector[2] v) do return true; end x(true, 1);"));
+        assertFalse(typeCheck("Boolean x(Scalar s) do return true; end  print x();"));
+        assertFalse(typeCheck("Boolean x(Scalar s) do return true; end  print x(1,2);"));
 
         assertTrue(typeCheck("Boolean x(Scalar s) do return true; end Boolean b = x(2);"));
         assertFalse(typeCheck("Boolean x(Scalar s) do return true; end Scalar b = x(2);"));
         assertTrue(typeCheck("Boolean x(Scalar s) do return true; end Boolean b = x(2) and false;"));
         assertTrue(typeCheck("Boolean x(Scalar s) do return true; end  print x(1);"));
-
     }
 
     @Test

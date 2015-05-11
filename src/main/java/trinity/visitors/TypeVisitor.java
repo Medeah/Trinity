@@ -132,6 +132,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 for (int i = 0; i < actualParams.size(); i++) {
                     expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
+            } else if(funcType.getParameterTypes().size() != 0) {
+                errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters", ctx);
+                return null;
             }
             return ctx.t = funcType.getType();
         } else {
@@ -254,10 +257,9 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitRange(TrinityParser.RangeContext ctx) {
         int from = new Integer(ctx.NUMBER(0).getText());
         int to = new Integer(ctx.NUMBER(1).getText());
-        if (from > to) {
-            errorReporter.reportError("Range error, " + from + " is larger than " + to + ".", ctx.NUMBER(0).getSymbol());
-        }
-        return new MatrixType(1, to - from + 1); // vector
+        int size = Math.abs(to - from) + 1;
+
+        return new MatrixType(1, size); // vector
     }
 
     @Override
@@ -294,10 +296,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         expect(scalar, ctx.expr().accept(this), ctx.expr());
 
-        Type symbol;
-
-        Type out;
-
+        Type symbol = null;
         try {
             symbol = symbolTable.retrieveSymbol(ctx.ID().getText());
         } catch (SymbolNotFoundException e) {
@@ -307,22 +306,22 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         if (symbol instanceof MatrixType) {
             MatrixType matrix = (MatrixType) symbol;
             if (matrix.getRows() == 1) {
-                out = scalar;
+                ctx.t = scalar;
             } else {
-                out = new MatrixType(1, matrix.getCols()); // vector
+                ctx.t = new MatrixType(1, matrix.getCols()); // vector
             }
+            // TODO: ugly hack: use literal ref to pass dimensions codegen
+            ctx.ref = Integer.toString(matrix.getCols());
         } else {
-
-            errorReporter.reportError("hmm error", ctx);
-            out = null;
+            errorReporter.reportError("Can only index vectors and matrices.", ctx);
+            ctx.t = null;
         }
-        ctx.t = out;
-        return out;
+
+        return  ctx.t;
     }
 
     @Override
     public Type visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        Type out;
         expect(scalar, ctx.expr(0).accept(this), ctx.expr(0));
         expect(scalar, ctx.expr(1).accept(this), ctx.expr(1));
 
@@ -335,14 +334,16 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         }
 
         if (symbol instanceof MatrixType) {
-            out = scalar;
+            ctx.t = scalar;
+            // TODO: ugly hack: use literal ref to pass dimensions codegen
+            MatrixType matrix = (MatrixType) symbol;
+            ctx.ref = matrix.getRows() + "x" + matrix.getCols();
         } else {
-            errorReporter.reportError("hmm error", ctx);
+            errorReporter.reportError("Can only index vectors and matrices.", ctx);
             return null;
         }
 
-        ctx.t = out;
-        return out;
+        return ctx.t;
     }
 
     @Override
@@ -388,8 +389,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         expect(op1, op2, ctx);
 
-        if (op1.equals(bool) && op2.equals(bool)) {
-            errorReporter.reportError("Cannot compare booleans", ctx);
+        if (!op1.equals(scalar) && !op2.equals(scalar)) {
+            errorReporter.reportError("Can only compare scalars", ctx);
         }
 
         return ctx.t = bool;
@@ -456,7 +457,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         expect(scalar, op2, ctx.expr(1));
 
         return ctx.t = op1;
-    }
+    } // TODO:Check that the exponent is not negative for matrix types and round numbers to whole numbers for MatrixT
 
     @Override
     public Type visitAddSubtract(TrinityParser.AddSubtractContext ctx) {

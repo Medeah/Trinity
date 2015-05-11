@@ -3,9 +3,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/* Index to Rows */
 #define IDX2R(i,j,ld) (((i)*(ld))+(j))
+/* Index to Columns */
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
+/* Index to FORTAN (Columns with 1-indexing)*/
 #define IDX2F(i,j,ld) ((((j)-1)*(ld))+((i)-1))
+/* Index to Trinity (Rows with 1-indexing)*/
 #define IDX2T(i,j,ld) ((((i)-1)*(ld))+((j)-1))
 
 /* TODO: maybe we don't need this */
@@ -25,9 +29,9 @@ bool print_m_c(float *m, int r, int c) {
 bool print_m(float *m, int r, int c) {
   int i, j;
   for(i = 0; i < r; i++) {
-    printf("[%f", m[i*c]);
+    printf("[%f", m[IDX2R(i, 0, c)]);
     for(j = 1; j < c ; j++) {
-      printf(", %f", m[j+i*c]);
+      printf(", %f", m[IDX2R(i, j, c)]);
     }
     printf("]\n");
   }
@@ -48,11 +52,9 @@ bool print_s(float s) {
   return true;
 }
 
-int stdError(char* errorString, int value) {
-
-	printf("%s:\n %d\n", errorString, value);
-
-	return(EXIT_FAILURE);
+void stdError(char* errorString, int value) {
+	fprintf(stderr, "%s:\n %d\n", errorString, value);
+	exit(1);
 }
 
 float* fmmult(float s, float* A, int rowsA, int colsA) {

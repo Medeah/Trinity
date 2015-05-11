@@ -256,35 +256,32 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (ctx.expr().t instanceof MatrixType) {
             MatrixType matrix = (MatrixType) ctx.expr().t;
 
-            //TODO: refactor much.
-            // vector in matrix
-            Boolean vinm = false;
-            if (matrix.getRows() != 1) {
-                vinm = true;
-            }
-
             String incId = UniqueId.next();
-            int size = vinm ? matrix.getRows() : matrix.getCols();
+
+            // TODO: refactor
+            int size;
+            String type, element;
+
+            if (matrix.getRows() != 1) {
+                // Vector in matrix
+                size = matrix.getRows();
+                type = "float*";
+                element = "+IDX2R(" + incId + ",0," + matrix.getCols() + ")";
+            } else {
+                // Scalar in vector
+                size = matrix.getCols();
+                type = "float";
+                element = "[" + incId + "]";
+            }
 
             emit("int " + incId + ";");
             emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
+            // Current scalar/vector being iterated
+            emit(type + " _" + ctx.ID().getText() + "=");
+            ctx.expr().accept(this); // matrix/vector pre-initialized id.
+            emit(element + ";");
 
-            // current scalar/vector being iterated
-            emit(vinm ? "float* " : "float ");
-            emit("_" + ctx.ID().getText());
-            emit("=");
-            ctx.expr().accept(this); //TODO: this should always emit the pre-initialized vector id;
-
-            if (vinm) {
-                // Get pointer to vector in matrix
-                emit("+" + incId + "*");
-                emit(matrix.getCols() + "");
-                emit(";");
-            } else {
-                // Get scalar element
-                emit("[" + incId + "];");
-            }
-
+            // For loop body
             ctx.block().accept(this);
 
             emit("}");
@@ -473,7 +470,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
         String[] dims = ctx.ref.split("x"); // TODO: refactor this hack
-        //int rows = new Integer(hack[0]);
+        //int rows = new Integer(dims[0]);
         int cols = new Integer(dims[1]);
         // TODO: bounds check
         emit("_" + ctx.ID().getText() + "[IDX2T((int)(");

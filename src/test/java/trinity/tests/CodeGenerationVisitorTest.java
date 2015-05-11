@@ -89,7 +89,6 @@ public class CodeGenerationVisitorTest {
 
     @Test
     public void testRange() throws Exception {
-        assertEquals("true\n", getOutput("print [1,2,3,4] == [1..4];"));
         assertEquals("[1.000000, 2.000000, 3.000000, 4.000000]\n", getOutput("Vector[4] v = [1..4]; print v;"));
         assertEquals("[8.000000, 7.000000, 6.000000]\n", getOutput("Vector[3] v = [8..6]; print v;"));
         assertEquals("true\n", getOutput("print [1,2,3][3,4,5] == [1..3][3..5];"));
@@ -130,8 +129,12 @@ public class CodeGenerationVisitorTest {
     @Ignore
     public void indexingBounds() throws Exception {
         // TODO: bounds checking
-        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
-        assertEquals("12.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[4];"));
+        assertEquals("error\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
+        assertEquals("error\n", getOutput("Vector[3] a = [2,3,4]; print a[4];"));
+        assertEquals("error\n", getOutput("Matrix[2,3] a = [2,3,4][1..3]; print a[2,0];"));
+        assertEquals("error\n", getOutput("Matrix[2,3] a = [2,3,4][1..3]; print a[2,4];"));
+        assertEquals("error\n", getOutput("Matrix[2,3] a = [2,3,4][1..3]; print a[0,2];"));
+        assertEquals("error\n", getOutput("Matrix[2,3] a = [2,3,4][1..3]; print a[3,2];"));
     }
 
     @Test

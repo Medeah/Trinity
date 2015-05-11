@@ -3,7 +3,6 @@ package trinity.tests;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.Ignore;
 import org.junit.Test;
 import trinity.customExceptions.ParseException;
 import trinity.ErrorReporter;
@@ -108,7 +107,7 @@ public class ReachabilityVisitorTest {
                 "    do\n" +
                 "    end\n" +
                 "end"));
-        assertFalse(reachabilityTest("Scalar s () do\n" +
+        assertTrue(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
                 "        do\n" +
                 "            return 1;\n" +

@@ -11,6 +11,7 @@ import trinity.utils.UniqueId;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Stack;
 
 import static com.google.common.io.Resources.getResource;
@@ -25,8 +26,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     private static final StringBuilder mainBody = new StringBuilder();
     private static final StringBuilder funcBody = new StringBuilder();
     private static final StringBuilder globals = new StringBuilder();
-
-    private final DependencyVisitor dependencyVisitor = new DependencyVisitor();
 
     /**
      * Get C code output after calling visit.
@@ -88,7 +87,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
      * @param ctx parse tree rule to search
      */
     private void emitDependencies(ParserRuleContext ctx) {
-        Iterable<StaticMatrix> matrices = ctx.accept(dependencyVisitor);
+        DependencyVisitor dependencyVisitor = new DependencyVisitor();
+        ctx.accept(dependencyVisitor);
+        List<StaticMatrix> matrices = dependencyVisitor.getResult();
 
         // Initialize matrix arrays
         if (matrices != null) {

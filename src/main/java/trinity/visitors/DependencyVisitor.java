@@ -2,11 +2,16 @@ package trinity.visitors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import trinity.*;
+import trinity.StaticMatrix;
+import trinity.TrinityBaseVisitor;
+import trinity.TrinityParser;
+import trinity.TrinityVisitor;
 import trinity.types.MatrixType;
 import trinity.utils.UniqueId;
 
 import static java.util.Collections.singletonList;
+
+// TODO: maybe create private output list, and access through method instead of returning and aggregating it.
 
 /**
  * Visits vector and matrix literals, creating a list of all element expressions,

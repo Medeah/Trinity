@@ -12,20 +12,6 @@
 /* Index to Trinity (Rows with 1-indexing)*/
 #define IDX2T(i,j,ld) ((((i)-1)*(ld))+((j)-1))
 
-/* TODO: maybe we don't need this */
-bool print_m_c(float *m, int r, int c) {
-  int i, j;
-  for(i = 0; i < r; i++) {
-    printf("[");
-    for(j = 0; j < c-1; j++) {
-      printf("%f, ", m[IDX2C(i, j, r)]);
-    }
-    printf("%f]\n", m[IDX2C(i, j, r)]);
-  }
-  return true;
-}
-
-/* TODO: define? */
 bool print_m(float *m, int r, int c) {
   int i, j;
   for(i = 0; i < r; i++) {

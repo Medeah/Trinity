@@ -83,7 +83,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     }
 
     /**
-     * Visit expression and emit initialization code for all vector and matrix literals.
+     * Emit initialization code for vector and matrix literals in {@code ctx} expression.
      *
      * @param ctx parse tree rule to search
      */
@@ -118,6 +118,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
                         emit("int " + incId + ";");
                         emit("int " + valId + ";");
+                        // TODO: short this long mf
                         emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i += Math.abs(to - from) + 1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
                         emit(staticMatrix.id + "[" + incId + "]=" + valId + ";");
                         emit("}");
@@ -131,7 +132,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitProg(TrinityParser.ProgContext ctx) {
-        // Reset variables and StringBuilders
+        // Reset scopeDepth and StringBuilders
         scopeDepth = 0;
         output.setLength(0);
         mainBody.setLength(0);

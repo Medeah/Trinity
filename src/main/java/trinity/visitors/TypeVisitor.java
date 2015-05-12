@@ -132,7 +132,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 for (int i = 0; i < actualParams.size(); i++) {
                     expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
-            } else if(funcType.getParameterTypes().size() != 0) {
+            } else if (funcType.getParameterTypes().size() != 0) {
                 errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters", ctx);
                 return null;
             }
@@ -255,8 +255,15 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitRange(TrinityParser.RangeContext ctx) {
-        int from = new Integer(ctx.NUMBER(0).getText());
-        int to = new Integer(ctx.NUMBER(1).getText());
+        int from, to;
+        try {
+            from = new Integer(ctx.NUMBER(0).getText());
+            to = new Integer(ctx.NUMBER(1).getText());
+        } catch (NumberFormatException ex) {
+            errorReporter.reportError("internal error, visitExprList", ctx);
+            return null;
+        }
+
         int size = Math.abs(to - from) + 1;
 
         return new MatrixType(1, size); // vector
@@ -317,7 +324,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             ctx.t = null;
         }
 
-        return  ctx.t;
+        return ctx.t;
     }
 
     @Override

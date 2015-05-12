@@ -24,7 +24,9 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class Trinity {
 
-    private Trinity () {}
+    private Trinity() {
+    }
+
     static CommandLineOptions options = new CommandLineOptions();
 
     private static class CommandLineOptions {
@@ -105,7 +107,7 @@ public class Trinity {
 
     }
 
-    public static String compile(String trinityProgram) throws Exception{
+    public static String compile(String trinityProgram) throws Exception {
         ANTLRInputStream input = new ANTLRInputStream(trinityProgram);
         return compile(input);
     }

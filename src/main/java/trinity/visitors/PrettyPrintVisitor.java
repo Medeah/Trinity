@@ -20,7 +20,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
     private int indentLevel = 0;
     private int spaces = 0;
 
-    private static final StringBuilder builder = new StringBuilder ();
+    private static final StringBuilder builder = new StringBuilder();
 
     private static void emit(String string) {
         builder.append(string);
@@ -49,6 +49,7 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 
     /**
      * Get pretty printed code after calling visit
+     *
      * @return pretty printed code
      */
     public String getOutput() {

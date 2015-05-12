@@ -132,7 +132,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 for (int i = 0; i < actualParams.size(); i++) {
                     expect(funcType.getParameterTypes().get(i), actualParams.get(i).accept(this), actualParams.get(i));
                 }
-            } else if(funcType.getParameterTypes().size() != 0) {
+            } else if (funcType.getParameterTypes().size() != 0) {
                 errorReporter.reportError(ctx.ID().getText() + " called with wrong number of parameters", ctx);
                 return null;
             }
@@ -324,7 +324,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             ctx.t = null;
         }
 
-        return  ctx.t;
+        return ctx.t;
     }
 
     @Override

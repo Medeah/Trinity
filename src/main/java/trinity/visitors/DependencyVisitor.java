@@ -6,18 +6,24 @@ import trinity.*;
 import trinity.types.MatrixType;
 import trinity.utils.UniqueId;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.util.Collections.singletonList;
 
 /**
- * Visit vector and matrix literals to aggregates a list of all element expressions, and store a unique id for future reference.
+ * Visits vector and matrix literals, creating a list of all element expressions,
+ * and store a unique id for future reference. This information is used to initialize
+ * matrix and vector literals during code generation.
  */
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>> implements TrinityVisitor<Iterable<StaticMatrix>> {
-
-    // The ref variable stores the generated ids for pre-initialized matrices and vectors
+    //TODO: move.
+    //The ref variable stores the generated ids for pre-initialized matrices and vectors
     // so they can be referenced later on.
+
+    /**
+     * Creates a new instance of StaticMatrix and adds it to the list.
+     *
+     * @param ctx the parse tree
+     * @return an aggregated list of StaticMatrix
+     */
     @Override
     public Iterable<StaticMatrix> visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
         if (ctx.matrix() == null) {
@@ -33,17 +39,32 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }
 
+    /**
+     * Creates a new instance of StaticMatrix and adds it to the list.
+     * A vector is a matrix with a single row {@code singletonList}
+     *
+     * @param ctx the parse tree
+     * @return an aggregated list of StaticMatrix
+     */
     @Override
     public Iterable<StaticMatrix> visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         ctx.ref = UniqueId.next();
         StaticMatrix staticMatrix = new StaticMatrix();
         staticMatrix.id = ctx.ref;
         staticMatrix.rows = singletonList(ctx.vector());
-        staticMatrix.size =  ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
+        staticMatrix.size = ((MatrixType) ctx.t).getCols() * ((MatrixType) ctx.t).getRows();
 
         return aggregateResult(visitChildren(ctx), ImmutableList.of(staticMatrix));
     }
 
+    /**
+     * Concatenates two lists
+     *
+     * @param aggregate  The previous aggregate value.
+     * @param nextResult The result of the immediately preceeding call
+     *                   to visit a child node.
+     * @return The updated aggregate result.
+     */
     @Override
     protected Iterable<StaticMatrix> aggregateResult(Iterable<StaticMatrix> aggregate, Iterable<StaticMatrix> nextResult) {
         if (aggregate == null) {

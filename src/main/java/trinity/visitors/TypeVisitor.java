@@ -406,10 +406,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op2 = ctx.expr(1).accept(this);
 
         expect(op1, op2, ctx);
-        if (op1.equals(bool)) {
-            errorReporter.reportError("Cannot use operator ==/!= on boolean values.", ctx);
-        }
-        
+
         return ctx.t = bool;
     }
 

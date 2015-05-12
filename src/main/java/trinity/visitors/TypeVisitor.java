@@ -394,11 +394,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         Type op1 = ctx.expr(0).accept(this);
         Type op2 = ctx.expr(1).accept(this);
 
-        expect(op1, op2, ctx);
-
-        if (!op1.equals(scalar) && !op2.equals(scalar)) {
-            errorReporter.reportError("Can only compare scalars", ctx);
-        }
+        expect(scalar, op1, ctx.expr(0));
+        expect(scalar, op2, ctx.expr(1));
 
         return ctx.t = bool;
     }

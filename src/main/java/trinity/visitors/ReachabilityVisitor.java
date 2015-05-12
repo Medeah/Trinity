@@ -5,6 +5,10 @@ import trinity.TrinityBaseVisitor;
 import trinity.TrinityParser;
 import trinity.TrinityVisitor;
 
+/**
+ * The ReachabilityVisitor goes through all function decls, to vertify a return is allways present.
+ */
+
 public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean> {
 
     private ErrorReporter errorReporter;
@@ -13,9 +17,15 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         this.errorReporter = errorReporter;
     }
 
+    /**
+     * Visits all function decls in the desired program.
+     *
+     * @param ctx the parse tree
+     * @return a boolean, true if return is found in all functions
+     */
     @Override
-    public Boolean visitProg(TrinityParser.ProgContext ctx){
-        for (int i = 0; i < ctx.functionDecl().size(); i++){
+    public Boolean visitProg(TrinityParser.ProgContext ctx) {
+        for (int i = 0; i < ctx.functionDecl().size(); i++) {
             // Check every FunctionDecl for unreachable code or missing return statements.
             // If a check has returned false, then end visitor.
 
@@ -28,47 +38,63 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         return true;
     }
 
+    /**
+     * Visit single block inside function.
+     *
+     * @param ctx the parse tree
+     * @return a boolean, true if return is found in all functions
+     */
     @Override
     public Boolean visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-        //TODO: Remember to check block for return-controls thrown too early.
         return ctx.block().accept(this);
     }
 
     @Override
-    public Boolean visitBlock(TrinityParser.BlockContext ctx){
-        boolean isReturnValid = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : false, returnFound = false;
+    public Boolean visitBlock(TrinityParser.BlockContext ctx) {
+        boolean isReturnValid = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : false;
 
         for (TrinityParser.StmtContext csctx : ctx.stmt()) {
-            if (csctx.accept(this)){
-                returnFound = true;
-                break;
+            if (csctx.accept(this)) {
+                return true;
             }
         }
 
-        return (returnFound || isReturnValid);
+        return isReturnValid;
     }
 
+    /**
+     * Visit semi expression inside single expression.
+     *
+     * @param ctx the parse tree
+     * @return a boolean, true if return is found in all functions
+     */
     @Override
-    public Boolean visitSingleExpression(TrinityParser.SingleExpressionContext ctx){
+    public Boolean visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
         return ctx.semiExpr().accept(this);
     }
 
+    /**
+     * Inside the semi expression visits the expression, and returns if its not null.
+     *
+     * @param ctx the parse tree
+     * @return a boolean, true if the expr returns not null
+     */
     @Override
-    public Boolean visitSemiExpr(TrinityParser.SemiExprContext ctx){
+    public Boolean visitSemiExpr(TrinityParser.SemiExprContext ctx) {
         return !(ctx.expr().accept(this) == null);
     }
 
     @Override
-    public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx){
+    public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx) {
         int blocks = ctx.block().size(), exprs = ctx.expr().size();
         boolean contentFound = (blocks != 0) ? true : false;
 
-        if(exprs == blocks){
+        if (exprs == blocks) {
             return false;
         }
 
-        for (TrinityParser.BlockContext btx : ctx.block()){
-            if(contentFound){
+        for (TrinityParser.BlockContext btx : ctx.block()) {
+            if (contentFound) {
                 contentFound = btx.accept(this);
             }
         }
@@ -77,18 +103,35 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     }
 
 
+    /**
+     * Visits the return statement, checks if the semi expression after 'return' is valid.
+     *
+     * @param ctx the parse tree
+     * @return a boolean, true if the return is valid
+     */
     @Override
     public Boolean visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
         return (ctx.semiExpr() != null) ? !ctx.semiExpr().isEmpty() : true;
     }
 
 
+    /**
+     * Visits the block in a block statement
+     *
+     * @param ctx the parse tree
+     * @return what the block returns.
+     */
     @Override
     public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
-        // Simply return whatever the block returns, but do accept empty blocks.
         return ctx.block().accept(this);
     }
 
+    /**
+     * Visits the block in a for loop
+     *
+     * @param ctx the parse tree
+     * @return what the for loop returns.
+     */
     @Override
     public Boolean visitForLoop(TrinityParser.ForLoopContext ctx) {
         return ctx.block().accept(this);

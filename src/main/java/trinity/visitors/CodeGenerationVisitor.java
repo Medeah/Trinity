@@ -7,6 +7,7 @@ import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
 import trinity.types.Type;
+import trinity.utils.Emitter;
 import trinity.utils.UniqueId;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     private static final StringBuilder globals = new StringBuilder();
 
     private final DependencyVisitor dependencyVisitor = new DependencyVisitor();
+    private Emitter emitter;
 
     /**
      * Get C code output after calling visit.
@@ -61,27 +63,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return "";
     }
 
-    // TODO: make emit class or organize code
-    private Stack<StringBuilder> emitStack = new Stack<>();
-
-    private void setEmitterContext(StringBuilder writer) {
-        if (currentWriter != null) {
-            emitStack.push(currentWriter);
-        }
-        currentWriter = writer;
-    }
-
-    private void restoreEmitterContext() {
-        currentWriter = emitStack.pop();
-    }
-
-    //TODO: dynamically set input stream, to avoid bad restoration code.
-    private static StringBuilder currentWriter; //= new StringBuilder();
-
-    private static void emit(String string) {
-        currentWriter.append(string);
-    }
-
     /**
      * Emit initialization code for vector and matrix literals in {@code ctx} expression.
      *
@@ -94,8 +75,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (matrices != null) {
             for (StaticMatrix staticMatrix : matrices) {
                 // Declare array
-                //emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
-                emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.size + "*sizeof(float));");
+                //emitter.emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
+                emitter.emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.size + "*sizeof(float));");
 
                 // TODO: this could be implemented as a visitor.
                 // Init array elements from expressions or ranges
@@ -104,9 +85,9 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                     if (vector.exprList() != null) {
                         // Initialize each array element with expression.
                         for (TrinityParser.ExprContext expr : vector.exprList().expr()) {
-                            emit(staticMatrix.id + "[" + i++ + "]=");
+                            emitter.emit(staticMatrix.id + "[" + i++ + "]=");
                             expr.accept(this);
-                            emit(";");
+                            emitter.emit(";");
                         }
                     } else if (vector.range() != null) {
                         // Initialize range of array elements with for loop.
@@ -116,12 +97,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                         String incId = UniqueId.next();
                         String valId = UniqueId.next();
 
-                        emit("int " + incId + ";");
-                        emit("int " + valId + ";");
+                        emitter.emit("int " + incId + ";");
+                        emitter.emit("int " + valId + ";");
                         // TODO: short this long mf
-                        emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i += Math.abs(to - from) + 1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
-                        emit(staticMatrix.id + "[" + incId + "]=" + valId + ";");
-                        emit("}");
+                        emitter.emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i += Math.abs(to - from) + 1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
+                        emitter.emit(staticMatrix.id + "[" + incId + "]=" + valId + ";");
+                        emitter.emit("}");
                     }
                 }
 
@@ -139,7 +120,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         funcBody.setLength(0);
         globals.setLength(0);
 
-        setEmitterContext(mainBody);
+        emitter = new Emitter(mainBody);
 
         visitChildren(ctx);
         return null;
@@ -149,38 +130,38 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
         if (scopeDepth == 0) {
-            setEmitterContext(globals);
+            emitter.setContext(globals);
 
             ctx.type().accept(this);
-            emit("_" + ctx.ID().getText());
-            emit(";");
+            emitter.emit("_" + ctx.ID().getText());
+            emitter.emit(";");
 
-            restoreEmitterContext();
+            emitter.restoreContext();
 
         } else {
             ctx.type().accept(this);
         }
-        emit("_" + ctx.ID().getText());
-        emit("=");
+        emitter.emit("_" + ctx.ID().getText());
+        emitter.emit("=");
         ctx.semiExpr().accept(this);
         return null;
     }
 
     @Override
     public Void visitFunctionDecl(TrinityParser.FunctionDeclContext ctx) {
-        setEmitterContext(funcBody);
+        emitter.setContext(funcBody);
 
         ctx.type().accept(this);
-        emit("_" + ctx.ID().getText());
-        emit("(");
+        emitter.emit("_" + ctx.ID().getText());
+        emitter.emit("(");
         if (ctx.formalParameters() != null) {
             ctx.formalParameters().accept(this);
         }
-        emit("){");
+        emitter.emit("){");
         ctx.block().accept(this);
-        emit("}");
+        emitter.emit("}");
 
-        restoreEmitterContext();
+        emitter.restoreContext();
         return null;
     }
 
@@ -188,7 +169,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
         ctx.formalParameter(0).accept(this);
         for (int i = 1; i < ctx.formalParameter().size(); i++) {
-            emit(",");
+            emitter.emit(",");
             ctx.formalParameter(i).accept(this);
         }
         return null;
@@ -197,29 +178,29 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitFormalParameter(TrinityParser.FormalParameterContext ctx) {
         ctx.type().accept(this);
-        emit("_" + ctx.ID().getText());
+        emitter.emit("_" + ctx.ID().getText());
         return null;
     }
 
     @Override
     public Void visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
         if (ctx.getText().equals("Boolean")) {
-            emit("bool ");
+            emitter.emit("bool ");
         } else /* Scalar */ {
-            emit("float ");
+            emitter.emit("float ");
         }
         return null;
     }
 
     @Override
     public Void visitVectorType(TrinityParser.VectorTypeContext ctx) {
-        emit("float* ");
+        emitter.emit("float* ");
         return null;
     }
 
     @Override
     public Void visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
-        emit("float* ");
+        emitter.emit("float* ");
         return null;
     }
 
@@ -239,7 +220,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
         emitDependencies(ctx.semiExpr());
-        emit("return ");
+        emitter.emit("return ");
         ctx.semiExpr().accept(this);
         return null;
     }
@@ -247,7 +228,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitSemiExpr(TrinityParser.SemiExprContext ctx) {
         visitChildren(ctx);
-        emit(";");
+        emitter.emit(";");
         return null;
     }
 
@@ -277,20 +258,20 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 element = "[" + incId + "]";
             }
 
-            emit("int " + incId + ";");
-            emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
+            emitter.emit("int " + incId + ";");
+            emitter.emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
             // Current scalar/vector being iterated
-            emit(type + " _" + ctx.ID().getText() + "=");
+            emitter.emit(type + " _" + ctx.ID().getText() + "=");
             ctx.expr().accept(this); // matrix/vector pre-initialized id.
-            emit(element + ";");
+            emitter.emit(element + ";");
 
             // For loop body
             ctx.block().accept(this);
 
-            emit("}");
+            emitter.emit("}");
         } else {
             // TODO: is this safe to remove.
-            emit("INTERNAL-ERROR;");
+            emitter.emit("INTERNAL-ERROR;");
         }
 
         return null;
@@ -303,33 +284,33 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emitDependencies(ctx.expr(i));
         }
 
-        emit("if(");
+        emitter.emit("if(");
         ctx.expr(0).accept(this);
-        emit("){");
+        emitter.emit("){");
         ctx.block(0).accept(this);
 
         int i;
         for (i = 1; i < ctx.expr().size(); i++) {
-            emit("}else if(");
+            emitter.emit("}else if(");
             ctx.expr(i).accept(this);
-            emit("){");
+            emitter.emit("){");
             ctx.block(i).accept(this);
         }
 
         if (ctx.block(i) != null) {
-            emit("}else{");
+            emitter.emit("}else{");
             ctx.block(i).accept(this);
         }
 
-        emit("}");
+        emitter.emit("}");
         return null;
     }
 
     @Override
     public Void visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
-        emit("{");
+        emitter.emit("{");
         ctx.block().accept(this);
-        emit("}");
+        emitter.emit("}");
         return null;
     }
 
@@ -339,22 +320,22 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         Type expType = ctx.semiExpr().expr().t;
         if (expType instanceof PrimitiveType) {
             if (((PrimitiveType) expType).getPType() == EnumType.SCALAR) {
-                emit("print_s(");
+                emitter.emit("print_s(");
                 ctx.semiExpr().expr().accept(this);
-                emit(");");
+                emitter.emit(");");
             } else {
-                emit("print_b(");
+                emitter.emit("print_b(");
                 ctx.semiExpr().expr().accept(this);
-                emit(");");
+                emitter.emit(");");
             }
         } else if (expType instanceof MatrixType) {
-            emit("print_m(");
+            emitter.emit("print_m(");
             ctx.semiExpr().expr().accept(this);
-            emit("," + ((MatrixType) expType).getRows());
-            emit("," + ((MatrixType) expType).getCols());
-            emit(");");
+            emitter.emit("," + ((MatrixType) expType).getRows());
+            emitter.emit("," + ((MatrixType) expType).getCols());
+            emitter.emit(");");
         } else {
-            emit("printf(" + expType.toString() + ");");
+            emitter.emit("printf(" + expType.toString() + ");");
         }
         return null;
     }
@@ -362,7 +343,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitOr(TrinityParser.OrContext ctx) {
         ctx.expr(0).accept(this);
-        emit("||");
+        emitter.emit("||");
         ctx.expr(1).accept(this);
         return null;
     }
@@ -370,18 +351,18 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitExponent(TrinityParser.ExponentContext ctx) {
         if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
-            emit("pow(");
+            emitter.emit("pow(");
             ctx.expr(0).accept(this);
-            emit(",");
+            emitter.emit(",");
             ctx.expr(1).accept(this);
-            emit(")");
+            emitter.emit(")");
         } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
-            emit("mfexpo(");
+            emitter.emit("mfexpo(");
             ctx.expr(0).accept(this);
-            emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-            emit(",");
+            emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+            emitter.emit(",");
             ctx.expr(1).accept(this);
-            emit(")");
+            emitter.emit(")");
         }
 
         return null;
@@ -389,19 +370,19 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitParens(TrinityParser.ParensContext ctx) {
-        emit("(");
+        emitter.emit("(");
         ctx.expr().accept(this);
-        emit(")");
+        emitter.emit(")");
         return null;
     }
 
     @Override
     public Void visitTranspose(TrinityParser.TransposeContext ctx) {
-        emit("transpose(");
+        emitter.emit("transpose(");
         ctx.expr().accept(this);
-        emit("," + ((MatrixType) ctx.expr().t).getRows());
-        emit("," + ((MatrixType) ctx.expr().t).getCols());
-        emit(")");
+        emitter.emit("," + ((MatrixType) ctx.expr().t).getRows());
+        emitter.emit("," + ((MatrixType) ctx.expr().t).getCols());
+        emitter.emit(")");
         return null;
     }
 
@@ -410,58 +391,58 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (ctx.op.getText().equals("*")) {
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
-                emit("*");
+                emitter.emit("*");
                 ctx.expr(1).accept(this);
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof MatrixType) {
                 if (((MatrixType) ctx.expr(0).t).getRows() == 1 && ((MatrixType) ctx.expr(1).t).getRows() == 1) {
-                    emit("dotProduct(");
+                    emitter.emit("dotProduct(");
                     ctx.expr(0).accept(this);
-                    emit(",");
+                    emitter.emit(",");
                     ctx.expr(1).accept(this);
-                    emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                    emit(")");
+                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                    emitter.emit(")");
                 } else {
-                    emit("mmmult(");
+                    emitter.emit("mmmult(");
                     ctx.expr(0).accept(this);
-                    emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                    emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                    emit(",");
+                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                    emitter.emit(",");
                     ctx.expr(1).accept(this);
-                    emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-                    emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-                    emit(")");
+                    emitter.emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+                    emitter.emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+                    emitter.emit(")");
                 }
             } else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
-                emit("fmmult(");
+                emitter.emit("fmmult(");
                 ctx.expr(0).accept(this);
-                emit(",");
+                emitter.emit(",");
                 ctx.expr(1).accept(this);
-                emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-                emit(")");
+                emitter.emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+                emitter.emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+                emitter.emit(")");
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
-                emit("fmmult(");
+                emitter.emit("fmmult(");
                 ctx.expr(1).accept(this);
-                emit(",");
+                emitter.emit(",");
                 ctx.expr(0).accept(this);
-                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emit(")");
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emitter.emit(")");
             } // TODO: smarter way to destinguish between Matrix*Primitive and Primitive*Matrix
         } else {
             // Op can only be "*" which we have done or "/" hence the else
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
-                emit("/");
+                emitter.emit("/");
                 ctx.expr(1).accept(this);
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
-                emit("mfdiv(");
+                emitter.emit("mfdiv(");
                 ctx.expr(1).accept(this);
-                emit(",");
+                emitter.emit(",");
                 ctx.expr(0).accept(this);
-                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emit(")");
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emitter.emit(")");
             }
         }
         return null;
@@ -473,11 +454,11 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         //int rows = new Integer(dims[0]);
         int cols = new Integer(dims[1]);
         // TODO: bounds check
-        emit("_" + ctx.ID().getText() + "[IDX2T((int)(");
+        emitter.emit("_" + ctx.ID().getText() + "[IDX2T((int)(");
         ctx.expr(0).accept(this);
-        emit("),(int)(");
+        emitter.emit("),(int)(");
         ctx.expr(1).accept(this);
-        emit(")," + cols + ")]");
+        emitter.emit(")," + cols + ")]");
         return null;
     }
 
@@ -485,15 +466,15 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         // TODO: bounds check
         // TODO: maybe use IDX2T define here as well (instead of -1)
-        emit("_" + ctx.ID().getText() + "[(int)(");
+        emitter.emit("_" + ctx.ID().getText() + "[(int)(");
         ctx.expr().accept(this);
-        emit(")-1]");
+        emitter.emit(")-1]");
         return null;
     }
 
     @Override
     public Void visitNot(TrinityParser.NotContext ctx) {
-        emit("!");
+        emitter.emit("!");
         ctx.expr().accept(this);
         return null;
     }
@@ -501,27 +482,27 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitRelation(TrinityParser.RelationContext ctx) {
         ctx.expr(0).accept(this);
-        emit(ctx.op.getText());
+        emitter.emit(ctx.op.getText());
         ctx.expr(1).accept(this);
         return null;
     }
 
     @Override
     public Void visitIdentifier(TrinityParser.IdentifierContext ctx) {
-        emit("_" + ctx.ID().getText());
+        emitter.emit("_" + ctx.ID().getText());
         return null;
     }
 
     @Override
     public Void visitNumber(TrinityParser.NumberContext ctx) {
-        emit(ctx.NUMBER().getText());
+        emitter.emit(ctx.NUMBER().getText());
         return null;
     }
 
     @Override
     public Void visitAnd(TrinityParser.AndContext ctx) {
         ctx.expr(0).accept(this);
-        emit("&&");
+        emitter.emit("&&");
         ctx.expr(1).accept(this);
         return null;
     }
@@ -529,26 +510,26 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitNegate(TrinityParser.NegateContext ctx) {
         if (ctx.expr().t instanceof PrimitiveType) {
-            emit("-");
+            emitter.emit("-");
             ctx.expr().accept(this);
         } else if (ctx.expr().t instanceof MatrixType) {
-            emit("fmmult(-1,");
+            emitter.emit("fmmult(-1,");
             ctx.expr().accept(this);
-            emit("," + ((MatrixType) ctx.expr().t).getRows());
-            emit("," + ((MatrixType) ctx.expr().t).getCols());
-            emit(")");
+            emitter.emit("," + ((MatrixType) ctx.expr().t).getRows());
+            emitter.emit("," + ((MatrixType) ctx.expr().t).getCols());
+            emitter.emit(")");
         }
         return null;
     }
 
     @Override
     public Void visitFunctionCall(TrinityParser.FunctionCallContext ctx) {
-        emit("_" + ctx.ID().getText());
-        emit("(");
+        emitter.emit("_" + ctx.ID().getText());
+        emitter.emit("(");
         if (ctx.exprList() != null) {
             ctx.exprList().accept(this);
         }
-        emit(")");
+        emitter.emit(")");
         return null;
     }
 
@@ -559,19 +540,19 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             // Both a Scalar or Boolean
             ctx.expr(0).accept(this);
             // Use same operator as trinity (== or !=)
-            emit(ctx.op.getText());
+            emitter.emit(ctx.op.getText());
             ctx.expr(1).accept(this);
         } else if (ctx.expr(0).t instanceof MatrixType) {
             if (ctx.op.getText().equals("!=")) {
-                emit("!");
+                emitter.emit("!");
             }
-            emit("mmeq(");
+            emitter.emit("mmeq(");
             ctx.expr(0).accept(this);
-            emit(",");
+            emitter.emit(",");
             ctx.expr(1).accept(this);
-            emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-            emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-            emit(")");
+            emitter.emit("," + ((MatrixType) ctx.expr(1).t).getRows());
+            emitter.emit("," + ((MatrixType) ctx.expr(1).t).getCols());
+            emitter.emit(")");
         }
 
         return null;
@@ -579,7 +560,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitBoolean(TrinityParser.BooleanContext ctx) {
-        emit(ctx.BOOL().getText());
+        emitter.emit(ctx.BOOL().getText());
         return null;
     }
 
@@ -588,31 +569,31 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         if (ctx.op.getText().equals("+")) {
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
-                emit("+");
+                emitter.emit("+");
                 ctx.expr(1).accept(this);
             } else {
-                emit("mmadd(");
+                emitter.emit("mmadd(");
                 ctx.expr(0).accept(this);
-                emit(",");
+                emitter.emit(",");
                 ctx.expr(1).accept(this);
-                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emit(")");
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emitter.emit(")");
             }
         } else {
             // Op can only be "+" which we have done or "-" hence the else
             if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
                 ctx.expr(0).accept(this);
-                emit("-");
+                emitter.emit("-");
                 ctx.expr(1).accept(this);
             } else {
-                emit("mmsubt(");
+                emitter.emit("mmsubt(");
                 ctx.expr(0).accept(this);
-                emit(",");
+                emitter.emit(",");
                 ctx.expr(1).accept(this);
-                emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emit(")");
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
+                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                emitter.emit(")");
             }
         }
         return null;
@@ -622,7 +603,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitExprList(TrinityParser.ExprListContext ctx) {
         ctx.expr(0).accept(this);
         for (int i = 1; i < ctx.expr().size(); i++) {
-            emit(",");
+            emitter.emit(",");
             ctx.expr(i).accept(this);
         }
         return null;
@@ -631,14 +612,14 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitMatrixLiteral(TrinityParser.MatrixLiteralContext ctx) {
         // Emit identifier to matrix array initialized with the dependency visitor.
-        emit(ctx.ref);
+        emitter.emit(ctx.ref);
         return null;
     }
 
     @Override
     public Void visitVectorLiteral(TrinityParser.VectorLiteralContext ctx) {
         // Emit identifier to vector array initialized with the dependency visitor.
-        emit(ctx.ref);
+        emitter.emit(ctx.ref);
         return null;
     }
 

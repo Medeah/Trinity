@@ -1,8 +1,33 @@
 package trinity.utils;
 
-// TODO: implement or remove
+import java.util.Stack;
+
 /**
- * Created by mathias on 07/05/15.
+ * Class for emitting code into StringBuilders.
  */
 public class Emitter {
+
+    private StringBuilder currentWriter;
+
+    private final Stack<StringBuilder> emitStack = new Stack<>();
+
+    public Emitter(StringBuilder context) {
+        setContext(context);
+    }
+
+    public void setContext(StringBuilder writer) {
+        if (currentWriter != null) {
+            emitStack.push(currentWriter);
+        }
+        currentWriter = writer;
+    }
+
+    public void restoreContext() {
+        currentWriter = emitStack.pop();
+    }
+
+    public void emit(String string) {
+        currentWriter.append(string);
+    }
+
 }

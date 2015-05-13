@@ -26,9 +26,6 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     @Override
     public Boolean visitProg(TrinityParser.ProgContext ctx) {
         for (int i = 0; i < ctx.functionDecl().size(); i++) {
-            // Check every FunctionDecl for unreachable code or missing return statements.
-            // If a check has returned false, then end visitor.
-
             if (!ctx.functionDecl(i).accept(this)) {
                 errorReporter.reportError("No return found in function.", ctx);
                 return false;

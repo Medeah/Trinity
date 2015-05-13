@@ -11,6 +11,7 @@ import trinity.customExceptions.ParseException;
 import trinity.customExceptions.TypeCheckException;
 import trinity.visitors.CodeGenerationVisitor;
 import trinity.visitors.PrettyPrintVisitor;
+import trinity.visitors.ReachabilityVisitor;
 import trinity.visitors.TypeVisitor;
 
 import java.io.IOException;
@@ -131,6 +132,13 @@ public class Trinity {
         if (reporter.getErrorAmount() > 0) {
             throw new TypeCheckException("Too many type errors aborting");
         }
+
+        ReachabilityVisitor reachabilityChecker = new ReachabilityVisitor(reporter);
+        tree.accept(reachabilityChecker);
+        if (parser.getNumberOfSyntaxErrors() != 0) {
+            throw new ParseException("Invalid reachability test.");
+        }
+
 
         CodeGenerationVisitor generator = new CodeGenerationVisitor();
         generator.visit(tree);

@@ -19,9 +19,6 @@ import static java.util.Collections.singletonList;
  * matrix and vector literals during code generation.
  */
 public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>> implements TrinityVisitor<Iterable<StaticMatrix>> {
-    //TODO: move.
-    //The ref variable stores the generated ids for pre-initialized matrices and vectors
-    // so they can be referenced later on.
 
     /**
      * Creates a new instance of StaticMatrix and adds it to the list.

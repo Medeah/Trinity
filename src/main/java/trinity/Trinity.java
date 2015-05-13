@@ -157,7 +157,6 @@ public class Trinity {
         }
 
         return new Pair<>(tree, parser);
-
     }
 
     private static void prettyPrint(Path filename, int indentation) throws Exception {

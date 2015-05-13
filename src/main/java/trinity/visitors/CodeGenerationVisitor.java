@@ -2,7 +2,10 @@ package trinity.visitors;
 
 import com.google.common.base.Charsets;
 import org.antlr.v4.runtime.ParserRuleContext;
-import trinity.*;
+import trinity.StaticMatrix;
+import trinity.TrinityBaseVisitor;
+import trinity.TrinityParser;
+import trinity.TrinityVisitor;
 import trinity.types.EnumType;
 import trinity.types.MatrixType;
 import trinity.types.PrimitiveType;
@@ -12,7 +15,6 @@ import trinity.utils.UniqueId;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Stack;
 
 import static com.google.common.io.Resources.getResource;
 
@@ -21,14 +23,13 @@ import static com.google.common.io.Resources.getResource;
  */
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
-    private int scopeDepth = 0;
-    private static final StringBuilder output = new StringBuilder();
     private static final StringBuilder mainBody = new StringBuilder();
     private static final StringBuilder funcBody = new StringBuilder();
     private static final StringBuilder globals = new StringBuilder();
 
     private final DependencyVisitor dependencyVisitor = new DependencyVisitor();
     private Emitter emitter;
+    private int scopeDepth = 0;
 
     /**
      * Get C code output after calling visit.
@@ -36,9 +37,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
      * @return C code
      */
     public String getOutput() {
-        if (output == null) {
-            return "";
-        }
+        StringBuilder output = new StringBuilder();
 
         output.append(stdlib());
         output.append("/* ENTRY POINT */\n"); //TODO: remove
@@ -99,8 +98,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
                         emitter.emit("int " + incId + ";");
                         emitter.emit("int " + valId + ";");
-                        // TODO: short this long mf
-                        emitter.emit("for(" + incId + "=" + i + "," + valId + "=" + from + ";" + incId + "<" + (i += Math.abs(to - from) + 1) + "; " + incId + "++," + valId + (from < to ? "++" : "--") + "){");
+
+                        String init = incId + "=" + i + "," + valId + "=" + from;
+                        i += Math.abs(to - from) + 1;
+                        String cond = incId + "<" + i;
+                        String inc = incId + "++," + valId + (from < to ? "++" : "--");
+                        emitter.emit("for(" + init + ";" + cond + "; " + inc + "){");
                         emitter.emit(staticMatrix.id + "[" + incId + "]=" + valId + ";");
                         emitter.emit("}");
                     }
@@ -115,7 +118,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitProg(TrinityParser.ProgContext ctx) {
         // Reset scopeDepth and StringBuilders
         scopeDepth = 0;
-        output.setLength(0);
         mainBody.setLength(0);
         funcBody.setLength(0);
         globals.setLength(0);
@@ -236,50 +238,43 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
         // TODO: row-major / column-major
         emitDependencies(ctx.expr());
+        MatrixType matrix = (MatrixType) ctx.expr().t;
+        String incId = UniqueId.next();
 
-        if (ctx.expr().t instanceof MatrixType) {
-            MatrixType matrix = (MatrixType) ctx.expr().t;
+        // TODO: refactor
+        int size;
+        String type, element;
 
-            String incId = UniqueId.next();
-
-            // TODO: refactor
-            int size;
-            String type, element;
-
-            if (matrix.getRows() != 1) {
-                // Vector in matrix
-                size = matrix.getRows();
-                type = "float*";
-                element = "+IDX2R(" + incId + ",0," + matrix.getCols() + ")";
-            } else {
-                // Scalar in vector
-                size = matrix.getCols();
-                type = "float";
-                element = "[" + incId + "]";
-            }
-
-            emitter.emit("int " + incId + ";");
-            emitter.emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
-            // Current scalar/vector being iterated
-            emitter.emit(type + " _" + ctx.ID().getText() + "=");
-            ctx.expr().accept(this); // matrix/vector pre-initialized id.
-            emitter.emit(element + ";");
-
-            // For loop body
-            ctx.block().accept(this);
-
-            emitter.emit("}");
+        if (matrix.getRows() != 1) {
+            // Vector in matrix
+            size = matrix.getRows();
+            type = "float*";
+            element = "+IDX2R(" + incId + ",0," + matrix.getCols() + ")";
         } else {
-            // TODO: is this safe to remove.
-            emitter.emit("INTERNAL-ERROR;");
+            // Scalar in vector
+            size = matrix.getCols();
+            type = "float";
+            element = "[" + incId + "]";
         }
+
+        emitter.emit("int " + incId + ";");
+        emitter.emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
+        // Current scalar/vector being iterated
+        emitter.emit(type + " _" + ctx.ID().getText() + "=");
+        ctx.expr().accept(this); // matrix/vector pre-initialized id.
+        emitter.emit(element + ";");
+
+        // For loop body
+        ctx.block().accept(this);
+
+        emitter.emit("}");
 
         return null;
     }
 
     @Override
     public Void visitIfStatement(TrinityParser.IfStatementContext ctx) {
-        //TODO: initialize dependencies
+        // Initialize dependencies
         for (int i = 0; i < ctx.expr().size(); i++) {
             emitDependencies(ctx.expr(i));
         }
@@ -626,24 +621,21 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitRange(TrinityParser.RangeContext ctx) {
         // Ranges are generated by emitDependencies().
-        // TODO: This should never be called
-        System.out.println("ERROR: visitRange should not be called.");
+        System.err.println("INTERNAL ERROR: visitRange should not be called.");
         return null;
     }
 
     @Override
     public Void visitVector(TrinityParser.VectorContext ctx) {
         // Vectors are generated by emitDependencies(), and referenced by visitVectorLiteral().
-        // TODO: This should never be called
-        System.out.println("ERROR: visitVector should not be called.");
+        System.err.println("INTERNAL ERROR: visitVector should not be called.");
         return null;
     }
 
     @Override
     public Void visitMatrix(TrinityParser.MatrixContext ctx) {
         // Matrices are generated by emitDependencies(), and referenced by visitMatrixLiteral().
-        // TODO: This should never be called
-        System.out.println("ERROR: visitMatrix should not be called.");
+        System.err.println("INTERNAL ERROR: visitMatrix should not be called.");
         return null;
     }
 
@@ -653,11 +645,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return null;
     }
 
-    // TODO: these will be visited by default implementation (TrinityBaseVisitor)
-    /*@Override
+    @Override
     public Void visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
-
-        return super.visitConstDeclaration(ctx);
-    }*/
+        visitChildren(ctx);
+        return null;
+    }
 
 }

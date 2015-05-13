@@ -39,7 +39,7 @@ bool print_s(float s) {
 }
 
 void stdError(char* errorString, int value) {
-	fprintf(stderr, "%s:\n %d\n", errorString, value);
+	fprintf(stderr, "%s: %d\n", errorString, value);
 	exit(1);
 }
 
@@ -125,16 +125,19 @@ float* eye(size_t size) {
 float* mfexpo(float* A, size_t size, float exponent) {
 	int j, expo;
 	float sum;
-	float *C;
-	C = malloc(size * size * sizeof(float));
+	float *C = malloc(size * size * sizeof(float));
+
 	/* rounding of the exponent. Decimal number not currently supported.*/
 	expo = round(exponent);
 
-	f (expo == 1) {
-    		return A;
-    	} else if (expo == 0) {
-    		C = eye(size);
-    		return C;
+	if (expo == 1) {
+		return A;
+	}
+
+	if (expo == 0) {
+		C = eye(size);
+		return C;
+	}
 
     for(j = 0; j < size * size; j++) {
     	C[j] = A[j];
@@ -145,13 +148,8 @@ float* mfexpo(float* A, size_t size, float exponent) {
 			C = mmmult(C, size, size, A, size, size);
 			expo = expo - 1;
 		}
-	} else if (expo == 1) {
-		return A;
-	} else if (expo == 0) {
-		C = eye(size);
-		return C;
 	} else {
-		stdError("The exponential function cannot be calculated with the current exponent value", exponent);
+		stdError("The exponential function cannot be calculated with negative exponent value", exponent);
 	}
 
 	return C;

@@ -56,9 +56,9 @@ public class Trinity {
     public static void main(String[] args) throws Exception {
         JCommander jc = new JCommander(options, args);
 
-        options.files.add("src/test/resources/trinity/tests/simple.tri");
-
-        options.formatc = true;
+        //hardcoded options for testing
+        //options.files.add("src/test/resources/trinity/tests/simple.tri");
+        //options.formatc = true;
 
         if (options.version) {
             System.out.println("Trinity 0.1");
@@ -76,7 +76,6 @@ public class Trinity {
                 prettyPrint(file, options.indentation);
             } else {
                 String out = compile(file);
-                System.out.println(out);
                 PrintWriter pw = new PrintWriter(filename + ".c");
                 pw.println(out);
                 pw.flush();

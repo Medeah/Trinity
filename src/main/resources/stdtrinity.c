@@ -123,14 +123,20 @@ float* eye(size_t size) {
 }
 
 float* mfexpo(float* A, size_t size, float exponent) {
-	int crA, ccA, crB, ccB, j = 0, expo;
+	int j, expo;
 	float sum;
-	float* C;
+	float *C;
 	C = malloc(size * size * sizeof(float));
 	/* rounding of the exponent. Decimal number not currently supported.*/
 	expo = round(exponent);
 
-    for(j; j < size * size; j++) {
+	f (expo == 1) {
+    		return A;
+    	} else if (expo == 0) {
+    		C = eye(size);
+    		return C;
+
+    for(j = 0; j < size * size; j++) {
     	C[j] = A[j];
     }
 

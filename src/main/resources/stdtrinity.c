@@ -12,7 +12,7 @@
 /* Index to Trinity (Rows with 1-indexing)*/
 #define IDX2T(i,j,ld) ((((i)-1)*(ld))+((j)-1))
 
-bool print_m(float *m, int r, int c) {
+bool print_m(float *m, size_t r, size_t c) {
   int i, j;
   for(i = 0; i < r; i++) {
     printf("[%f", m[IDX2R(i, 0, c)]);
@@ -43,7 +43,7 @@ void stdError(char* errorString, int value) {
 	exit(1);
 }
 
-float* fmmult(float s, float* A, int rowsA, int colsA) {
+float* fmmult(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
@@ -55,24 +55,23 @@ float* fmmult(float s, float* A, int rowsA, int colsA) {
 	return resMatrix;
 } /* TODO: call free() on matrix resMatrix */
 
-float* mfdiv(float s, float* A, int rowsA, int colsA) {
+float* mfdiv(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rowsA * colsA * sizeof(float));
 
-	if (s != 0){
-    		for (i = 0; i < rowsA * colsA; i++) {
-    			resMatrix[i] = A[i] / s;
-    			//printf("%.1f \n", B[i]);
-    		}
-    	} else {
-    		stdError("It is impossible to divide by", s);
-    	}
+    if (s != 0){
+        for (i = 0; i < rowsA * colsA; i++) {
+            resMatrix[i] = A[i] / s;
+        }
+    } else {
+        stdError("It is impossible to divide by", s);
+    }
 
 	return resMatrix;
 } /* TODO: call free() on matrix resMatrix */
 
-float* transpose(float* A, int nrRowsA, int nrColsA) {
+float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
 	int n;
 	float* resMatrix;
 	resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
@@ -86,7 +85,7 @@ float* transpose(float* A, int nrRowsA, int nrColsA) {
     return resMatrix;
 }/* TODO: call free() on matrix resMatrix */
 
-float* mmmult(float* A, int rowsA, int colsA, float* B, int rowsB, int colsB) {
+float* mmmult(float* A, size_t rowsA, size_t colsA, float* B, size_t rowsB, size_t colsB) {
 	int rowsC, colsC, indexA, indexB, crA, ccA, crB, ccB, Cindex = 0;
 	rowsC = rowsA;
 	colsC = colsB;
@@ -177,7 +176,7 @@ bool mmeq(float* A, float* B, size_t rows, size_t cols) {
 	return true;
 }
 
-float* mmadd(float* A, float* B, int rows, int cols) {
+float* mmadd(float* A, float* B, size_t rows, size_t cols) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rows * cols * sizeof(float));
@@ -189,7 +188,7 @@ float* mmadd(float* A, float* B, int rows, int cols) {
 	return resMatrix;
 }
 
-float* mmsubt(float* A, float* B, int rows, int cols) {
+float* mmsubt(float* A, float* B, size_t rows, size_t cols) {
 	int i;
 	float* resMatrix;
 	resMatrix = malloc(rows * cols * sizeof(float));

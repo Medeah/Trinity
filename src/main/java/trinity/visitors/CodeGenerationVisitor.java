@@ -259,6 +259,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
         emitter.emit("int " + incId + ";");
         emitter.emit("for(" + incId + "=0;" + incId + "<" + size + "; " + incId + "++){");
+
         // Current scalar/vector being iterated
         emitter.emit(type + " _" + ctx.ID().getText() + "=");
         ctx.expr().accept(this); // matrix/vector pre-initialized id.
@@ -459,11 +460,17 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
-        // TODO: bounds check
-        // TODO: maybe use IDX2T define here as well (instead of -1)
-        emitter.emit("_" + ctx.ID().getText() + "[(int)(");
-        ctx.expr().accept(this);
-        emitter.emit(")-1]");
+        if (ctx.t instanceof MatrixType) {
+            // Vector in matrix
+            emitter.emit("_" + ctx.ID().getText() + "+IDX2T((int)(");
+            ctx.expr().accept(this);
+            emitter.emit("),1," + ((MatrixType)ctx.t).getCols() + ")");
+        } else {
+            // Scalar in vector
+            emitter.emit("_" + ctx.ID().getText() + "[(int)(");
+            ctx.expr().accept(this);
+            emitter.emit(")-1]");
+        }
         return null;
     }
 

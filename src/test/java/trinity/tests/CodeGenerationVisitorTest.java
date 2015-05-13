@@ -124,6 +124,7 @@ public class CodeGenerationVisitorTest {
         assertEquals("2.000000\n3.000000\n", getOutput("Vector[3] a = [2,3,4]; print a[1]; print a[2];"));
         assertEquals("15.000000\n", getOutput("Vector[10] a = [11..20]; print a[5];"));
         assertEquals("12.000000\n2.000000\n4.000000\n", getOutput("Matrix[3,5] a = [11..15][4,6,8,2,1][3..7]; print a[1,2]; print a[2,4]; print a[3,2];"));
+        assertEquals("7.000000\n", getOutput("Matrix[3,10] m = [1..10][3..12][64..55]; Vector[10] a = m[2]; print a[5];"));
     }
 
     @Ignore

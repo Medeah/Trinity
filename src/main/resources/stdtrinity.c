@@ -45,20 +45,18 @@ void stdError(char* errorString, int value) {
 
 float* fmmult(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
-	float* resMatrix;
-	resMatrix = malloc(rowsA * colsA * sizeof(float));
+	float* resMatrix = malloc(rowsA * colsA * sizeof(float));
 
 	for (i = 0; i < rowsA * colsA; i++) {
 		resMatrix[i] = s * A[i];
 	}
 
 	return resMatrix;
-} /* TODO: call free() on matrix resMatrix */
+}
 
 float* mfdiv(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
-	float* resMatrix;
-	resMatrix = malloc(rowsA * colsA * sizeof(float));
+	float* resMatrix = malloc(rowsA * colsA * sizeof(float));
 
     if (s != 0){
         for (i = 0; i < rowsA * colsA; i++) {
@@ -69,12 +67,11 @@ float* mfdiv(float s, float* A, size_t rowsA, size_t colsA) {
     }
 
 	return resMatrix;
-} /* TODO: call free() on matrix resMatrix */
+}
 
 float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
 	int n;
-	float* resMatrix;
-	resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
+	float* resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
 
     for(n = 0; n < nrRowsA * nrColsA; n++) {
         int i = n / nrRowsA;
@@ -83,15 +80,14 @@ float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
     }
 
     return resMatrix;
-}/* TODO: call free() on matrix resMatrix */
+}
 
 float* mmmult(float* A, size_t rowsA, size_t colsA, float* B, size_t rowsB, size_t colsB) {
 	int rowsC, colsC, indexA, indexB, crA, ccA, crB, ccB, Cindex = 0;
 	rowsC = rowsA;
 	colsC = colsB;
 	float sum;
-	float* C;
-	C = malloc(rowsC * colsC * sizeof(float));
+	float* C = malloc(rowsC * colsC * sizeof(float));
 
 	for (crA = 0; crA < rowsA; crA++) {
 		for (ccB = 0; ccB < colsB; ccB++) {
@@ -106,13 +102,12 @@ float* mmmult(float* A, size_t rowsA, size_t colsA, float* B, size_t rowsB, size
 	}
 
 	return C;
-}/* TODO: call free on C */
+}
 
 float* eye(size_t size) {
-	int i, j;
+	int i;
 
-	float* C;
-	C = calloc(size * size, sizeof(float));
+	float* C = calloc(size * size, sizeof(float));
 
 	for (i = 0; i < size; i++) {
 			C[i * (size + 1)] = 1.0f;
@@ -178,8 +173,7 @@ bool mmeq(float* A, float* B, size_t rows, size_t cols) {
 
 float* mmadd(float* A, float* B, size_t rows, size_t cols) {
 	int i;
-	float* resMatrix;
-	resMatrix = malloc(rows * cols * sizeof(float));
+	float* resMatrix = malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
 		resMatrix[i] = A[i] + B[i];
@@ -190,8 +184,7 @@ float* mmadd(float* A, float* B, size_t rows, size_t cols) {
 
 float* mmsubt(float* A, float* B, size_t rows, size_t cols) {
 	int i;
-	float* resMatrix;
-	resMatrix = malloc(rows * cols * sizeof(float));
+	float* resMatrix = malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
 		resMatrix[i] = A[i] - B[i];

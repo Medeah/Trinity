@@ -389,23 +389,21 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 emitter.emit("*");
                 ctx.expr(1).accept(this);
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof MatrixType) {
-                if (((MatrixType) ctx.expr(0).t).getRows() == 1 && ((MatrixType) ctx.expr(1).t).getRows() == 1) {
+                MatrixType matrix1 = (MatrixType) ctx.expr(0).t;
+                MatrixType matrix2 = (MatrixType) ctx.expr(1).t;
+                if (matrix1.getRows() == 1 && matrix2.getRows() == 1) {
                     emitter.emit("dotProduct(");
                     ctx.expr(0).accept(this);
                     emitter.emit(",");
                     ctx.expr(1).accept(this);
-                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
+                    emitter.emit("," + matrix1.getCols());
                     emitter.emit(")");
                 } else {
                     emitter.emit("mmmult(");
                     ctx.expr(0).accept(this);
-                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                    emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                    emitter.emit(",");
+                    emitter.emit("," + matrix1.getRows() + "," + matrix1.getCols() + ",");
                     ctx.expr(1).accept(this);
-                    emitter.emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-                    emitter.emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-                    emitter.emit(")");
+                    emitter.emit("," + matrix2.getRows() + "," + matrix2.getCols() + ")");
                 }
             } else if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof MatrixType) {
                 emitter.emit("fmmult(");
@@ -431,13 +429,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 emitter.emit("/");
                 ctx.expr(1).accept(this);
             } else if (ctx.expr(0).t instanceof MatrixType && ctx.expr(1).t instanceof PrimitiveType) {
+                MatrixType matrix = (MatrixType) ctx.expr(0).t;
                 emitter.emit("mfdiv(");
                 ctx.expr(1).accept(this);
                 emitter.emit(",");
                 ctx.expr(0).accept(this);
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emitter.emit(")");
+                emitter.emit("," + matrix.getRows() + "," + matrix.getCols() + ")");
             }
         }
         return null;

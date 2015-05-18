@@ -7,8 +7,6 @@ import org.junit.Test;
 import trinity.Trinity;
 
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,16 +16,19 @@ import static org.junit.Assert.assertEquals;
 
 public class CodeGenerationVisitorTest {
 
+    private static final Path testFile = Paths.get("./test.c");
+    private static final Path binFile = Paths.get("./a.bin");
+
     private static String getOutput(String input) throws Exception {
         String out = Trinity.compile(input);
-        Files.write(Paths.get("test.c"), out.getBytes());
+        Files.write(testFile, out.getBytes());
 
-        Process process = new ProcessBuilder("gcc", "test.c", "-lm", "-o", "a.bin").start();
+        Process process = new ProcessBuilder("gcc", testFile.toString(), "-lm", "-o", binFile.toString()).start();
         if (process.waitFor() != 0) {
             throw new Exception("Error compiling c code");
         }
 
-        Process prog = new ProcessBuilder("./a.bin").start();
+        Process prog = new ProcessBuilder(binFile.toString()).start();
         if (prog.waitFor() != 0) {
             throw new Exception("program exited with non zero exit code");
         }
@@ -40,8 +41,8 @@ public class CodeGenerationVisitorTest {
 
     @AfterClass
     public static void removeFiles() throws Exception {
-        delete(FileSystems.getDefault().getPath("a.bin"));
-        delete(FileSystems.getDefault().getPath("test.c"));
+        delete(binFile);
+        delete(testFile);
     }
 
     @Test

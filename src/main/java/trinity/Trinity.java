@@ -15,7 +15,7 @@ import trinity.visitors.ReachabilityVisitor;
 import trinity.visitors.TypeVisitor;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -69,24 +69,22 @@ public class Trinity {
             jc.usage();
             System.exit(1);
         }
-        Path file = Paths.get(options.files.get(0));
-        String filename = getNameWithoutExtension(file.toString());
+        Path triFile = Paths.get(options.files.get(0));
+        Path cFile = Paths.get(getNameWithoutExtension(triFile.toString()) + ".c");
         try {
             if (options.prettyPrint) {
-                prettyPrint(file, options.indentation);
+                prettyPrint(triFile, options.indentation);
             } else {
-                String out = compile(file);
-                PrintWriter pw = new PrintWriter(filename + ".c");
-                pw.println(out);
-                pw.flush();
+                String out = compile(triFile);
+                Files.write(cFile, out.getBytes());
 
-                Process ccProcess = new ProcessBuilder(options.ccompiler, filename + ".c", "-lm").start();
+                Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm").start();
                 if (ccProcess.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
 
                 if (options.formatc) {
-                    Process indentProcess = new ProcessBuilder("indent", filename + ".c").start();
+                    Process indentProcess = new ProcessBuilder("indent", cFile.toString()).start();
                     if (indentProcess.waitFor() != 0) {
                         System.err.println("error running indent, do you have it installed?");
                     }

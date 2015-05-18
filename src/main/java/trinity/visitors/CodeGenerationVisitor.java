@@ -374,11 +374,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitTranspose(TrinityParser.TransposeContext ctx) {
+        MatrixType matrix = (MatrixType) ctx.expr().t;
         emitter.emit("transpose(");
         ctx.expr().accept(this);
-        emitter.emit("," + ((MatrixType) ctx.expr().t).getRows());
-        emitter.emit("," + ((MatrixType) ctx.expr().t).getCols());
-        emitter.emit(")");
+        emitter.emit("," + matrix.getRows() + "," + matrix.getCols() + ")");
         return null;
     }
 
@@ -464,6 +463,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             // Vector in matrix
             emitter.emit("_" + ctx.ID().getText() + "+IDX2T((int)(");
             ctx.expr().accept(this);
+            // Resulting matrix has same number of columns as the source
             emitter.emit("),1," + ((MatrixType)ctx.t).getCols() + ")");
         } else {
             // Scalar in vector
@@ -515,11 +515,10 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emitter.emit("-");
             ctx.expr().accept(this);
         } else if (ctx.expr().t instanceof MatrixType) {
+            MatrixType matrix = (MatrixType) ctx.expr().t;
             emitter.emit("fmmult(-1,");
             ctx.expr().accept(this);
-            emitter.emit("," + ((MatrixType) ctx.expr().t).getRows());
-            emitter.emit("," + ((MatrixType) ctx.expr().t).getCols());
-            emitter.emit(")");
+            emitter.emit("," + matrix.getRows() + "," + matrix.getCols() + ")");
         }
         return null;
     }
@@ -545,6 +544,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emitter.emit(ctx.op.getText());
             ctx.expr(1).accept(this);
         } else if (ctx.expr(0).t instanceof MatrixType) {
+            MatrixType matrix = (MatrixType) ctx.expr(1).t;
             if (ctx.op.getText().equals("!=")) {
                 emitter.emit("!");
             }
@@ -552,9 +552,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             ctx.expr(0).accept(this);
             emitter.emit(",");
             ctx.expr(1).accept(this);
-            emitter.emit("," + ((MatrixType) ctx.expr(1).t).getRows());
-            emitter.emit("," + ((MatrixType) ctx.expr(1).t).getCols());
-            emitter.emit(")");
+            emitter.emit("," + matrix.getRows() + "," + matrix.getCols() + ")");
         }
 
         return null;
@@ -568,35 +566,18 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitAddSubtract(TrinityParser.AddSubtractContext ctx) {
-        if (ctx.op.getText().equals("+")) {
-            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
-                ctx.expr(0).accept(this);
-                emitter.emit("+");
-                ctx.expr(1).accept(this);
-            } else {
-                emitter.emit("mmadd(");
-                ctx.expr(0).accept(this);
-                emitter.emit(",");
-                ctx.expr(1).accept(this);
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emitter.emit(")");
-            }
+        boolean addition = ctx.op.getText().equals("+");
+        if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
+            ctx.expr(0).accept(this);
+            emitter.emit(addition ? "+" : "-");
+            ctx.expr(1).accept(this);
         } else {
-            // Op can only be "+" which we have done or "-" hence the else
-            if (ctx.expr(0).t instanceof PrimitiveType && ctx.expr(1).t instanceof PrimitiveType) {
-                ctx.expr(0).accept(this);
-                emitter.emit("-");
-                ctx.expr(1).accept(this);
-            } else {
-                emitter.emit("mmsubt(");
-                ctx.expr(0).accept(this);
-                emitter.emit(",");
-                ctx.expr(1).accept(this);
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getRows());
-                emitter.emit("," + ((MatrixType) ctx.expr(0).t).getCols());
-                emitter.emit(")");
-            }
+            MatrixType matrix = (MatrixType) ctx.expr(0).t;
+            emitter.emit(addition ? "mmadd(" : "mmsubt(");
+            ctx.expr(0).accept(this);
+            emitter.emit(",");
+            ctx.expr(1).accept(this);
+            emitter.emit("," + matrix.getRows() + "," + matrix.getCols() + ")");
         }
         return null;
     }

@@ -40,14 +40,13 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         StringBuilder output = new StringBuilder();
 
         output.append(stdlib());
-        output.append("/* ENTRY POINT */\n"); //TODO: remove
         output.append(globals.toString());
         output.append(funcBody.toString());
 
-        // main body
-        output.append("\nint main(void){");
+        // Main body
+        output.append("int main(void){");
         output.append(mainBody.toString());
-        output.append("return 0;};"); // TODO: end-semi is just for indent.
+        output.append("return 0;};");
 
         return output.toString();
     }
@@ -75,6 +74,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             for (StaticMatrix staticMatrix : matrices) {
                 // Declare array
                 //emitter.emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
+                // TODO: free these
                 emitter.emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.size + "*sizeof(float));");
 
                 // TODO: this could be implemented as a visitor.
@@ -236,25 +236,24 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitForLoop(TrinityParser.ForLoopContext ctx) {
-        // TODO: row-major / column-major
         emitDependencies(ctx.expr());
         MatrixType matrix = (MatrixType) ctx.expr().t;
         String incId = UniqueId.next();
 
         // TODO: refactor
         int size;
-        String type, element;
+        String type, indexing;
 
         if (matrix.getRows() != 1) {
             // Vector in matrix
             size = matrix.getRows();
             type = "float*";
-            element = "+IDX2R(" + incId + ",0," + matrix.getCols() + ")";
+            indexing = "+IDX2R(" + incId + ",0," + matrix.getCols() + ")"; // pointer arithmetic
         } else {
             // Scalar in vector
             size = matrix.getCols();
             type = "float";
-            element = "[" + incId + "]";
+            indexing = "[" + incId + "]";
         }
 
         emitter.emit("int " + incId + ";");
@@ -262,8 +261,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
         // Current scalar/vector being iterated
         emitter.emit(type + " _" + ctx.ID().getText() + "=");
-        ctx.expr().accept(this); // matrix/vector pre-initialized id.
-        emitter.emit(element + ";");
+        ctx.expr().accept(this); // matrix/vector pre-initialized id (ref).
+        emitter.emit(indexing + ";");
 
         // For loop body
         ctx.block().accept(this);
@@ -275,16 +274,18 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitIfStatement(TrinityParser.IfStatementContext ctx) {
-        // Initialize dependencies
+        // Initialize any matrix dependencies in the if expressions
         for (int i = 0; i < ctx.expr().size(); i++) {
             emitDependencies(ctx.expr(i));
         }
 
+        // If block
         emitter.emit("if(");
         ctx.expr(0).accept(this);
         emitter.emit("){");
         ctx.block(0).accept(this);
 
+        // Else If block
         int i;
         for (i = 1; i < ctx.expr().size(); i++) {
             emitter.emit("}else if(");
@@ -293,6 +294,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             ctx.block(i).accept(this);
         }
 
+        // Else block
         if (ctx.block(i) != null) {
             emitter.emit("}else{");
             ctx.block(i).accept(this);

@@ -56,7 +56,7 @@ public class Trinity {
     public static void main(String[] args) throws Exception {
         JCommander jc = new JCommander(options, args);
 
-        //hardcoded options for testing
+        // TODO: hardcoded options for testing
         //options.files.add("src/test/resources/trinity/tests/simple.tri");
         //options.formatc = true;
 

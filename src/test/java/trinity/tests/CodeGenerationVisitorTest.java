@@ -133,7 +133,7 @@ public class CodeGenerationVisitorTest {
 
     @Ignore
     public void indexingBounds() throws Exception {
-        // TODO: bounds checking
+        // TODO: bounds checking (also ranges)
         assertEquals("error\n", getOutput("Vector[3] a = [2,3,4]; print a[0];"));
         assertEquals("error\n", getOutput("Vector[3] a = [2,3,4]; print a[4];"));
         assertEquals("error\n", getOutput("Matrix[2,3] a = [2,3,4][1..3]; print a[2,0];"));

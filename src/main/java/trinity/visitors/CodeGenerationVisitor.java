@@ -23,6 +23,11 @@ import static com.google.common.io.Resources.getResource;
  */
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
+    public CodeGenerationVisitor(boolean gpuenabled) {
+        this.gpuenabled = gpuenabled;
+    }
+
+    private boolean gpuenabled;
     private static final StringBuilder mainBody = new StringBuilder();
     private static final StringBuilder funcBody = new StringBuilder();
     private static final StringBuilder globals = new StringBuilder();
@@ -39,7 +44,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public String getOutput() {
         StringBuilder output = new StringBuilder();
 
-        output.append(stdlib());
+        output.append(loadlib("stdtrinity.c"));
+        if (gpuenabled) {
+            output.append(loadlib("gputrinity.c"));
+        } else {
+            output.append(loadlib("cputrinity.c"));
+        }
         output.append(globals.toString());
         output.append(funcBody.toString());
 
@@ -51,8 +61,8 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         return output.toString();
     }
 
-    private String stdlib() {
-        URL test = getResource("stdtrinity.c");
+    private String loadlib(String libname) {
+        URL test = getResource(libname);
         try {
             return com.google.common.io.Resources.toString(test, Charsets.UTF_8);
         } catch (IOException e) {

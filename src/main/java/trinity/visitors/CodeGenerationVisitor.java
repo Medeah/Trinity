@@ -444,15 +444,12 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitDoubleIndexing(TrinityParser.DoubleIndexingContext ctx) {
-        String[] dims = ctx.ref.split("x"); // TODO: refactor this hack
-        //int rows = new Integer(dims[0]);
-        int cols = new Integer(dims[1]);
         // TODO: bounds check
         emitter.emit("_" + ctx.ID().getText() + "[IDX2T((int)(");
         ctx.expr(0).accept(this);
         emitter.emit("),(int)(");
         ctx.expr(1).accept(this);
-        emitter.emit(")," + cols + ")]");
+        emitter.emit(")," + ctx.dims.getCols() + ")]");
         return null;
     }
 
@@ -462,8 +459,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             // Vector in matrix
             emitter.emit("_" + ctx.ID().getText() + "+IDX2T((int)(");
             ctx.expr().accept(this);
-            // Resulting matrix has same number of columns as the source
-            emitter.emit("),1," + ((MatrixType)ctx.t).getCols() + ")");
+            emitter.emit("),1," + ctx.dims.getCols() + ")");
         } else {
             // Scalar in vector
             emitter.emit("_" + ctx.ID().getText() + "[(int)(");

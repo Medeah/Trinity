@@ -29,6 +29,7 @@ public class Trinity {
     }
 
     private static CommandLineOptions options = new CommandLineOptions();
+
     private static class CommandLineOptions {
         @Parameter(description = "filename")
         private List<String> files = new ArrayList<>();

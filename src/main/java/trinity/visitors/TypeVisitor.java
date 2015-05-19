@@ -2,9 +2,9 @@ package trinity.visitors;
 
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
+import trinity.*;
 import trinity.customExceptions.SymbolAlreadyDefinedException;
 import trinity.customExceptions.SymbolNotFoundException;
-import trinity.*;
 import trinity.types.*;
 
 import java.util.ArrayList;
@@ -298,7 +298,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         return new MatrixType(rows, cols);
     }
 
-
     @Override
     public Type visitSingleIndexing(TrinityParser.SingleIndexingContext ctx) {
         expect(scalar, ctx.expr().accept(this), ctx.expr());
@@ -317,8 +316,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             } else {
                 ctx.t = new MatrixType(1, matrix.getCols()); // vector
             }
-            // TODO: ugly hack: use literal ref to pass dimensions codegen
-            ctx.ref = Integer.toString(matrix.getCols());
+            ctx.dims = matrix;
         } else {
             errorReporter.reportError("Can only index vectors and matrices.", ctx);
             ctx.t = null;
@@ -342,9 +340,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
         if (symbol instanceof MatrixType) {
             ctx.t = scalar;
-            // TODO: ugly hack: use literal ref to pass dimensions codegen
-            MatrixType matrix = (MatrixType) symbol;
-            ctx.ref = matrix.getRows() + "x" + matrix.getCols();
+            ctx.dims = (MatrixType) symbol;
         } else {
             errorReporter.reportError("Can only index vectors and matrices.", ctx);
             return null;

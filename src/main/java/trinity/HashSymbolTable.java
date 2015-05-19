@@ -35,6 +35,7 @@ public class HashSymbolTable implements SymbolTable {
 
     /**
      * Gets the nesting level (depth) of the current scope
+     *
      * @return the scope depth
      */
     public int getCurrentScopeDepth() {
@@ -68,7 +69,8 @@ public class HashSymbolTable implements SymbolTable {
     /**
      * Enters the given symbol information into the symbol table. If the given
      * symbol is already present at the current nest level an exception is thrown.
-     * @param id the symbol identifier
+     *
+     * @param id   the symbol identifier
      * @param info the symbol type information
      * @throws SymbolAlreadyDefinedException
      */

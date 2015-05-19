@@ -43,8 +43,14 @@ stmt
 
 // Expressions
 
+/**
+ * Some properties is added in order to retain information (decorate) the tree
+ * t: the resulting type
+ * ref: identifier for pre-initialized vector and matrix literals
+ * dims: dimensions of the source vector or matrix when indexing
+ */
 expr
-locals [Type t, String ref]
+locals [Type t, String ref, MatrixType dims]
     : ID '(' exprList? ')'              # FunctionCall
     | ID '[' expr ']'                   # SingleIndexing
     | ID '[' expr ',' expr ']'          # DoubleIndexing

@@ -49,8 +49,11 @@ public class Trinity {
         @Parameter(names = {"-gpu", "--gpuenabled"}, description = "Enabled some functions to be performed on a gpu")
         private boolean gpuenabled;
 
-        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command")
-        private String ccompiler = "";
+        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command if nothing else is specified and if so dependant on the gpuaneabled variable")
+        private String ccompiler;
+
+        @Parameter(names = {"-h", "--help"}, description = "Display this information")
+        private boolean help;
 
         @Parameter(names = {"-o"}, description = "Write output to file")
         private String output;
@@ -63,7 +66,7 @@ public class Trinity {
         JCommander jc = new JCommander(options, args);
 
         // TODO: hardcoded options for testing
-        options.files.add("src/test/resources/trinity/tests/simple.tri");
+        //options.files.add("src/test/resources/trinity/tests/simple.tri");
         //options.formatc = true;
 
         if (options.version) {
@@ -71,6 +74,10 @@ public class Trinity {
             System.exit(0);
         }
 
+        if (options.help) {
+            jc.usage();
+            System.exit(0);
+        }
         if (options.files.size() != 1) {
             jc.usage();
             System.exit(1);
@@ -89,7 +96,7 @@ public class Trinity {
                 String out = compile(triFile, options.gpuenabled);
                 Files.write(cFile, out.getBytes());
 
-                if (options.ccompiler.equals("")) {
+                if (options.ccompiler.equals(null)) {
                     if (options.gpuenabled) {
                         options.ccompiler = "nvcc";
                     } else {

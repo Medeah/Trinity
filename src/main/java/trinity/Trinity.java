@@ -68,8 +68,12 @@ public class Trinity {
             System.exit(0);
         }
 
-        if (options.files.size() != 1) {
+        if (options.files.size() == 0) {
+            System.out.print("No file specified");
             jc.usage();
+            System.exit(1);
+        } else if (options.files.size() > 1) {
+            System.out.print("Too manny files specified");
             System.exit(1);
         }
 

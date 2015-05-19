@@ -60,7 +60,7 @@ public class Trinity {
         JCommander jc = new JCommander(options, args);
 
         // TODO: hardcoded options for testing
-        options.files.add("src/test/resources/trinity/tests/simple.tri");
+        //options.files.add("src/test/resources/trinity/tests/simple.tri");
         //options.formatc = true;
 
         if (options.version) {

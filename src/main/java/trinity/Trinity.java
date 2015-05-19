@@ -72,13 +72,15 @@ public class Trinity {
             jc.usage();
             System.exit(1);
         }
+
         Path triFile = Paths.get(options.files.get(0));
         String filename = getNameWithoutExtension(triFile.toString());
-        String outName = filename;
-        if(options.output != null) {
-            outName = options.output;
-        }
         Path cFile = Paths.get(filename + ".c");
+
+        if(options.output == null) {
+            options.output = filename;
+        }
+
         try {
             if (options.prettyPrint) {
                 prettyPrint(triFile, options.indentation);
@@ -86,7 +88,7 @@ public class Trinity {
                 String out = compile(triFile);
                 Files.write(cFile, out.getBytes());
 
-                Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm", "-o", outName).start();
+                Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm", "-o", options.output).start();
                 if (ccProcess.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
@@ -98,11 +100,9 @@ public class Trinity {
                     }
                 }
             }
-
         } catch (IOException ex) {
             System.out.println("File not found: " + ex.getMessage());
             System.exit(1);
-            //jc.usage();
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
@@ -143,8 +143,7 @@ public class Trinity {
         if (parser.getNumberOfSyntaxErrors() != 0) {
             throw new ParseException("Invalid reachability test.");
         }
-
-
+        
         CodeGenerationVisitor generator = new CodeGenerationVisitor();
         generator.visit(tree);
         String out = generator.getOutput();

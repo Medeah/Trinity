@@ -49,6 +49,9 @@ public class Trinity {
         @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command")
         private String ccompiler = "cc";
 
+        @Parameter(names = {"-o"}, description = "Write output to file")
+        private String output;
+
         @Parameter(names = {"-v", "--version"}, description = "Display the version number")
         private boolean version;
     }
@@ -57,7 +60,7 @@ public class Trinity {
         JCommander jc = new JCommander(options, args);
 
         // TODO: hardcoded options for testing
-        //options.files.add("src/test/resources/trinity/tests/simple.tri");
+        options.files.add("src/test/resources/trinity/tests/simple.tri");
         //options.formatc = true;
 
         if (options.version) {
@@ -70,7 +73,12 @@ public class Trinity {
             System.exit(1);
         }
         Path triFile = Paths.get(options.files.get(0));
-        Path cFile = Paths.get(getNameWithoutExtension(triFile.toString()) + ".c");
+        String filename = getNameWithoutExtension(triFile.toString());
+        String outName = filename;
+        if(options.output != null) {
+            outName = options.output;
+        }
+        Path cFile = Paths.get(filename + ".c");
         try {
             if (options.prettyPrint) {
                 prettyPrint(triFile, options.indentation);
@@ -78,7 +86,7 @@ public class Trinity {
                 String out = compile(triFile);
                 Files.write(cFile, out.getBytes());
 
-                Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm").start();
+                Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm", "-o", outName).start();
                 if (ccProcess.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class CodeGenerationVisitorTest {
 
     private static final Path testFile = Paths.get("./test.c");
-    private static final Path binFile = Paths.get("./a.bin");
+    private static final Path binFile = Paths.get("./test.bin");
 
     private static String getOutput(String input) throws Exception {
         String out = Trinity.compile(input);

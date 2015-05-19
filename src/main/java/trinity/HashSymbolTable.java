@@ -7,6 +7,9 @@ import trinity.types.Type;
 
 import java.util.*;
 
+/**
+ * Symbol table implemented with a hash table.
+ */
 public class HashSymbolTable implements SymbolTable {
 
     private static class tableEntry {
@@ -30,6 +33,10 @@ public class HashSymbolTable implements SymbolTable {
         openScope();
     }
 
+    /**
+     * Gets the nesting level (depth) of the current scope
+     * @return the scope depth
+     */
     public int getCurrentScopeDepth() {
         return scopeDisplay.size();
     }
@@ -59,8 +66,11 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     /**
-     * Enter the given symbol information into the symbol table. If the given
-     * symbol is already present at the current nest level, Throw an exception.
+     * Enters the given symbol information into the symbol table. If the given
+     * symbol is already present at the current nest level an exception is thrown.
+     * @param id the symbol identifier
+     * @param info the symbol type information
+     * @throws SymbolAlreadyDefinedException
      */
     public void enterSymbol(String id, Type info) throws SymbolAlreadyDefinedException {
         if (declaredLocally(id)) {
@@ -81,9 +91,12 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     /**
-     * Returns the information associated with the innermost currently valid
-     * declaration of the given symbol. If there is no such valid declaration,
-     * return null. Do NOT throw any exceptions from this method.
+     * Returns the information associated with the innermost currently valid declaration
+     * of the given symbol. If there is no such valid declaration an exception is thrown.
+     *
+     * @param id the symbol identifier
+     * @return the type of the symbol
+     * @throws SymbolNotFoundException
      */
     public Type retrieveSymbol(String id) throws SymbolNotFoundException {
         if (hashTable.containsKey(id)) {
@@ -93,22 +106,35 @@ public class HashSymbolTable implements SymbolTable {
     }
 
     /**
-     * trinity whether name is present in the symbol table’s
-     * current (innermost) scope. If it is, true is returned. If name is in an outer
-     * scope, or is not in the symbol table at all, false is returned.
+     * Returns whether id is present in the symbol table’s current (innermost) scope.
+     *
+     * @param id the symbol identifier
+     * @return true if symbol is locally declared, false otherwise.
      */
     public boolean declaredLocally(String id) {
         return hashTable.containsKey(id) && hashTable.get(id).depth == getCurrentScopeDepth();
     }
 
+    /**
+     * Gets the type of the current function in scope
+     *
+     * @return the type of the current function in scope
+     * @throws SymbolNotFoundException
+     */
     public FunctionType getCurrentFunction() throws SymbolNotFoundException {
         return (FunctionType) retrieveSymbol("##func");
     }
 
+    /**
+     * Sets the type of the current function in scope
+     *
+     * @param type the type of the current function in scope
+     */
     public void setCurrentFunction(FunctionType type) {
         try {
             enterSymbol("##func", type);
         } catch (SymbolAlreadyDefinedException e) {
+            // TODO: should this be caught during type-check instead?
             e.printStackTrace();
         }
     }

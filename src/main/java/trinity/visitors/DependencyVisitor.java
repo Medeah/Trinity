@@ -63,7 +63,7 @@ public class DependencyVisitor extends TrinityBaseVisitor<Iterable<StaticMatrix>
      * Concatenates two lists
      *
      * @param aggregate  The previous aggregate value.
-     * @param nextResult The result of the immediately preceeding call
+     * @param nextResult The result of the immediately preceding call
      *                   to visit a child node.
      * @return The updated aggregate result.
      */

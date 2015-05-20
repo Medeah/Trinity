@@ -90,7 +90,7 @@ public class Trinity {
         String filename = getNameWithoutExtension(triFile.toString());
         Path cFile = Paths.get(filename + ".c");
 
-        if(options.output == null) {
+        if (options.output == null) {
             options.output = filename;
         }
 

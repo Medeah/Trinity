@@ -11,8 +11,6 @@ import trinity.utils.UniqueId;
 
 import static java.util.Collections.singletonList;
 
-// TODO: maybe create private output list, and access through method instead of returning and aggregating it.
-
 /**
  * Visits vector and matrix literals, creating a list of all element expressions,
  * and store a unique id for future reference. This information is used to initialize

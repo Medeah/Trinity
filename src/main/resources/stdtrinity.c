@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-
 /* Index to Rows */
 #define IDX2R(i,j,ld) (((i)*(ld))+(j))
 /* Index to Columns */
@@ -85,8 +84,6 @@ float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
 
     return resMatrix;
 }
-
-
 
 float* eye(size_t size) {
 	int i;

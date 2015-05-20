@@ -96,7 +96,7 @@ public class Trinity {
                 String out = compile(triFile, options.gpuenabled);
                 Files.write(cFile, out.getBytes());
 
-                if (options.ccompiler.equals(null)) {
+                if (options.ccompiler == null) {
                     if (options.gpuenabled) {
                         options.ccompiler = "nvcc";
                     } else {

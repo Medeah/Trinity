@@ -85,7 +85,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
                 // Declare array
                 //emitter.emit("float " + staticMatrix.id + "[" + staticMatrix.items.size() + "];");
                 // TODO: free these
-                emitter.emit("float* " + staticMatrix.id + " = malloc(" + staticMatrix.size + "*sizeof(float));");
+                emitter.emit("float* " + staticMatrix.id + " = (float*)malloc(" + staticMatrix.size + "*sizeof(float));");
 
                 // TODO: this could be implemented as a visitor.
                 // Init array elements from expressions or ranges

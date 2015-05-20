@@ -49,7 +49,7 @@ void stdError(char* errorString, int value) {
 
 float* fmmult(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
-	float* resMatrix = malloc(rowsA * colsA * sizeof(float));
+	float* resMatrix = (float*)malloc(rowsA * colsA * sizeof(float));
 
 	for (i = 0; i < rowsA * colsA; i++) {
 		resMatrix[i] = s * A[i];
@@ -60,7 +60,7 @@ float* fmmult(float s, float* A, size_t rowsA, size_t colsA) {
 
 float* mfdiv(float s, float* A, size_t rowsA, size_t colsA) {
 	int i;
-	float* resMatrix = malloc(rowsA * colsA * sizeof(float));
+	float* resMatrix = (float*)malloc(rowsA * colsA * sizeof(float));
 
     if (s != 0){
         for (i = 0; i < rowsA * colsA; i++) {
@@ -75,7 +75,7 @@ float* mfdiv(float s, float* A, size_t rowsA, size_t colsA) {
 
 float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
 	int n;
-	float* resMatrix = malloc(nrRowsA * nrColsA * sizeof(float));
+	float* resMatrix = (float*)malloc(nrRowsA * nrColsA * sizeof(float));
 
     for(n = 0; n < nrRowsA * nrColsA; n++) {
         int i = n / nrRowsA;
@@ -91,7 +91,7 @@ float* transpose(float* A, size_t nrRowsA, size_t nrColsA) {
 float* eye(size_t size) {
 	int i;
 
-	float* C = calloc(size * size, sizeof(float));
+	float* C = (float*)calloc(size * size, sizeof(float));
 
 	for (i = 0; i < size; i++) {
 			C[i * (size + 1)] = 1.0f;
@@ -157,7 +157,7 @@ bool mmeq(float* A, float* B, size_t rows, size_t cols) {
 
 float* mmadd(float* A, float* B, size_t rows, size_t cols) {
 	int i;
-	float* resMatrix = malloc(rows * cols * sizeof(float));
+	float* resMatrix = (float*)malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
 		resMatrix[i] = A[i] + B[i];
@@ -168,7 +168,7 @@ float* mmadd(float* A, float* B, size_t rows, size_t cols) {
 
 float* mmsubt(float* A, float* B, size_t rows, size_t cols) {
 	int i;
-	float* resMatrix = malloc(rows * cols * sizeof(float));
+	float* resMatrix = (float*)malloc(rows * cols * sizeof(float));
 
 	for (i = 0; i < rows * cols; i++) {
 		resMatrix[i] = A[i] - B[i];

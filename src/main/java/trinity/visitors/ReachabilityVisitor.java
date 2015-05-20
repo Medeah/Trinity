@@ -96,7 +96,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
      */
     @Override
     public Boolean visitReturnStmt(TrinityParser.ReturnStmtContext ctx) {
-        return (ctx.semiExpr() != null) ? !ctx.semiExpr().isEmpty() : true;
+        return !ctx.semiExpr().isEmpty();
     }
 
 

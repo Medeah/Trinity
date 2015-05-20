@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Ignore;
 import org.junit.Test;
-import trinity.customExceptions.ParseException;
 import trinity.*;
+import trinity.customExceptions.ParseException;
 import trinity.visitors.TypeVisitor;
 
 import static org.junit.Assert.assertFalse;

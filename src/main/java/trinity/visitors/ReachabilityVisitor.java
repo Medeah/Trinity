@@ -66,18 +66,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
      */
     @Override
     public Boolean visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
-        return ctx.semiExpr().accept(this);
-    }
-
-    /**
-     * Inside the semi expression visits the expression, and returns if its not null.
-     *
-     * @param ctx the parse tree
-     * @return a boolean, true if the expr returns not null
-     */
-    @Override
-    public Boolean visitSemiExpr(TrinityParser.SemiExprContext ctx) {
-        return !(ctx.expr().accept(this) == null);
+        return false;
     }
 
     @Override

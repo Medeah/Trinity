@@ -4,11 +4,11 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
-import trinity.customExceptions.ParseException;
 import trinity.ErrorReporter;
 import trinity.StandardErrorReporter;
 import trinity.TrinityLexer;
 import trinity.TrinityParser;
+import trinity.customExceptions.ParseException;
 import trinity.visitors.ReachabilityVisitor;
 
 import static org.junit.Assert.assertFalse;

@@ -7,9 +7,8 @@ import java.util.Stack;
  */
 public class Emitter {
 
-    private StringBuilder currentWriter;
-
     private final Stack<StringBuilder> emitStack = new Stack<>();
+    private StringBuilder currentWriter;
 
     public Emitter(StringBuilder context) {
         setContext(context);

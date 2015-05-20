@@ -17,10 +17,18 @@ import trinity.types.Type;
  */
 public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements TrinityVisitor<Object> {
 
+    private static final StringBuilder builder = new StringBuilder();
     private int indentLevel = 0;
     private int spaces = 0;
 
-    private static final StringBuilder builder = new StringBuilder();
+    public PrettyPrintVisitor() {
+        this(4);
+    }
+
+    // Pretty print visitor for Trinity, will remove comments
+    public PrettyPrintVisitor(int spaces) {
+        this.spaces = spaces;
+    }
 
     private static void emit(String string) {
         builder.append(string);
@@ -36,15 +44,6 @@ public class PrettyPrintVisitor extends TrinityBaseVisitor<Object> implements Tr
 
     private final void indent() {
         emit(Strings.repeat(" ", indentLevel * spaces));
-    }
-
-    public PrettyPrintVisitor() {
-        this(4);
-    }
-
-    // Pretty print visitor for Trinity, will remove comments
-    public PrettyPrintVisitor(int spaces) {
-        this.spaces = spaces;
     }
 
     /**

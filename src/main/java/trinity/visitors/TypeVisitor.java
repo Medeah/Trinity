@@ -12,11 +12,10 @@ import java.util.List;
 
 public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisitor<Type> {
 
-    private ErrorReporter errorReporter;
-    private SymbolTable symbolTable;
-
     private final Type scalar = new PrimitiveType(EnumType.SCALAR);
     private final Type bool = new PrimitiveType(EnumType.BOOLEAN);
+    private ErrorReporter errorReporter;
+    private SymbolTable symbolTable;
 
     public TypeVisitor(ErrorReporter errorReporter, SymbolTable symbolTable) {
         this.errorReporter = errorReporter;

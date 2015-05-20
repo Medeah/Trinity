@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io
 
+test.c
+
 ### Antlr ###
 src/main/generated
 

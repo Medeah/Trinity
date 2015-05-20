@@ -12,23 +12,8 @@ import java.util.*;
  */
 public class HashSymbolTable implements SymbolTable {
 
-    private static class tableEntry {
-        private String name;
-        private Type type;
-        private int depth;
-        public tableEntry outerDeclaration;
-
-        public tableEntry(String name, Type type, int depth) {
-            this.name = name;
-            this.type = type;
-            this.depth = depth;
-            this.outerDeclaration = null;
-        }
-    }
-
     private Map<String, tableEntry> hashTable = new HashMap<String, tableEntry>();
     private Deque<List<tableEntry>> scopeDisplay = new ArrayDeque<List<tableEntry>>();
-
     public HashSymbolTable() {
         openScope();
     }
@@ -138,6 +123,20 @@ public class HashSymbolTable implements SymbolTable {
         } catch (SymbolAlreadyDefinedException e) {
             // TODO: should this be caught during type-check instead?
             e.printStackTrace();
+        }
+    }
+
+    private static class tableEntry {
+        public tableEntry outerDeclaration;
+        private String name;
+        private Type type;
+        private int depth;
+
+        public tableEntry(String name, Type type, int depth) {
+            this.name = name;
+            this.type = type;
+            this.depth = depth;
+            this.outerDeclaration = null;
         }
     }
 

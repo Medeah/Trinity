@@ -23,18 +23,16 @@ import static com.google.common.io.Resources.getResource;
  */
 public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements TrinityVisitor<Void> {
 
-    public CodeGenerationVisitor(boolean gpuenabled) {
-        this.gpuenabled = gpuenabled;
-    }
-
-    private boolean gpuenabled;
     private static final StringBuilder mainBody = new StringBuilder();
     private static final StringBuilder funcBody = new StringBuilder();
     private static final StringBuilder globals = new StringBuilder();
-
     private final DependencyVisitor dependencyVisitor = new DependencyVisitor();
+    private boolean gpuenabled;
     private Emitter emitter;
     private int scopeDepth = 0;
+    public CodeGenerationVisitor(boolean gpuenabled) {
+        this.gpuenabled = gpuenabled;
+    }
 
     /**
      * Get C code output after calling visit.

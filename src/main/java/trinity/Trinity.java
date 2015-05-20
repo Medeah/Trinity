@@ -25,41 +25,9 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class Trinity {
 
-    private Trinity() {
-    }
-
     private static CommandLineOptions options = new CommandLineOptions();
 
-    private static class CommandLineOptions {
-        @Parameter(description = "filename")
-        private List<String> files = new ArrayList<>();
-
-        @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
-        private boolean prettyPrint;
-
-        @Parameter(names = {"-i", "--indent"}, description = "Indentation width")
-        private int indentation = 4;
-
-        @Parameter(names = {"-g", "--go"}, description = "Keep-on-trucking on error")
-        private boolean notFailOnError;
-
-        @Parameter(names = {"-f", "--format"}, description = "Format the generated c code using indent")
-        private boolean formatc;
-
-        @Parameter(names = {"-gpu", "--gpuenabled"}, description = "Enabled some functions to be performed on a gpu")
-        private boolean gpuenabled;
-
-        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command if nothing else is specified and if so dependant on the gpuaneabled variable")
-        private String ccompiler;
-
-        @Parameter(names = {"-h", "--help"}, description = "Display this information")
-        private boolean help;
-
-        @Parameter(names = {"-o"}, description = "Write output to file")
-        private String output;
-
-        @Parameter(names = {"-v", "--version"}, description = "Display the version number")
-        private boolean version;
+    private Trinity() {
     }
 
     public static void main(String[] args) throws Exception {
@@ -90,7 +58,7 @@ public class Trinity {
         String filename = getNameWithoutExtension(triFile.toString());
         Path cFile = Paths.get(filename + ".c");
 
-        if(options.output == null) {
+        if (options.output == null) {
             options.output = filename;
         }
 
@@ -192,5 +160,37 @@ public class Trinity {
         PrettyPrintVisitor prettyPrinter = new PrettyPrintVisitor(indentation);
         prettyPrinter.visit(tree);
         System.out.print(prettyPrinter.getOutput());
+    }
+
+    private static class CommandLineOptions {
+        @Parameter(description = "filename")
+        private List<String> files = new ArrayList<>();
+
+        @Parameter(names = {"-p", "--pretty"}, description = "Pretty Print mode")
+        private boolean prettyPrint;
+
+        @Parameter(names = {"-i", "--indent"}, description = "Indentation width")
+        private int indentation = 4;
+
+        @Parameter(names = {"-g", "--go"}, description = "Keep-on-trucking on error")
+        private boolean notFailOnError;
+
+        @Parameter(names = {"-f", "--format"}, description = "Format the generated c code using indent")
+        private boolean formatc;
+
+        @Parameter(names = {"-gpu", "--gpuenabled"}, description = "Enabled some functions to be performed on a gpu")
+        private boolean gpuenabled;
+
+        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command to use. If nothing is specified a default value will be chosen depending on the value of gpuenabled")
+        private String ccompiler;
+
+        @Parameter(names = {"-h", "--help"}, description = "Display this information")
+        private boolean help;
+
+        @Parameter(names = {"-o"}, description = "Write output to file")
+        private String output;
+
+        @Parameter(names = {"-v", "--version"}, description = "Display the version number")
+        private boolean version;
     }
 }

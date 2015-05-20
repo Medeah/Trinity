@@ -8,7 +8,6 @@ import trinity.TrinityVisitor;
 /**
  * The ReachabilityVisitor goes through all function decls, to vertify a return is allways present.
  */
-
 public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean> {
 
     private ErrorReporter errorReporter;
@@ -50,8 +49,8 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     public Boolean visitBlock(TrinityParser.BlockContext ctx) {
         boolean isReturnValid = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : false;
 
-        for (TrinityParser.StmtContext csctx : ctx.stmt()) {
-            if (csctx.accept(this)) {
+        for (TrinityParser.StmtContext stm : ctx.stmt()) {
+            if (stm.accept(this)) {
                 return true;
             }
         }

@@ -7,6 +7,9 @@ public class UniqueId {
 
     private static int idc = 0;
 
+    private UniqueId() {
+    }
+
     /**
      * Gets a new unique identifier
      *
@@ -14,8 +17,5 @@ public class UniqueId {
      */
     public static String next() {
         return "u" + idc++;
-    }
-
-    private UniqueId() {
     }
 }

@@ -6,6 +6,7 @@ apply plugin: 'jacoco'
 version = '0.1'
 
 mainClassName = 'trinity.Trinity'
+applicationName = 'tric'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'

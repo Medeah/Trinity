@@ -46,8 +46,14 @@ public class Trinity {
         @Parameter(names = {"-f", "--format"}, description = "Format the generated c code using indent")
         private boolean formatc;
 
-        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command")
-        private String ccompiler = "cc";
+        @Parameter(names = {"-gpu", "--gpuenabled"}, description = "Enabled some functions to be performed on a gpu")
+        private boolean gpuenabled;
+
+        @Parameter(names = {"-c", "--ccompiler"}, description = "Name of c compiler command if nothing else is specified and if so dependant on the gpuaneabled variable")
+        private String ccompiler;
+
+        @Parameter(names = {"-h", "--help"}, description = "Display this information")
+        private boolean help;
 
         @Parameter(names = {"-o"}, description = "Write output to file")
         private String output;
@@ -68,9 +74,12 @@ public class Trinity {
             System.exit(0);
         }
 
-        if (options.files.size() == 0) {
-            System.out.print("No file specified");
+        if (options.help) {
             jc.usage();
+            System.exit(0);
+        }
+        if (options.files.size() == 0) {
+            System.out.print("No file specified use -h to see usage");
             System.exit(1);
         } else if (options.files.size() > 1) {
             System.out.print("Too manny files specified");
@@ -89,10 +98,19 @@ public class Trinity {
             if (options.prettyPrint) {
                 prettyPrint(triFile, options.indentation);
             } else {
-                String out = compile(triFile);
+                String out = compile(triFile, options.gpuenabled);
                 Files.write(cFile, out.getBytes());
 
+                if (options.ccompiler == null) {
+                    if (options.gpuenabled) {
+                        options.ccompiler = "nvcc";
+                    } else {
+                        options.ccompiler = "cc";
+                    }
+                }
+
                 Process ccProcess = new ProcessBuilder(options.ccompiler, cFile.toString(), "-lm", "-o", options.output).start();
+
                 if (ccProcess.waitFor() != 0) {
                     System.err.println("Error compiling c code");
                 }
@@ -117,17 +135,17 @@ public class Trinity {
 
     }
 
-    public static String compile(String trinityProgram) throws Exception {
+    public static String compile(String trinityProgram, boolean compilemode) throws Exception {
         ANTLRInputStream input = new ANTLRInputStream(trinityProgram);
-        return compile(input);
+        return compile(input, compilemode);
     }
 
-    public static String compile(Path filePath) throws Exception {
+    public static String compile(Path filePath, boolean compilemode) throws Exception {
         ANTLRInputStream input = new ANTLRFileStream(filePath.toString());
-        return compile(input);
+        return compile(input, compilemode);
     }
 
-    private static String compile(ANTLRInputStream is) throws Exception {
+    private static String compile(ANTLRInputStream is, boolean compilemode) throws Exception {
         Pair<ParseTree, TrinityParser> r = parse(is);
         ParseTree tree = r.a;
         TrinityParser parser = r.b;
@@ -147,8 +165,8 @@ public class Trinity {
         if (parser.getNumberOfSyntaxErrors() != 0) {
             throw new ParseException("Invalid reachability test.");
         }
-        
-        CodeGenerationVisitor generator = new CodeGenerationVisitor();
+
+        CodeGenerationVisitor generator = new CodeGenerationVisitor(compilemode);
         generator.visit(tree);
         String out = generator.getOutput();
 

@@ -20,11 +20,14 @@ public class CodeGenerationVisitorTest {
     private static final Path binFile = Paths.get("./test.bin");
 
     private static String getOutput(String input) throws Exception {
-        String out = Trinity.compile(input);
+        String out = Trinity.compile(input, false);
         Files.write(testFile, out.getBytes());
 
-        Process process = new ProcessBuilder("gcc", testFile.toString(), "-lm", "-o", binFile.toString()).start();
+        Process process = new ProcessBuilder("cc", testFile.toString(), "-lm", "-o", binFile.toString()).start();
         if (process.waitFor() != 0) {
+            InputStreamReader inr = new InputStreamReader(process.getErrorStream());
+            String content = CharStreams.toString(inr);
+            System.err.print(content);
             throw new Exception("Error compiling c code");
         }
 

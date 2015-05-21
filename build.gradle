@@ -3,7 +3,7 @@ apply plugin: 'antlr'
 apply plugin: 'application'
 apply plugin: 'jacoco'
 
-version = '0.1'
+version = '1.0RC'
 
 mainClassName = 'trinity.Trinity'
 applicationName = 'tric'

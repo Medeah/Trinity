@@ -140,6 +140,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitConstDecl(TrinityParser.ConstDeclContext ctx) {
         emitDependencies(ctx.semiExpr());
         if (scopeDepth == 0) {
+            // If in outermost scope emit the declaration as a c global
             emitter.setContext(globals);
 
             ctx.type().accept(this);
@@ -147,7 +148,6 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
             emitter.emit(";");
 
             emitter.restoreContext();
-
         } else {
             ctx.type().accept(this);
         }
@@ -162,8 +162,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
         emitter.setContext(funcBody);
 
         ctx.type().accept(this);
-        emitter.emit("_" + ctx.ID().getText());
-        emitter.emit("(");
+        emitter.emit("_" + ctx.ID().getText() + "(");
         if (ctx.formalParameters() != null) {
             ctx.formalParameters().accept(this);
         }
@@ -196,7 +195,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     public Void visitPrimitiveType(TrinityParser.PrimitiveTypeContext ctx) {
         if (ctx.getText().equals("Boolean")) {
             emitter.emit("bool ");
-        } else /* Scalar */ {
+        } else {
             emitter.emit("float ");
         }
         return null;
@@ -216,14 +215,14 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitBlock(TrinityParser.BlockContext ctx) {
-        scopeDepth++;
+        this.scopeDepth++;
         for (TrinityParser.StmtContext stmt : ctx.stmt()) {
             stmt.accept(this);
         }
         if (ctx.returnStmt() != null) {
             ctx.returnStmt().accept(this);
         }
-        scopeDepth--;
+        this.scopeDepth--;
         return null;
     }
 

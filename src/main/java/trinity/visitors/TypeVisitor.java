@@ -21,10 +21,10 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         this.errorReporter = errorReporter;
         this.symbolTable = symbolTable;
 
-        addstdlib();
+        addStdLib();
     }
 
-    private void addstdlib() {
+    private void addStdLib() {
         Type numFunc = new FunctionType(scalar, ImmutableList.of(scalar));
         List<String> funcs = ImmutableList.of("abs", "round", "floor", "ceil", "sin", "cos", "tan", "asin", "acos", "atan", "log", "log10", "sqrt");
         try {
@@ -535,7 +535,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             return null;
         }
     }
-
 
     @Override
     public Type visitNegate(TrinityParser.NegateContext ctx) {

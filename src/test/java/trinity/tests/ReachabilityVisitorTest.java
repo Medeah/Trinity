@@ -259,12 +259,10 @@ public class ReachabilityVisitorTest {
 
     @Test
     public void fail() throws Exception {
-        assertTrue(reachabilityTest("Scalar dotp(Vector[3] a, Vector[3] b) do" +
-                "   Scalar x = 0;" +
-                "   return a*b;" +
-                "end" +
-                "Vector[3] v1 = [1,2,3];" +
-                "print dotp(v1,[4,5,6]);"));
+        assertTrue(reachabilityTest("Scalar dotp(Scalar b) do\n" +
+                "   Scalar x = 0;\n" +
+                "   return b;\n" +
+                "end"));
     }
 
 }

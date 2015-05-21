@@ -22,7 +22,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     public Boolean visitProg(TrinityParser.ProgContext ctx) {
         for (TrinityParser.FunctionDeclContext fdecl : ctx.functionDecl()) {
             if (!fdecl.accept(this)) {
-                errorReporter.reportError("Can reach end of function " + fdecl.ID().toString(), ctx);
+                errorReporter.reportError("Reachability error in function " + fdecl.ID().toString(), fdecl);
                 return false;
             }
         }

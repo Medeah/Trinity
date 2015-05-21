@@ -47,10 +47,10 @@ public class Trinity {
             System.exit(0);
         }
         if (options.files.size() == 0) {
-            System.out.print("No file specified use -h to see usage");
+            System.out.println("No file specified use -h to see usage");
             System.exit(1);
         } else if (options.files.size() > 1) {
-            System.out.print("Too manny files specified");
+            System.out.println("Too manny files specified");
             System.exit(1);
         }
 

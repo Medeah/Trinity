@@ -24,13 +24,12 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
      */
     @Override
     public Boolean visitProg(TrinityParser.ProgContext ctx) {
-        for (int i = 0; i < ctx.functionDecl().size(); i++) {
-            if (!ctx.functionDecl(i).accept(this)) {
-                errorReporter.reportError("No return found in function.", ctx);
+        for(TrinityParser.FunctionDeclContext fdecl : ctx.functionDecl()) {
+            if (!fdecl.accept(this)) {
+                errorReporter.reportError("Can reach end of function " + fdecl.ID().toString(), ctx);
                 return false;
             }
         }
-
         return true;
     }
 
@@ -47,7 +46,34 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitBlock(TrinityParser.BlockContext ctx) {
-        boolean isReturnValid = (ctx.returnStmt() != null) ? ctx.returnStmt().accept(this) : false;
+        if (ctx.returnStmt() == null) {
+            // no return statement
+
+            if (ctx.stmt().size() == 0) {
+                // no statement -> can always reach end
+                return false;
+            }
+
+            int i = 0;
+            for (; i < ctx.stmt().size() - 1; i++) {
+                if (ctx.stmt(i).accept(this)) {
+                    return false;
+                }
+            }
+            return ctx.stmt(i).accept(this);
+        } else {
+            for (TrinityParser.StmtContext stm : ctx.stmt()) {
+                if (stm.accept(this)) {
+                    return false;
+                }
+            }
+            return ctx.returnStmt().accept(this);
+        }
+    }
+
+
+
+        /*boolean returnPresent = (ctx.returnStmt() != null);
 
         for (TrinityParser.StmtContext stm : ctx.stmt()) {
             if (stm.accept(this)) {
@@ -55,7 +81,18 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
             }
         }
 
-        return isReturnValid;
+        return returnPresent;
+    }
+
+    /**
+     * Visits the block in a block statement
+     *
+     * @param ctx the parse tree
+     * @return what the block returns.
+     */
+    @Override
+    public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
+        return ctx.block().accept(this);
     }
 
     /**
@@ -71,20 +108,22 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
 
     @Override
     public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx) {
-        int blocks = ctx.block().size(), exprs = ctx.expr().size();
-        boolean contentFound = (blocks != 0) ? true : false;
+        int blocks = ctx.block().size();
+        int exprs = ctx.expr().size();
+        boolean contentFound = true;
 
         if (exprs == blocks) {
+            // no else block. It is posible that all expr will be false
             return false;
         }
 
         for (TrinityParser.BlockContext btx : ctx.block()) {
-            if (contentFound) {
-                contentFound = btx.accept(this);
+            if (!btx.accept(this)) {
+                return false;
             }
         }
 
-        return contentFound;
+        return true;
     }
 
 
@@ -99,16 +138,17 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         return true;
     }
 
-
-    /**
-     * Visits the block in a block statement
-     *
-     * @param ctx the parse tree
-     * @return what the block returns.
-     */
     @Override
-    public Boolean visitBlockStatement(TrinityParser.BlockStatementContext ctx) {
-        return ctx.block().accept(this);
+    public Boolean visitConstDeclaration(TrinityParser.ConstDeclarationContext ctx) {
+        return false;
+    }
+
+
+
+
+    @Override
+    public Boolean visitPrintStatement(TrinityParser.PrintStatementContext ctx) {
+        return false;
     }
 
     /**
@@ -121,4 +161,6 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     public Boolean visitForLoop(TrinityParser.ForLoopContext ctx) {
         return ctx.block().accept(this);
     }
+
+
 }

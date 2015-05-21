@@ -64,6 +64,17 @@ public class ReachabilityVisitorTest {
                 "        end\n" +
                 "    end\n" +
                 "end"));
+        assertTrue(reachabilityTest("Scalar s () do\n" +
+                "   do\n" +
+                "       return 1;" +
+                "   end\n" +
+                "end"));
+        assertFalse(reachabilityTest("Scalar s () do\n" +
+                "   do\n" +
+                "       return 1;" +
+                "   end\n" +
+                "   return 2;\n" +
+                "end"));
     }
 
     @Test
@@ -107,7 +118,7 @@ public class ReachabilityVisitorTest {
                 "    do\n" +
                 "    end\n" +
                 "end"));
-        assertTrue(reachabilityTest("Scalar s () do\n" +
+        assertFalse(reachabilityTest("Scalar s () do\n" +
                 "    do\n" +
                 "        do\n" +
                 "            return 1;\n" +
@@ -249,7 +260,7 @@ public class ReachabilityVisitorTest {
 
     @Test
     public void testForloop6() throws Exception {
-        assertTrue(reachabilityTest("Scalar f () do\n" +
+        assertFalse(reachabilityTest("Scalar f () do\n" +
                 "   for Scalar a in [1 .. 10] do\n" +
                 "       return 4;\n" +
                 "   end\n" +
@@ -261,6 +272,14 @@ public class ReachabilityVisitorTest {
     public void fail() throws Exception {
         assertTrue(reachabilityTest("Scalar dotp(Scalar b) do\n" +
                 "   Scalar x = 0;\n" +
+                "   return b;\n" +
+                "end"));
+    }
+
+    @Test
+    public void fail2() throws Exception {
+        assertTrue(reachabilityTest("Scalar dotp(Scalar b) do\n" +
+                "   print 2;\n" +
                 "   return b;\n" +
                 "end"));
     }

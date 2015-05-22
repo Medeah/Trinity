@@ -18,3 +18,35 @@ Trinity can now be evoked with `./bin/tric [options] filename`.
 Feel free to move the tric folder and/or add the bin folder to your PATH.
 
 To run the unit tests run the check gradle task: `./gradlew check`
+
+## Usage
+```
+Usage: <main class> [options] filename
+  Options:
+    -c, --ccompiler
+       Name of c compiler command to use. If nothing is specified a default
+       value will be chosen depending on the value of gpuenabled
+    -f, --format
+       Format the generated c code using indent
+       Default: false
+    -g, --go
+       Keep-on-trucking on error
+       Default: false
+    -gpu, --gpuenabled
+       Enabled some functions to be performed on a gpu
+       Default: false
+    -h, --help
+       Display this information
+       Default: false
+    -i, --indent
+       Indentation width
+       Default: 4
+    -p, --pretty
+       Pretty Print mode
+       Default: false
+    -v, --version
+       Display the version number
+       Default: false
+    -o
+       Write output to file
+```

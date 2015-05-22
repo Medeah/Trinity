@@ -499,7 +499,13 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
 
     @Override
     public Void visitNumber(TrinityParser.NumberContext ctx) {
-        emitter.emit(ctx.NUMBER().getText());
+        String text = ctx.NUMBER().getText();
+        if (text.contains(".") || text.contains("e") || text.contains("E")) {
+            emitter.emit(text);
+        } else {
+            emitter.emit(text + '.');
+        }
+
         return null;
     }
 

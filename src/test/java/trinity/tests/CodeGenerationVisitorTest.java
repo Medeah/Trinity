@@ -170,6 +170,7 @@ public class CodeGenerationVisitorTest {
     @Test
     public void division() throws Exception {
         assertEquals("4.000000\n", getOutput("Scalar a = 100; Scalar t = 25; print a / t;"));
+        assertEquals("2.333333\n", getOutput("Scalar a = 7; Scalar t = 3; print a / t;"));
         assertEquals("[1.000000, 2.000000, 4.000000, 8.000000]\n", getOutput("Vector[4] v = [2, 4, 8, 16]; Scalar n = 2; print v / n;"));
         assertEquals("[8.000000, 7.000000]\n[6.000000, 5.000000]\n[4.000000, 3.000000]\n[2.000000, 1.000000]\n", getOutput("Matrix[4,2] m = [16, 14][12, 10][8, 6][4, 2]; Scalar i = 2; print m / i;"));
         assertEquals("[-8.000000, -7.000000, -6.000000, -5.000000]\n", getOutput("Vector[4] v = [16, 14, 12, 10]; Scalar i = -2; print v / i;"));

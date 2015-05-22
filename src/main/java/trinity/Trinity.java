@@ -81,12 +81,14 @@ public class Trinity {
 
                 if (ccProcess.waitFor() != 0) {
                     System.err.println("Error compiling c code");
+                    System.exit(1);
                 }
 
                 if (options.formatc) {
                     Process indentProcess = new ProcessBuilder("indent", cFile.toString()).start();
                     if (indentProcess.waitFor() != 0) {
                         System.err.println("error running indent, do you have it installed?");
+                        System.exit(1);
                     }
                 }
             }

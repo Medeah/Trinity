@@ -8,7 +8,7 @@ import trinity.TrinityVisitor;
 /**
  * This visitor goes through all function decls to verify that the end is not reachable. And that there are
  * no unreachable statements. This ensures that every function will return a value.
- * Each visit method returns a boolean. It returns true if there are no errors.
+ * Each visit method returns a boolean. It determines if the endpoint of not be reachable.
  */
 public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean> {
 
@@ -22,7 +22,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     public Boolean visitProg(TrinityParser.ProgContext ctx) {
         for (TrinityParser.FunctionDeclContext fdecl : ctx.functionDecl()) {
             if (!fdecl.accept(this)) {
-                errorReporter.reportError("Reachability error in function " + fdecl.ID().toString(), fdecl);
+                errorReporter.reportError("End of function " + fdecl.ID().toString() + " is reachable", fdecl);
                 return false;
             }
         }
@@ -46,7 +46,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
             int i = 0;
             for (; i < ctx.stmt().size() - 1; i++) {
                 if (ctx.stmt(i).accept(this)) {
-                    return false;
+                    errorReporter.reportError("Cannot reach statement after", ctx.stmt(i));
                 }
             }
             return ctx.stmt(i).accept(this);
@@ -54,7 +54,7 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
         } else {
             for (TrinityParser.StmtContext stm : ctx.stmt()) {
                 if (stm.accept(this)) {
-                    return false;
+                    errorReporter.reportError("Cannot reach statement after", stm);
                 }
             }
             return ctx.returnStmt().accept(this);

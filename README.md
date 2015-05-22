@@ -13,8 +13,8 @@ To build the project run the installDist task:
 ```
 ./gradlew installDist
 ```
-This will install Trinity in `build/install/Trinity/`
-Trinity can now be evoked with `./bin/Trinity [options] filename`.
-Feel free to move the Trinity folder and add the bin folder to your PATH.
+This will install Trinity in `build/install/tric/`
+Trinity can now be evoked with `./bin/tric [options] filename`.
+Feel free to move the tric folder and/or add the bin folder to your PATH.
 
 To run the unit tests run the check gradle task: `./gradlew check`

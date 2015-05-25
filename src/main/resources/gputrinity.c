@@ -32,13 +32,13 @@ float* mmmult(const float *A, size_t rowsA, size_t colsA, const float *B, size_t
 	// Copy h_A and h_B to the device
 	error = cudaMemcpy(d_A, A, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
 	if (error != cudaSuccess) {
-		fprintf(stderr, Copying matrice h_A HtoD failed");
+		fprintf(stderr, "Copying matrice h_A HtoD failed");
 		exit(EXIT_FAILURE);
 	}
 
 	error = cudaMemcpy(d_B, B, rowsB * colsB * sizeof(float), cudaMemcpyHostToDevice);
 	if (error != cudaSuccess){
-		fprintf(stderr, Copying matrice h_B HtoD failed");
+		fprintf(stderr, "Copying matrice h_B HtoD failed");
 		exit(EXIT_FAILURE);
 	}
 

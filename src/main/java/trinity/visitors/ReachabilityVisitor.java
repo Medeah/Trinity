@@ -8,7 +8,7 @@ import trinity.TrinityVisitor;
 /**
  * This visitor goes through all function decls to verify that the end is not reachable. And that there are
  * no unreachable statements. This ensures that every function will return a value.
- * Each visit method returns a boolean. It determines if the endpoint of not be reachable.
+ * Each visit method returns a boolean. It determines if the endpoint is not reachable.
  */
 public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements TrinityVisitor<Boolean> {
 
@@ -75,10 +75,9 @@ public class ReachabilityVisitor extends TrinityBaseVisitor<Boolean> implements 
     public Boolean visitIfStatement(TrinityParser.IfStatementContext ctx) {
         int blocks = ctx.block().size();
         int exprs = ctx.expr().size();
-        boolean contentFound = true;
-
+        
         if (exprs == blocks) {
-            // no else block. It is possible that all expr will be false
+            // no else block. It is possible that expr will be false
             return false;
         }
 

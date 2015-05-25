@@ -145,7 +145,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitFormalParameters(TrinityParser.FormalParametersContext ctx) {
-        errorReporter.reportError("internal compiler error. visitFormalParameters should never be called", ctx);
+        errorReporter.reportError("Internal Error: visitFormalParameters should never be called", ctx);
 
         return null;
     }
@@ -201,7 +201,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 expect(new MatrixType(1, ((MatrixType) type).getCols()), contextType, ctx.type());
             }
         } else {
-            errorReporter.reportError("Hmm, expected a Matrix or Vector.", ctx.expr().getStart());
+            errorReporter.reportError("Expected a Matrix or Vector.", ctx.expr().getStart());
         }
 
         try {
@@ -259,7 +259,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             from = new Integer(ctx.NUMBER(0).getText());
             to = new Integer(ctx.NUMBER(1).getText());
         } catch (NumberFormatException ex) {
-            errorReporter.reportError("internal error, visitExprList", ctx);
+            errorReporter.reportError("Internal error: visitExprList", ctx);
             return null;
         }
 
@@ -270,7 +270,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
 
     @Override
     public Type visitExprList(TrinityParser.ExprListContext ctx) {
-        errorReporter.reportError("internal error, visitExprList", ctx);
+        errorReporter.reportError("Internal Error: visitExprList", ctx);
         return null;
     }
 
@@ -291,7 +291,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                     errorReporter.reportError("All rows in a Matrix must be of same size.", vectors.get(i));
                 }
             } else {
-                errorReporter.reportError("hmm error", ctx);
+                errorReporter.reportError("Internal Error: A Matrix should be a list of Vectors (row matrices)", ctx);
             }
         }
         return new MatrixType(rows, cols);
@@ -519,7 +519,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
                 }
             }
         } else {
-            errorReporter.reportError("what?", ctx);
+            errorReporter.reportError("Internal Error: Unexpected type.", ctx);
             ctx.t = null;
         }
 
@@ -558,7 +558,7 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
         } else if (prim.contentEquals("Scalar")) {
             return scalar;
         } else {
-            errorReporter.reportError("hmm", ctx);
+            errorReporter.reportError("Internal Error: Only Boolean and Scalar are supported PrimitiveTypes.", ctx);
             return null;
         }
     }
@@ -567,7 +567,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitVectorType(TrinityParser.VectorTypeContext ctx) {
         Type out = null;
         if (ctx.ID() != null) {
-            errorReporter.reportError("IDs not supported ... yet", ctx.ID().getSymbol());
+            // TODO: Support for variable dimensions (or dependent types)
+            errorReporter.reportError("IDs not supported in types", ctx.ID().getSymbol());
         } else {
             try {
                 int size = new Integer(ctx.NUMBER().getText());
@@ -583,7 +584,8 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
     public Type visitMatrixType(TrinityParser.MatrixTypeContext ctx) {
         Type out = null;
         if (ctx.ID(1) != null || ctx.ID(0) != null) {
-            errorReporter.reportError("IDs not supported ... yet", ctx.ID(0).getSymbol());
+            // TODO: See visitVectorType()
+            errorReporter.reportError("IDs not supported in types", ctx.ID(0).getSymbol());
         } else {
             int rows = 0;
             int cols = 0;
@@ -600,7 +602,6 @@ public class TypeVisitor extends TrinityBaseVisitor<Type> implements TrinityVisi
             }
 
             out = new MatrixType(rows, cols);
-
         }
 
         return out;

@@ -115,7 +115,6 @@ public class ParserTest {
     private static Boolean canParse(String syntax) throws IOException {
         TrinityParser parser = createParser(syntax);
         parser.prog();
-        int lol = parser.getNumberOfSyntaxErrors();
         return 0 == parser.getNumberOfSyntaxErrors();
     }
 

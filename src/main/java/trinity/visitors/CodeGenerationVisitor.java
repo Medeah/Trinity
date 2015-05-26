@@ -30,6 +30,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     private boolean gpuenabled;
     private Emitter emitter;
     private int scopeDepth = 0;
+
     public CodeGenerationVisitor(boolean gpuenabled) {
         this.gpuenabled = gpuenabled;
     }
@@ -638,6 +639,7 @@ public class CodeGenerationVisitor extends TrinityBaseVisitor<Void> implements T
     @Override
     public Void visitSingleExpression(TrinityParser.SingleExpressionContext ctx) {
         emitDependencies(ctx.semiExpr());
+        visitChildren(ctx);
         return null;
     }
 

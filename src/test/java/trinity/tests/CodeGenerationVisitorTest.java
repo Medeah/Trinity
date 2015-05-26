@@ -255,4 +255,16 @@ public class CodeGenerationVisitorTest {
         assertEquals("[1.000000, 0.000000, 0.000000, 0.000000]\n[0.000000, 1.000000, 0.000000, 0.000000]\n[0.000000, 0.000000, 1.000000, 0.000000]\n[0.000000, 0.000000, 0.000000, 1.000000]\n", getOutput("Matrix[4,4] y = [5, -9, -8, -7][5, -6, -5, -4][5, 4, 5, 6][5, 7, 8, 9]; print y ^ 0;"));
     }
 
+    @Test
+    public void singleExpressions() throws Exception {
+        assertEquals("5.000000\n", getOutput("Scalar s() do print 5; return 1; end s();"));
+        assertEquals("[4.000000, 3.000000]\n", getOutput("Scalar s() do print [4,3]; return 1; end s();"));
+    }
+
+    @Test
+    public void blockStatement() throws Exception {
+        assertEquals("3.000000\n", getOutput("do print 3; end"));
+        assertEquals("[1.000000, 2.000000]\n", getOutput("do print [1,2]; end"));
+    }
+
 }

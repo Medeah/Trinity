@@ -38,7 +38,7 @@ public class Trinity {
         //options.formatc = true;
 
         if (options.version) {
-            System.out.println("Trinity 1.0RC");
+            System.out.println("Trinity 1.0");
             System.exit(0);
         }
 
